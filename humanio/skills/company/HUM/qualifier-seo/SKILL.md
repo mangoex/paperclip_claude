@@ -53,13 +53,33 @@ Lee el documento adjunto al ticket con la lista de prospectos.
 
 ### 3. Score de oportunidad (1-10)
 
-Calcula el score basado en:
+Calcula el score sumando los factores presentes. **Score máximo: 10 — cap automático.**
 
-* Sin web: +4 puntos
-* Web desactualizada/deficiente: +3 puntos
-* Sin Instagram o poco activo: +2 puntos
-* Sin WhatsApp Business: +1 punto
-* Muchas reseñas negativas: +1 punto (oportunidad de reputación)
+| Factor | Puntos |
+|--------|--------|
+| Sin página web | +4 |
+| Web desactualizada, básica o deficiente | +2 |
+| Sin Instagram o cuenta poco activa (< 1 post/semana) | +2 |
+| Sin Google Business Profile o perfil incompleto | +1 |
+| Sin WhatsApp Business activo | +1 |
+
+**Nota:** si la suma supera 10, el score es 10. La escala es 1-10 — nunca reportes más de 10.
+
+Ejemplo: sin web (+4) + sin Instagram (+2) + sin Google Business (+1) + sin WhatsApp (+1) = **8/10**
+
+Umbral mínimo para generar propuesta completa: **score ≥ 6**
+
+### 3.5 Generar el diagnóstico HTML (para prospectos con score ≥ 6)
+
+Antes de crear los tickets, genera el reporte visual HTML usando el skill `qualifier-diagnostic-html`.
+
+Inputs que debes tener listos para ese skill:
+- Todos los scores por área (Técnico, On-Page, Contenido, Local, Autoridad)
+- Lista de hallazgos críticos con evidencia específica
+- Lista de quick wins
+- Propuesta de precios Humanio
+
+El skill crea `/tmp/proposal-{slug}/diagnostico.html`. Adjunta ese archivo al ticket del WebDesigner.
 
 ### 4. Propuesta personalizada
 
@@ -105,19 +125,22 @@ Genera un reporte con:
 * Top 5 prospectos prioritarios con propuesta completa
 * Resumen ejecutivo para el CEO
 
-### 6. Crear tickets para WebDesigner y Outreach
+### 6. Crear tickets — primero WebDesigner, luego Outreach
 
-Para cada prospecto con score ≥ 6, crea DOS tickets simultáneamente:
+**Flujo correcto:** WebDesigner primero → cuando entregue la URL → Outreach.
+No los crees en paralelo — Outreach necesita la URL de la propuesta web para operar.
 
-**Ticket 1 — WebDesigner:**
+---
 
-* Título: "Diseñar propuesta web: {Nombre negocio}"
+**Ticket 1 — WebDesigner** (crear primero):
+
+* Título: `Diseñar propuesta web: {Nombre negocio}`
 * Prioridad: High
 * Asignado a: WebDesigner
-* Contenido:
+* parentId: el ticket actual del Qualifier
 
 ```
-## Brief para propuesta web
+## Brief para propuesta web — {NOMBRE_NEGOCIO}
 
 **Negocio:** {Nombre del negocio}
 **Giro:** {estética/restaurante/dentista/etc}
@@ -130,35 +153,60 @@ Para cada prospecto con score ≥ 6, crea DOS tickets simultáneamente:
 **Rating Google:** {X/5 con N reseñas}
 
 ### Identidad visual detectada
-{Descripción de colores, estilo y estética basada en sus redes sociales}
+{Descripción de colores, estilo y estética basada en redes sociales}
 
 ### Servicios que ofrece
 {Lista de servicios detectados}
 
 ### Propuesta de servicios Humanio
-{Copiar la propuesta generada por el Qualifier}
+{Copiar la propuesta generada}
 
 ### Score de oportunidad
 {X}/10 — {Alta/Media} prioridad
 
 ### Notas para el diseño
-{Cualquier detalle relevante: logo, colores, estilo de fotos, etc.}
+{Detalles: logo, colores, estilo de fotos, etc.}
+
+### Diagnóstico HTML
+El archivo `diagnostico.html` está en `/tmp/proposal-{slug}/diagnostico.html`.
+Inclúyelo en el deploy como página secundaria (`/diagnostico`).
+Al terminar, responde a este ticket con ambas URLs:
+- URL propuesta: https://humanio-{slug}.netlify.app
+- URL diagnóstico: https://humanio-{slug}.netlify.app/diagnostico
 ```
 
-**Ticket 2 — Outreach:**
+---
 
-* Título: "Outreach: {Nombre negocio}"
+**Ticket 2 — Outreach** (crear DESPUÉS de que WebDesigner entregue la URL):
+
+Espera el comentario de WebDesigner con las URLs. Cuando lo recibas:
+
+* Título: `Outreach: {Nombre negocio}`
 * Prioridad: High
 * Asignado a: Outreach
-* Contenido: el mismo brief completo del Ticket 1 más la URL de propuesta web si ya existe
+* parentId: el ticket actual del Qualifier
+
+```
+## Brief de outreach — {NOMBRE_NEGOCIO}
+
+{Mismo brief que WebDesigner, más:}
+
+**URL propuesta web:** {URL de Netlify}
+**URL diagnóstico:** {URL de Netlify}/diagnostico
+**Score:** {X}/10
+**Contacto disponible:** {email y/o whatsapp}
+```
+
+Si necesitas crear el ticket de Outreach antes de que WebDesigner termine (por urgencia),
+créalo con status `blocked` y comenta: "Esperando URL de WebDesigner — se desbloqueará cuando entregue."
 
 ### 7. Notificación al CEO
 
-Al terminar todos los tickets, crea un resumen para el CEO con:
+Al terminar todos los tickets:
 
-* Título: "Reporte de calificación listo: {Giro} en {Ciudad}"
-* Número de propuestas enviadas al WebDesigner y Outreach
-* Top 3 prospectos recomendados
+* Título: `Reporte de calificación listo: {Giro} en {Ciudad}`
+* Top 3 prospectos con score y URL de propuesta
+* Número de tickets creados para WebDesigner y Outreach
 
 ## Criterios de propuesta de precios (orientativos)
 
