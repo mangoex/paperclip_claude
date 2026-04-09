@@ -127,10 +127,10 @@ Umbral mínimo para generar propuesta completa: **score ≥ 6**
 
 ### Diagnóstico HTML
 Se generará y adjuntará en comentario posterior.
-Inclúyelo en el deploy como página secundaria (`/diagnostico`) cuando llegue.
+Inclúyelo en el deploy como página secundaria (`/reporte`). Nómbralo `reporte.html`.
 Al terminar, responde a este ticket con ambas URLs:
 - URL propuesta: https://humanio-{slug}.netlify.app
-- URL diagnóstico: https://humanio-{slug}.netlify.app/diagnostico
+- URL reporte: https://humanio-{slug}.netlify.app/reporte
 ```
 
 ### 5. Generar propuesta personalizada
@@ -181,15 +181,15 @@ Inputs que debes tener listos:
 - Lista de quick wins
 - Propuesta de precios Humanio
 
-El skill crea `/tmp/proposal-{slug}/diagnostico.html`.
+El skill crea `/tmp/proposal-{slug}/reporte.html`.
 
 Cuando esté listo, agrégalo como comentario al ticket de WebDesigner:
 
 ```
-## Diagnóstico HTML listo
+## Reporte HTML listo
 
-El archivo diagnostico.html está en `/tmp/proposal-{slug}/diagnostico.html`.
-Inclúyelo en el deploy como `/diagnostico`.
+El archivo reporte.html está en `/tmp/proposal-{slug}/reporte.html`.
+Inclúyelo en el deploy como `/reporte`.
 ```
 
 ### 7. Crear ticket Outreach (después de que WebDesigner entregue la URL)
@@ -207,7 +207,7 @@ Espera el comentario de WebDesigner con las URLs. Cuando lo recibas:
 {Mismo brief que WebDesigner, más:}
 
 **URL propuesta web:** {URL de Netlify}
-**URL diagnóstico:** {URL de Netlify}/diagnostico
+**URL reporte:** {URL de Netlify}/reporte
 **Score:** {X}/10
 **Contacto disponible:** {email y/o whatsapp}
 ```

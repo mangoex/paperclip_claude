@@ -43,7 +43,7 @@ SI el ticket dice "URL propuesta web: Pendiente" o el campo está vacío:
   → EXIT — no continúes el proceso
 
 SI el campo contiene una URL (https://humanio-*.netlify.app):
-  → Extrae: PROPUESTA_URL y DIAGNOSTICO_URL
+  → Extrae: PROPUESTA_URL y REPORTE_URL
   → Continúa al paso 2
 ```
 
@@ -62,14 +62,13 @@ ANTES de generar cualquier material, crea un Approval request:
 **Propuesta web:** {URL o "Pendiente"}
 
 **Material a generar:**
-- PDF Diagnóstico de Marketing Digital
 - PDF Propuesta de Servicios con precios
 - Draft de correo profesional (NO se enviará automáticamente)
 - Mensaje WhatsApp → se enviará automáticamente vía WhatsApp Business Cloud API
 
 **Propuesta estimada:** {MONTO_TOTAL} MXN
 **URL propuesta web:** {PROPUESTA_URL}
-**URL diagnóstico:** {DIAGNOSTICO_URL}
+**URL reporte SEO:** {REPORTE_URL}
 
 **Modo envío correo:** DRAFT — el Board revisará y enviará manualmente
 **Modo envío WhatsApp:** AUTOMÁTICO tras tu aprobación aquí
@@ -79,133 +78,20 @@ ANTES de generar cualquier material, crea un Approval request:
 
 Espera aprobación antes de continuar.
 
-### 3. Generar el PDF de Diagnóstico
+### 3. Confirmar URLs del WebDesigner
 
-> **IMPORTANTE:** NO usar puppeteer, wkhtmltopdf ni herramientas locales.
-> Usar EXCLUSIVAMENTE la API de PDFShift via curl con $PDFSHIFT\_API\_KEY.
-> PDFShift convierte HTML a PDF remotamente — no requiere nada instalado localmente.
+> El diagnóstico SEO ya existe como página web en `/reporte` — NO generar PDF de diagnóstico.
+> El Qualifier y WebDesigner ya crearon el reporte visual interactivo.
 
-Crea `/tmp/outreach-{slug}/diagnostico-{slug}.html`:
+Confirma que tienes ambas URLs del ticket:
 
-```html
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500&display=swap');
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'Inter',sans-serif;color:#1a1a2e;background:#fff;padding:0}
-  .cover{background:#03080f;color:#fff;padding:60px 50px;min-height:280px;position:relative;overflow:hidden}
-  .cover::after{content:'';position:absolute;right:-100px;top:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(45,212,191,0.1),transparent 70%)}
-  .cover-tag{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#2dd4bf;margin-bottom:16px}
-  .cover h1{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1.1;margin-bottom:12px}
-  .cover h1 span{color:#2dd4bf}
-  .cover p{color:rgba(255,255,255,0.5);font-size:14px;max-width:400px;line-height:1.6}
-  .cover-meta{margin-top:40px;display:flex;gap:40px}
-  .cover-meta div{font-size:12px}
-  .cover-meta strong{display:block;color:#fff;font-size:14px;margin-bottom:4px}
-  .cover-meta span{color:rgba(255,255,255,0.4)}
-  .section{padding:40px 50px;border-bottom:1px solid #f0f0f0}
-  .section:last-child{border-bottom:none}
-  .section-tag{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#2dd4bf;margin-bottom:8px}
-  .section h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#03080f;margin-bottom:20px}
-  .diagnosis-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-  .diagnosis-card{background:#f8f9fa;border-radius:10px;padding:20px;border-left:3px solid #2dd4bf}
-  .diagnosis-card.red{border-left-color:#ef4444}
-  .diagnosis-card.amber{border-left-color:#f59e0b}
-  .diagnosis-card.green{border-left-color:#10b981}
-  .diagnosis-card h4{font-size:12px;font-weight:500;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
-  .diagnosis-card p{font-size:14px;color:#1a1a2e;line-height:1.5}
-  .score-bar{background:#f0f0f0;border-radius:100px;height:8px;margin-top:8px}
-  .score-fill{background:#2dd4bf;height:8px;border-radius:100px}
-  .score-fill.red{background:#ef4444}
-  .score-fill.amber{background:#f59e0b}
-  .opportunity-box{background:#03080f;color:#fff;border-radius:12px;padding:24px;margin-top:20px}
-  .opportunity-box h3{font-family:'Syne',sans-serif;font-size:18px;margin-bottom:8px;color:#2dd4bf}
-  .opportunity-box p{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6}
-  .opportunity-box strong{color:#fff}
-  .footer-page{padding:20px 50px;display:flex;justify-content:space-between;align-items:center;background:#f8f9fa}
-  .footer-page p{font-size:11px;color:#94a3b8}
-  .footer-page strong{color:#2dd4bf}
-</style>
-</head>
-<body>
-<div class="cover">
-  <div class="cover-tag">Diagnóstico de Presencia Digital</div>
-  <h1>{NOMBRE_NEGOCIO}<br><span>Análisis 360°</span></h1>
-  <p>Evaluación completa de tu presencia digital actual y oportunidades de crecimiento en el mercado de {CIUDAD}.</p>
-  <div class="cover-meta">
-    <div><strong>{FECHA_HOY}</strong><span>Fecha de análisis</span></div>
-    <div><strong>{GIRO}</strong><span>Sector</span></div>
-    <div><strong>{SCORE}/10</strong><span>Score de oportunidad</span></div>
-  </div>
-</div>
-<div class="section">
-  <div class="section-tag">Diagnóstico actual</div>
-  <h2>Así está tu presencia digital hoy</h2>
-  <div class="diagnosis-grid">
-    <div class="diagnosis-card {COLOR_WEB}">
-      <h4>Página Web</h4>
-      <p>{DIAGNOSTICO_WEB}</p>
-      <div class="score-bar"><div class="score-fill {COLOR_WEB}" style="width:{SCORE_WEB}%"></div></div>
-    </div>
-    <div class="diagnosis-card {COLOR_SEO}">
-      <h4>Posicionamiento Google</h4>
-      <p>{DIAGNOSTICO_SEO}</p>
-      <div class="score-bar"><div class="score-fill {COLOR_SEO}" style="width:{SCORE_SEO}%"></div></div>
-    </div>
-    <div class="diagnosis-card {COLOR_REDES}">
-      <h4>Redes Sociales</h4>
-      <p>{DIAGNOSTICO_REDES}</p>
-      <div class="score-bar"><div class="score-fill {COLOR_REDES}" style="width:{SCORE_REDES}%"></div></div>
-    </div>
-    <div class="diagnosis-card {COLOR_WA}">
-      <h4>WhatsApp Business</h4>
-      <p>{DIAGNOSTICO_WA}</p>
-      <div class="score-bar"><div class="score-fill {COLOR_WA}" style="width:{SCORE_WA}%"></div></div>
-    </div>
-  </div>
-  <div class="opportunity-box">
-    <h3>Lo que estás perdiendo</h3>
-    <p>{PARRAFO_OPORTUNIDAD_PERDIDA} — en {CIUDAD} hay aproximadamente <strong>{BUSQUEDAS_MES} búsquedas mensuales</strong> para "{KEYWORD_PRINCIPAL}" y actualmente no apareces en los primeros resultados.</p>
-  </div>
-</div>
-<div class="section">
-  <div class="section-tag">Análisis competitivo</div>
-  <h2>Tu posición vs el mercado</h2>
-  <p style="font-size:14px;color:#64748b;line-height:1.7;margin-bottom:16px">{ANALISIS_COMPETITIVO}</p>
-  <div class="diagnosis-grid">
-    <div class="diagnosis-card green">
-      <h4>Fortalezas detectadas</h4>
-      <p>{FORTALEZAS}</p>
-    </div>
-    <div class="diagnosis-card red">
-      <h4>Brechas críticas</h4>
-      <p>{BRECHAS}</p>
-    </div>
-  </div>
-</div>
-<div class="footer-page">
-  <p>Diagnóstico preparado por <strong>Humanio Marketing</strong> · humanio.digital</p>
-  <p>Confidencial — Solo para {NOMBRE_NEGOCIO}</p>
-</div>
-</body>
-</html>
+```
+PROPUESTA_URL = https://humanio-{slug}.netlify.app
+REPORTE_URL   = https://humanio-{slug}.netlify.app/reporte
 ```
 
-Convierte a PDF:
-
-```bash
-mkdir -p /tmp/outreach-{slug}
-HTML_CONTENT=$(cat /tmp/outreach-{slug}/diagnostico-{slug}.html)
-curl -s -X POST https://api.pdfshift.io/v3/convert/pdf \
-  -u "api:$PDFSHIFT_API_KEY" \
-  -H "Content-Type: application/json" \
-  --data-binary "{\"source\":$(echo "$HTML_CONTENT" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')}" \
-  --output /tmp/outreach-{slug}/diagnostico-{slug}.pdf
-echo "PDF diagnóstico generado"
-```
+Usa estas URLs en todos los materiales: correo, WhatsApp y propuesta PDF.
+Si alguna URL falta, revisa el comentario de WebDesigner en el ticket padre.
 
 ### 4. Generar el PDF de Propuesta
 
@@ -453,7 +339,7 @@ fs.writeFileSync(`${draftDir}/draft-meta.json`, JSON.stringify({
   subject: 'Análisis digital de {NOMBRE_NEGOCIO} — {N} oportunidades encontradas',
   from: 'contacto@humanio.digital',
   fromName: 'Miguel González | Humanio Marketing',
-  attachments: ['diagnostico-{slug}.pdf', 'propuesta-{slug}.pdf'],
+  attachments: ['propuesta-{slug}.pdf', 'propuesta-{slug}.pdf'],
   smtpConfig: {host: 'smtpout.secureserver.net', port: 465, secure: true, user: 'contacto@humanio.digital'},
   status: 'DRAFT_PENDING_REVIEW',
   createdAt: new Date().toISOString()
@@ -479,7 +365,7 @@ ls -la /paperclip/upload-to-drive.js
 
 node /paperclip/upload-to-drive.js "{NOMBRE\_NEGOCIO}" \\
 
-&#x20; /tmp/outreach-{slug}/diagnostico-{slug}.pdf \\
+&#x20; /tmp/outreach-{slug}/propuesta-{slug}.pdf \\
 
 &#x20; /tmp/outreach-{slug}/propuesta-{slug}.pdf \\
 
@@ -495,7 +381,7 @@ if \[ $? -ne 0 ]; then
 
 &#x20; node /app/upload-to-drive.js "{NOMBRE\_NEGOCIO}" \\
 
-&#x20;   /tmp/outreach-{slug}/diagnostico-{slug}.pdf \\
+&#x20;   /tmp/outreach-{slug}/propuesta-{slug}.pdf \\
 
 &#x20;   /tmp/outreach-{slug}/propuesta-{slug}.pdf \\
 
@@ -529,7 +415,7 @@ En {CIUDAD} hay +{BUSQUEDAS_MES} búsquedas/mes para \"{KEYWORD}\" y actualmente
 Preparé un diagnóstico completo y una propuesta concreta 👇
 
 🌐 Propuesta: {PROPUESTA_URL}
-📊 Diagnóstico SEO: {DIAGNOSTICO_URL}
+📊 Diagnóstico SEO: {REPORTE_URL}
 
 ¿Tienes 30 min esta semana para una llamada sin compromiso?"
 
@@ -605,14 +491,14 @@ de 30 minutos sin costo. ¿A qué número le escribo?"
 **Score:** {SCORE}/10
 
 **Material generado:**
-- diagnostico-{slug}.pdf ✅
+- propuesta-{slug}.pdf ✅
 - propuesta-{slug}.pdf ✅
 - draft-email.html ✅ (PENDIENTE REVISIÓN Y ENVÍO MANUAL)
 - WhatsApp: {WA_STATUS}
 
 **URLs entregadas:**
 - Propuesta: {PROPUESTA_URL}
-- Diagnóstico: {DIAGNOSTICO_URL}
+- Diagnóstico: {REPORTE_URL}
 
 **Archivos en Google Drive:** carpeta Humanio - Outreach
 **Servidor:** /tmp/outreach-{slug}/

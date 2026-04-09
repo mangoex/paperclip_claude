@@ -311,11 +311,14 @@ window.addEventListener('resize', initParticles);
 ### Split-text reveal (h1)
 
 ```javascript
+// IMPORTANTE: usa split por palabras, NO por caracteres.
+// Split por caracteres destruye los <span> internos del h1 (renderiza HTML como texto).
 document.querySelectorAll('.split-reveal').forEach(el => {
-  const text = el.textContent;
-  el.innerHTML = text.split('').map((c, i) =>
-    `<span style="display:inline-block;opacity:0;transform:translateY(40px);animation:letterIn 0.6s ${i * 0.03}s forwards">${c === ' ' ? '&nbsp;' : c}</span>`
-  ).join('');
+  // Split by words to preserve inner HTML tags (spans, etc.)
+  const words = el.innerText.trim().split(/\s+/);
+  el.innerHTML = words.map((w, i) =>
+    `<span style="display:inline-block;opacity:0;transform:translateY(40px);animation:letterIn 0.7s ${i * 0.08}s cubic-bezier(0.16,1,0.3,1) forwards">${w}</span>`
+  ).join(' ');
 });
 
 // CSS
@@ -529,7 +532,7 @@ Antes de solicitar aprobación al Board, verifica:
 - [ ] Ciudad y giro mencionados correctamente
 - [ ] Precios coinciden con la propuesta del Qualifier
 - [ ] Teléfono/WhatsApp funcional en el enlace
-- [ ] URL de diagnóstico `/diagnostico` incluida si aplica
+- [ ] URL de reporte `/reporte` incluida si aplica
 
 ### Accesibilidad
 - [ ] Contraste de texto legible (mínimo 4.5:1 para body)

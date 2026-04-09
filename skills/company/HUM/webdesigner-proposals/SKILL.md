@@ -255,6 +255,7 @@ footer a{color:var(--accent);text-decoration:none}
     <a href="#nosotros">Nosotros</a>
     <a href="#proceso">Proceso</a>
     <a href="#contacto">Contacto</a>
+    <a href="/reporte">Reporte</a>
   </div>
   <a href="https://wa.me/52{TELEFONO_LIMPIO}" class="nav-cta">Agendar cita</a>
 </nav>
@@ -617,16 +618,16 @@ Repite todos los items exactamente 2 veces para el loop infinito.
 
 ### 6. Incluir el diagnóstico SEO (si existe)
 
-Si el ticket de Qualifier incluye el archivo `diagnostico.html` adjunto, inclúyelo en el site:
+Si el ticket de Qualifier incluye el archivo `reporte.html` adjunto, inclúyelo en el site:
 
 ```bash
-# El Qualifier genera diagnostico.html y lo adjunta al ticket
+# El Qualifier genera reporte.html y lo adjunta al ticket
 # Descarga el attachment y cópialo al directorio del site:
-cp /tmp/diagnostico-{slug}.html /tmp/proposal-{slug}/diagnostico.html
+cp /tmp/reporte-{slug}.html /tmp/proposal-{slug}/reporte.html
 
-# Añade también un botón en el index.html que apunte al diagnóstico.
+# Añade también un botón en el index.html que apunte al reporte.
 # Busca la sección del footer o nav y añade:
-# <a href="./diagnostico">Ver mi diagnóstico SEO gratuito →</a>
+# <a href="./reporte">Ver mi reporte SEO gratuito →</a>
 ```
 
 Si no hay diagnóstico disponible aún, omite este paso — el Qualifier lo generará y podrá actualizarse después del deploy.
@@ -649,7 +650,7 @@ Si no hay diagnóstico disponible aún, omite este paso — el Qualifier lo gene
 
 **Páginas:**
 - `/` — Propuesta web del negocio
-- `/diagnostico` — Reporte SEO gratuito (si disponible)
+- `/reporte` — Reporte SEO gratuito (si disponible)
 
 **URL destino:** https://humanio-{slug}.netlify.app
 
@@ -668,7 +669,7 @@ NETLIFY_AUTH_TOKEN=$NETLIFY_AUTH_TOKEN netlify deploy \
   --message="Propuesta {NOMBRE_NEGOCIO} — Humanio Marketing"
 
 echo "Sitio publicado: https://humanio-${SLUG}.netlify.app"
-echo "Diagnóstico: https://humanio-${SLUG}.netlify.app/diagnostico"
+echo "Reporte: https://humanio-${SLUG}.netlify.app/reporte"
 ```
 
 Si el deploy falla con error de site name ocupado, añade un sufijo numérico:
@@ -683,7 +684,7 @@ Si el deploy falla con error de site name ocupado, añade un sufijo numérico:
 
 **Cliente:** {NOMBRE_NEGOCIO}
 **URL propuesta:** https://humanio-{slug}.netlify.app
-**URL diagnóstico:** https://humanio-{slug}.netlify.app/diagnostico
+**URL reporte:** https://humanio-{slug}.netlify.app/reporte
 **Efectos:** parallax, magnetic buttons, 3D tilt, split-text, scroll progress, AOS cúbico, counters easeOut, blur-up images
 
 **Siguiente paso:** Outreach tiene ambas URLs para incluir en la propuesta comercial
