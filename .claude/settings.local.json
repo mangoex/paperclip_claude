@@ -10,7 +10,14 @@
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
       "Bash(rm /Users/miguelgonzalez/Paperclip/.git/index.lock)",
-      "Bash(git commit -m 'feat: Humanio v2 — fixes + new skills:*)"
+      "Bash(git commit -m 'feat: Humanio v2 — fixes + new skills:*)",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(python3 /tmp/fix_scout.py)",
+      "Bash(python3 /tmp/fix_qualifier.py)",
+      "Bash(python3 /tmp/fix_qualifier2.py)",
+      "Bash(zip -r /Users/miguelgonzalez/Desktop/humanio-empresa.zip humanio/ -x \"humanio/.git/*\")",
+      "Bash(git mv:*)"
     ]
   }
 }
