@@ -2,7 +2,7 @@ schema: "paperclip/v1"
 agents:
   ceo:
     role: "ceo"
-    capabilities: "Eres el CEO de Humanio Marketing, una agencia de marketing digital enfocada en negocios locales en México. Coordinas un equipo de agentes especializados:\n\n* Scout: Prospectador que encuentra negocios candidatos\n* Qualifier: Analista SEO que califica prospectos y genera propuestas\n* (Próximamente) Meta Ads: Creador de campañas en Facebook e Instagram\n* (Próximamente) Automation: Diseñador de flujos de WhatsApp\n\nTu rol es:\n\n1. Recibir solicitudes de prospección (país, ciudad, giro)\n2. Asignar la tarea al Scout\n3. Revisar reportes del Qualifier\n4. Aprobar propuestas antes de enviarlas\n5. Monitorear el pipeline de prospectos\n6. Reportar métricas semanales\n\nCuando alguien te diga \"prospecto {giro} en {ciudad}\", crea inmediatamente un ticket para Scout con esa información.Eres el CEO de Humanio Marketing, una agencia de marketing digital enfocada en negocios locales en México. Coordinas un equipo de agentes especializados:\n\n\\- Scout: Prospectador que encuentra negocios candidatos\n\n\\- Qualifier: Analista SEO que califica prospectos y genera propuestas\n\n\\- (Próximamente) Meta Ads: Creador de campañas en Facebook e Instagram\n\n\\- (Próximamente) Automation: Diseñador de flujos de WhatsApp\n\nTu rol es:\n\n1\\. Recibir solicitudes de prospección (país, ciudad, giro)\n\n2\\. Asignar la tarea al Scout\n\n3\\. Revisar reportes del Qualifier\n\n4\\. Aprobar propuestas antes de enviarlas\n\n5\\. Monitorear el pipeline de prospectos\n\n6\\. Reportar métricas semanales\n\nCuando alguien te diga \"prospecto {giro} en {ciudad}\", crea inmediatamente un ticket para Scout con esa información."
+    capabilities: "CEO de Humanio Marketing. Coordina Scout, Qualifier, WebDesigner, Outreach y DataAnalyst. Asigna tareas de prospección, aprueba propuestas, monitorea pipeline. Cuando recibe 'prospectar {giro} en {ciudad}', crea ticket para Scout."
     adapter:
       config:
         dangerouslySkipPermissions: true
@@ -96,6 +96,21 @@ agents:
           kind: "secret"
           default: ""
           requirement: "optional"
+        WHATSAPP_PHONE_NUMBER_ID:
+          description: "Meta WhatsApp Business phone number ID"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        WHATSAPP_CLOUD_API_TOKEN:
+          description: "Meta WhatsApp Business Cloud API permanent token"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        PDFSHIFT_API_KEY:
+          description: "PDFShift API key for HTML to PDF conversion"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
   qualifier:
     role: "general"
     capabilities: "Especialista en prospección de negocios locales. Recibe país, ciudad y giro comercial, realiza investigación exhaustiva en Google Maps, directorios, redes sociales y web para generar listas detalladas de prospectos con todos sus datos de contacto. Entrega reportes estructurados al agente Qualifier para calificación."
@@ -166,6 +181,11 @@ agents:
           kind: "secret"
           default: ""
           requirement: "optional"
+        PEXELS_API_KEY:
+          description: "Pexels API key for hero images"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
 company:
   logoPath: "images/company-logo.png"
 projects:
@@ -185,6 +205,14 @@ routines:
         kind: "schedule"
         cronExpression: "10 * * * *"
         label: "schedule-2"
+        timezone: "America/Mazatlan"
+  dataanalyst-pipeline-semanal:
+    status: "active"
+    triggers:
+      -
+        kind: "schedule"
+        cronExpression: "0 9 * * 1"
+        label: "weekly-monday-9am"
         timezone: "America/Mazatlan"
   webdesigner-revisar-briefs-pendientes:
     status: "paused"
