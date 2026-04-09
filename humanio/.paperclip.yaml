@@ -1,0 +1,206 @@
+schema: "paperclip/v1"
+agents:
+  ceo:
+    role: "ceo"
+    capabilities: "Eres el CEO de Humanio Marketing, una agencia de marketing digital enfocada en negocios locales en México. Coordinas un equipo de agentes especializados:\n\n* Scout: Prospectador que encuentra negocios candidatos\n* Qualifier: Analista SEO que califica prospectos y genera propuestas\n* (Próximamente) Meta Ads: Creador de campañas en Facebook e Instagram\n* (Próximamente) Automation: Diseñador de flujos de WhatsApp\n\nTu rol es:\n\n1. Recibir solicitudes de prospección (país, ciudad, giro)\n2. Asignar la tarea al Scout\n3. Revisar reportes del Qualifier\n4. Aprobar propuestas antes de enviarlas\n5. Monitorear el pipeline de prospectos\n6. Reportar métricas semanales\n\nCuando alguien te diga \"prospecto {giro} en {ciudad}\", crea inmediatamente un ticket para Scout con esa información.Eres el CEO de Humanio Marketing, una agencia de marketing digital enfocada en negocios locales en México. Coordinas un equipo de agentes especializados:\n\n\\- Scout: Prospectador que encuentra negocios candidatos\n\n\\- Qualifier: Analista SEO que califica prospectos y genera propuestas\n\n\\- (Próximamente) Meta Ads: Creador de campañas en Facebook e Instagram\n\n\\- (Próximamente) Automation: Diseñador de flujos de WhatsApp\n\nTu rol es:\n\n1\\. Recibir solicitudes de prospección (país, ciudad, giro)\n\n2\\. Asignar la tarea al Scout\n\n3\\. Revisar reportes del Qualifier\n\n4\\. Aprobar propuestas antes de enviarlas\n\n5\\. Monitorear el pipeline de prospectos\n\n6\\. Reportar métricas semanales\n\nCuando alguien te diga \"prospecto {giro} en {ciudad}\", crea inmediatamente un ticket para Scout con esa información."
+    adapter:
+      config:
+        dangerouslySkipPermissions: true
+        model: "claude-sonnet-4-5-20250929"
+      type: "claude_local"
+    runtime:
+      heartbeat:
+        enabled: true
+        maxConcurrentRuns: 1
+    permissions:
+      canCreateAgents: true
+  dataanalyst:
+    role: "researcher"
+    icon: "database"
+    capabilities: "Experto en evaluación y análisis de datos, creación de reportes y tableros de control, indicadores, OKRs. Identifica oportunidades de mercado a través de análisis de datos."
+    adapter:
+      config:
+        dangerouslySkipPermissions: true
+        model: "claude-sonnet-4-5-20250929"
+      type: "claude_local"
+    runtime:
+      heartbeat:
+        intervalSec: 300
+        maxConcurrentRuns: 1
+  outreach:
+    role: "general"
+    capabilities: "Especialista en comunicación comercial de Humanio Marketing. Recibe prospectos calificados, genera diagnósticos profesionales de marketing digital, crea propuestas personalizadas en PDF, y las envía por correo o WhatsApp según los datos disponibles del prospecto. Representa la imagen premium de Humanio ante cada cliente potencial."
+    adapter:
+      config:
+        dangerouslySkipPermissions: true
+        model: "claude-sonnet-4-5-20250929"
+      type: "claude_local"
+    runtime:
+      heartbeat:
+        intervalSec: 300
+        maxConcurrentRuns: 1
+    inputs:
+      env:
+        FROM_EMAIL:
+          description: "Provide FROM_EMAIL for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        FROM_NAME:
+          description: "Provide FROM_NAME for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_CLIENT_ID:
+          description: "Provide GOOGLE_CLIENT_ID for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_CLIENT_SECRET:
+          description: "Provide GOOGLE_CLIENT_SECRET for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_DRIVE_FOLDER_ID:
+          description: "Provide GOOGLE_DRIVE_FOLDER_ID for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_REFRESH_TOKEN:
+          description: "Provide GOOGLE_REFRESH_TOKEN for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        SMTP_HOST:
+          description: "Provide SMTP_HOST for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        SMTP_PASS:
+          description: "Provide SMTP_PASS for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        SMTP_PORT:
+          description: "Provide SMTP_PORT for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        SMTP_USER:
+          description: "Provide SMTP_USER for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        TELEFONO_MIGUEL:
+          description: "Provide TELEFONO_MIGUEL for agent outreach"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+  qualifier:
+    role: "general"
+    capabilities: "Especialista en prospección de negocios locales. Recibe país, ciudad y giro comercial, realiza investigación exhaustiva en Google Maps, directorios, redes sociales y web para generar listas detalladas de prospectos con todos sus datos de contacto. Entrega reportes estructurados al agente Qualifier para calificación."
+    adapter:
+      config:
+        model: "claude-sonnet-4-5-20250929"
+      type: "claude_local"
+    runtime:
+      heartbeat:
+        intervalSec: 300
+        maxConcurrentRuns: 1
+    inputs:
+      env:
+        FIRECRAWL_API_KEY:
+          description: "Provide FIRECRAWL_API_KEY for agent qualifier"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+  scout:
+    role: "general"
+    capabilities: "Especialista en prospección de negocios locales. Recibe país, ciudad y giro comercial, realiza investigación exhaustiva en Google Maps, directorios, redes sociales y web para generar listas detalladas de prospectos con todos sus datos de contacto. Entrega reportes estructurados al agente Qualifier para calificación."
+    adapter:
+      config:
+        model: "claude-sonnet-4-5-20250929"
+      type: "claude_local"
+    runtime:
+      heartbeat:
+        intervalSec: 300
+        maxConcurrentRuns: 1
+    inputs:
+      env:
+        FIRECRAWL_API_KEY:
+          description: "Provide FIRECRAWL_API_KEY for agent scout"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+  webdesigner:
+    role: "general"
+    capabilities: "Experto en diseño web moderno, UX/UI y usabilidad. Recibe prospectos calificados del Qualifier y crea propuestas web personalizadas con diseño profesional: efectos parallax en hero, animaciones de imágenes y mouse, paleta de colores acorde al giro del negocio. Genera imágenes con IA usando Google Imagen, construye el sitio en HTML/CSS/JS y lo publica en Netlify como propuesta para el cliente."
+    adapter:
+      config:
+        dangerouslySkipPermissions: true
+        model: "claude-sonnet-4-5-20250929"
+      type: "claude_local"
+    runtime:
+      heartbeat:
+        intervalSec: 300
+        maxConcurrentRuns: 1
+    inputs:
+      env:
+        GITHUB_TOKEN:
+          description: "Provide GITHUB_TOKEN for agent webdesigner"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_AI_API_KEY:
+          description: "Provide GOOGLE_AI_API_KEY for agent webdesigner"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        NETLIFY_AUTH_TOKEN:
+          description: "Provide NETLIFY_AUTH_TOKEN for agent webdesigner"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        TWENTY_FIRST_API_KEY:
+          description: "Provide TWENTY_FIRST_API_KEY for agent webdesigner"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+company:
+  logoPath: "images/company-logo.png"
+projects:
+  onboarding:
+    color: "#6366f1"
+    status: "in_progress"
+routines:
+  qualifier-revisar-tickets-pendientes:
+    status: "paused"
+    triggers:
+      -
+        kind: "schedule"
+        cronExpression: "10 * * * *"
+        label: "schedule"
+        timezone: "America/Mazatlan"
+      -
+        kind: "schedule"
+        cronExpression: "10 * * * *"
+        label: "schedule-2"
+        timezone: "America/Mazatlan"
+  webdesigner-revisar-briefs-pendientes:
+    status: "paused"
+    triggers:
+      -
+        kind: "schedule"
+        cronExpression: "10 * * * *"
+        label: "schedule"
+        timezone: "America/Mazatlan"
+sidebar:
+  agents:
+    - "ceo"
+    - "dataanalyst"
+    - "outreach"
+    - "qualifier"
+    - "scout"
+    - "webdesigner"
+  projects:
+    - "onboarding"
