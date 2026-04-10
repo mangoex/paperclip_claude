@@ -1,6 +1,6 @@
 ---
 name: "qualifier-diagnostic-html"
-description: "Genera un reporte de diagnóstico SEO visual en HTML puro — diseño oscuro premium con barras de progreso animadas, scorecard por área, hallazgos con evidencia, quick wins y plan de acción. Se despliega como /diagnostico en el mismo site de Netlify del prospecto."
+description: "Genera un reporte de diagnóstico SEO visual en HTML puro — diseño oscuro premium con barras de progreso animadas, scorecard por área, hallazgos con evidencia, quick wins y plan de acción. Se despliega como /reporte en el mismo site del prospecto (Surge.sh)."
 slug: "qualifier-diagnostic-html"
 metadata:
   paperclip:
@@ -17,8 +17,8 @@ key: "company/HUM/qualifier-diagnostic-html"
 Úsalo DESPUÉS de completar la auditoría SEO con `qualifier-prospect-auditor` y `qualifier-seo`.
 Tienes todos los datos del prospecto. Ahora conviertes esos datos en un reporte visual HTML.
 
-El archivo resultante (`diagnostico.html`) se entrega al WebDesigner en el brief del ticket,
-quien lo incluye en el deploy de Netlify como `/diagnostico`.
+El archivo resultante (`reporte.html`) se entrega al WebDesigner en el brief del ticket,
+quien lo incluye en el deploy como `/reporte`.
 
 ## Inputs requeridos
 
@@ -60,7 +60,7 @@ score < 45  → class="score-red"   → color "#ef4444"
 
 ### 3. Generar el HTML
 
-Crea `/tmp/proposal-{slug}/diagnostico.html` con el template completo a continuación.
+Crea `/tmp/proposal-{slug}/reporte.html` con el template completo a continuación.
 Reemplaza TODOS los marcadores `{...}` con datos reales del prospecto.
 NO dejes ningún marcador sin reemplazar.
 
@@ -661,9 +661,9 @@ if (firstBody) firstBody.style.display = 'block';
 ### 4. Guardar el archivo
 
 ```bash
-# El archivo ya está en /tmp/proposal-{slug}/diagnostico.html
+# El archivo ya está en /tmp/proposal-{slug}/reporte.html
 # Confirmar que existe:
-ls -la /tmp/proposal-{slug}/diagnostico.html
+ls -la /tmp/proposal-{slug}/reporte.html
 ```
 
 ### 5. Notificar al WebDesigner
@@ -673,13 +673,13 @@ Incluye en el ticket del WebDesigner:
 ```
 ### Diagnóstico HTML generado
 
-El archivo `/tmp/proposal-{slug}/diagnostico.html` ya existe y debe incluirse
-en el deploy de Netlify como página secundaria.
+El archivo `/tmp/proposal-{slug}/reporte.html` ya existe y debe incluirse
+en el deploy como página secundaria.
 
 Instrucción para WebDesigner:
-- Copiar `diagnostico.html` al directorio del site antes del deploy
-- Asegurarse que el `index.html` tenga un botón "Ver diagnóstico" que apunte a `./diagnostico`
-- URL final: `humanio-{slug}.netlify.app/diagnostico`
+- Copiar `reporte.html` al directorio del site antes del deploy
+- Asegurarse que el `index.html` tenga un botón "Ver reporte" que apunte a `./reporte`
+- URL final: `humanio-{slug}.surge.sh/reporte`
 ```
 
 ### 6. Actualizar el ticket de Outreach
@@ -687,8 +687,8 @@ Instrucción para WebDesigner:
 Cuando WebDesigner entregue la URL del site, el brief de Outreach debe incluir:
 
 ```
-- URL propuesta web: https://humanio-{slug}.netlify.app
-- URL diagnóstico gratuito: https://humanio-{slug}.netlify.app/diagnostico
+- URL propuesta web: https://humanio-{slug}.surge.sh
+- URL diagnóstico gratuito: https://humanio-{slug}.surge.sh/reporte
 ```
 
 ## Reglas críticas

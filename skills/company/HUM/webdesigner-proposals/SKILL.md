@@ -30,20 +30,6 @@ Al despertar, revisa tu inbox y backlog. Si hay múltiples tickets pendientes:
 
 Del ticket extrae: nombre, giro, ciudad, teléfono, WhatsApp, Instagram, servicios, rating, propuesta Humanio, score, URL de propuesta web si existe.
 
-### 1.5 Solicitar aprobación para crear
-
-```
-## Solicitud para crear propuesta web — {NOMBRE_NEGOCIO}
-
-**Negocio:** {NOMBRE_NEGOCIO}
-**Giro:** {GIRO} | {CIUDAD}
-**Score:** {SCORE}/10
-**Paleta:** fondo {COLOR_BG}, acento {COLOR_ACENTO}
-**Efectos:** cursor tracking, parallax hero, scroll animations, marquee, counters
-
-¿Apruebas crear esta propuesta?
-```
-
 ### 2. Definir identidad visual por giro
 
 **Dentistas:** `--accent:#2dd4bf` `--bg:#03080f` `--bg2:#060d17` `--bg3:#0a1628`
@@ -630,13 +616,9 @@ Repite todos los items exactamente 2 veces para el loop infinito.
 Si el ticket de Qualifier incluye el archivo `reporte.html` adjunto, inclúyelo en el site:
 
 ```bash
-# El Qualifier genera reporte.html y lo adjunta al ticket
-# Descarga el attachment y cópialo al directorio del site:
-cp /tmp/reporte-{slug}.html /tmp/proposal-{slug}/reporte.html
-
-# Añade también un botón en el index.html que apunte al reporte.
-# Busca la sección del footer o nav y añade:
-# <a href="./reporte">Ver mi reporte SEO gratuito →</a>
+# El Qualifier ya generó reporte.html en /tmp/proposal-{slug}/reporte.html
+# Si el archivo existe, ya está listo para el deploy
+ls /tmp/proposal-{slug}/reporte.html 2>/dev/null && echo "reporte.html presente ✅" || echo "reporte.html no disponible aún — se podrá agregar después del deploy"
 ```
 
 Si no hay diagnóstico disponible aún, omite este paso — el Qualifier lo generará y podrá actualizarse después del deploy.
@@ -961,32 +943,6 @@ Asegúrate de que el `index.html` principal tenga los 3 links en el nav:
 <li><a href="./reporte">Reporte SEO</a></li>
 ```
 
-### 8. Solicitar aprobación antes de publicar
-
-```
-## Propuesta lista para publicar — {NOMBRE_NEGOCIO}
-
-**Efectos incluidos:**
-- Cursor personalizado con magnetic pull en botones
-- Hero parallax (scroll suave throttled)
-- Scroll progress bar
-- Scroll animations (AOS con easing cúbico)
-- Contadores animados (easing easeOut)
-- 3D tilt en service cards (vanilla-tilt)
-- Split-text reveal en h1
-- Blur-up lazy loading de imágenes
-- Marquee infinito pausable
-
-**Páginas:**
-- `/` — Página premium de presentación
-- `/propuesta` — Propuesta comercial con precios y plan de acción
-- `/reporte` — Reporte SEO gratuito (si disponible)
-
-**URL destino:** https://humanio-{slug}.surge.sh
-
-¿Apruebas publicar?
-```
-
 ### 8. Publicar en Surge.sh
 
 ```bash
@@ -1050,7 +1006,6 @@ Inmediatamente después del deploy exitoso, crea este ticket:
 * SIEMPRE cursor personalizado
 * SIEMPRE parallax en el hero
 * SIEMPRE marquee con keywords del giro x2
-* SIEMPRE pedir aprobación antes de crear Y antes de publicar
 * El slug debe ser solo letras minúsculas y guiones
 * `{TELEFONO_LIMPIO}` solo dígitos sin espacios ni guiones
 * Las imágenes de Unsplash pueden tardar — si falla usar color de fondo sólido

@@ -42,41 +42,10 @@ SI el ticket dice "URL propuesta web: Pendiente" o el campo está vacío:
   → Agrega comentario: "Esperando URL de WebDesigner. Se retomará automáticamente cuando WebDesigner entregue la URL."
   → EXIT — no continúes el proceso
 
-SI el campo contiene una URL (https://humanio-*.netlify.app):
+SI el campo contiene una URL (https://humanio-*.surge.sh):
   → Extrae: PROPUESTA_URL y REPORTE_URL
-  → Continúa al paso 2
+  → Continúa al paso 3
 ```
-
-### 2. Solicitar aprobación del Board
-
-ANTES de generar cualquier material, crea un Approval request:
-
-```
-## Solicitud de outreach — {NOMBRE_NEGOCIO}
-
-**Prospecto:** {NOMBRE_NEGOCIO}
-**Giro:** {GIRO}
-**Ciudad:** {CIUDAD}
-**Score:** {SCORE}/10
-**Canal disponible:** {CORREO y/o WHATSAPP}
-**Propuesta web:** {URL o "Pendiente"}
-
-**Material a generar:**
-- PDF Propuesta de Servicios con precios
-- Draft de correo profesional (NO se enviará automáticamente)
-- Mensaje WhatsApp → se enviará automáticamente vía WhatsApp Business Cloud API
-
-**Propuesta estimada:** {MONTO_TOTAL} MXN
-**URL propuesta web:** {PROPUESTA_URL}
-**URL reporte SEO:** {REPORTE_URL}
-
-**Modo envío correo:** DRAFT — el Board revisará y enviará manualmente
-**Modo envío WhatsApp:** AUTOMÁTICO tras tu aprobación aquí
-
-¿Apruebas generar y enviar este material?
-```
-
-Espera aprobación antes de continuar.
 
 ### 3. Confirmar URLs del WebDesigner
 
@@ -86,8 +55,8 @@ Espera aprobación antes de continuar.
 Confirma que tienes ambas URLs del ticket:
 
 ```
-PROPUESTA_URL = https://humanio-{slug}.netlify.app
-REPORTE_URL   = https://humanio-{slug}.netlify.app/reporte
+PROPUESTA_URL = https://humanio-{slug}.surge.sh
+REPORTE_URL   = https://humanio-{slug}.surge.sh/reporte
 ```
 
 Usa estas URLs en todos los materiales: correo, WhatsApp y propuesta PDF.
@@ -395,7 +364,7 @@ fi
 
 ### 7. Enviar WhatsApp vía WhatsApp Business Cloud API
 
-> **Nota:** El envío es automático tras la aprobación del Board en el paso 2.
+> **Nota:** El envío es automático una vez completados los pasos anteriores.
 > Usa exclusivamente `curl` con la API oficial de Meta — no usar librerías locales.
 
 Compone el mensaje y envíalo:
