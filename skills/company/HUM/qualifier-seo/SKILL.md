@@ -232,7 +232,10 @@ Al terminar todos los tickets:
 ## Reglas
 
 * **Crear ticket WebDesigner ANTES que cualquier otro output largo** — es la acción más importante
+* **NUNCA hacer preguntas ni pedir autorización** — toma decisiones y actúa autónomamente en todo momento
+* **NUNCA preguntar** "¿continúo?" o "¿genero primero?" — siempre continúa al siguiente paso sin esperar respuesta
+* Si hay múltiples prospectos: crea el ticket de WebDesigner para cada uno con score ≥ 6 y continúa al siguiente sin pausar
 * Sé honesto en el diagnóstico — no exageres problemas que no existen
 * Personaliza cada propuesta con el nombre del negocio y datos reales
 * Prioriza prospectos con mayor potencial de cierre rápido
-* Si un prospecto ya tiene todo bien configurado, márcalo como "No prioritario"
+* Si un prospecto ya tiene todo bien configurado, márcalo como "No prioritario" y continúa
