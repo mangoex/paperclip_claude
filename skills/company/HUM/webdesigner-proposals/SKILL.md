@@ -633,7 +633,327 @@ cp /tmp/reporte-{slug}.html /tmp/proposal-{slug}/reporte.html
 
 Si no hay diagnóstico disponible aún, omite este paso — el Qualifier lo generará y podrá actualizarse después del deploy.
 
-### 7. Solicitar aprobación antes de publicar
+### 7. Generar propuesta.html (página /propuesta)
+
+Crea `/tmp/proposal-{slug}/propuesta.html` con el mismo dark theme y nav que el index, pero con contenido comercial completo. Usa todos los datos del brief del Qualifier.
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Propuesta — {NOMBRE_NEGOCIO} | Humanio Marketing</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--accent:{COLOR_ACENTO};--bg:#03080f;--bg2:#0a1628;--text:rgba(255,255,255,0.85);--muted:rgba(255,255,255,0.4);--border:rgba(255,255,255,0.06)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+/* NAV — igual que index */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;background:rgba(3,8,15,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.05em;transition:color .3s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent)}
+.btn-cta{background:var(--accent);color:#03080f;padding:10px 24px;border-radius:100px;font-size:.85rem;font-weight:600;text-decoration:none;transition:opacity .3s}
+.btn-cta:hover{opacity:.85}
+/* HERO PROPUESTA */
+.prop-hero{min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 40px 80px;background:linear-gradient(135deg,var(--bg) 0%,var(--bg2) 100%);position:relative;overflow:hidden}
+.prop-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(var(--accent-rgb),.08) 0%,transparent 70%)}
+.prop-tag{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.prop-hero h1{font-family:'Syne',sans-serif;font-size:clamp(2.5rem,5vw,4rem);font-weight:800;line-height:1.05;margin-bottom:16px}
+.prop-hero p{color:var(--muted);font-size:1.1rem;max-width:600px;margin:0 auto 40px}
+/* SCORE */
+.score-section{padding:80px 40px;max-width:900px;margin:0 auto}
+.score-header{text-align:center;margin-bottom:60px}
+.score-big{font-family:'Syne',sans-serif;font-size:6rem;font-weight:800;color:var(--accent);line-height:1}
+.score-label{color:var(--muted);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;margin-top:8px}
+.score-bars{display:flex;flex-direction:column;gap:20px}
+.score-bar-row{display:flex;align-items:center;gap:16px}
+.score-bar-label{flex:0 0 200px;font-size:.9rem;color:var(--muted)}
+.score-bar-track{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:100px;background:var(--accent);transform-origin:left;transform:scaleX(0);transition:transform 1.2s cubic-bezier(0.16,1,0.3,1)}
+.score-bar-val{flex:0 0 60px;text-align:right;font-size:.85rem;color:var(--text);font-weight:600}
+/* PROBLEMA */
+.problem-section{padding:80px 40px;background:var(--bg2)}
+.problem-inner{max-width:900px;margin:0 auto}
+.section-tag{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,3vw,2.5rem);font-weight:800;margin-bottom:24px}
+.alert-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-left:3px solid #ef4444;border-radius:12px;padding:28px;margin-bottom:32px}
+.alert-box h3{color:#ef4444;font-size:1rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px}
+.alert-box p{color:var(--text);line-height:1.7}
+/* DINERO PERDIDO */
+.money-section{padding:80px 40px;max-width:900px;margin:0 auto}
+.money-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;margin-top:40px}
+.money-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center}
+.money-card.highlight{border-color:rgba(var(--accent-rgb),.3);background:rgba(var(--accent-rgb),.05)}
+.money-amount{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;color:var(--accent);margin-bottom:8px}
+.money-label{color:var(--muted);font-size:.85rem}
+/* SERVICIOS */
+.services-section{padding:80px 40px;background:var(--bg2)}
+.services-inner{max-width:900px;margin:0 auto}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:40px}
+.service-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative;overflow:hidden;transition:border-color .3s}
+.service-card:hover{border-color:rgba(var(--accent-rgb),.3)}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .3s}
+.service-card:hover::before{opacity:1}
+.service-num{font-size:.7rem;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px}
+.service-card h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:12px}
+.service-card p{color:var(--muted);font-size:.9rem;line-height:1.7;margin-bottom:20px}
+.service-price{padding-top:16px;border-top:1px solid var(--border)}
+.price-main{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--accent)}
+.price-sub{color:var(--muted);font-size:.8rem;margin-left:4px}
+/* PLAN */
+.plan-section{padding:80px 40px;max-width:900px;margin:0 auto}
+.phase{margin-bottom:48px}
+.phase-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.phase-num{width:40px;height:40px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;color:#03080f;font-size:.9rem;flex-shrink:0}
+.phase h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700}
+.phase-items{list-style:none;display:flex;flex-direction:column;gap:12px;padding-left:56px}
+.phase-items li{display:flex;align-items:flex-start;gap:12px;color:var(--muted);font-size:.95rem}
+.phase-items li::before{content:'→';color:var(--accent);flex-shrink:0;margin-top:2px}
+/* CTA */
+.cta-section{padding:100px 40px;text-align:center;background:var(--bg2)}
+.cta-section h2{font-family:'Syne',sans-serif;font-size:clamp(2rem,4vw,3rem);font-weight:800;margin-bottom:16px}
+.cta-section p{color:var(--muted);margin-bottom:40px;max-width:500px;margin-left:auto;margin-right:auto}
+.btn-wa{display:inline-flex;align-items:center;gap:12px;background:#25d366;color:#fff;padding:16px 40px;border-radius:100px;font-size:1rem;font-weight:600;text-decoration:none;transition:transform .3s,box-shadow .3s}
+.btn-wa:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(37,211,102,.3)}
+footer{padding:40px;text-align:center;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}
+footer span{color:var(--accent)}
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">{LOGO_P1}<span>{LOGO_P2}</span></div>
+  <ul class="nav-links">
+    <li><a href="./">Inicio</a></li>
+    <li><a href="./propuesta" class="active">Propuesta</a></li>
+    <li><a href="./reporte">Reporte SEO</a></li>
+  </ul>
+  <a href="https://wa.me/{TELEFONO_LIMPIO}?text=Hola,%20vi%20su%20propuesta%20de%20Humanio" class="btn-cta">Agendar llamada</a>
+</nav>
+
+<!-- HERO -->
+<section class="prop-hero">
+  <div>
+    <div class="prop-tag">Propuesta de Crecimiento Digital</div>
+    <h1>{NOMBRE_NEGOCIO}</h1>
+    <p>Diagnóstico personalizado y plan de acción para capturar los clientes que hoy se pierden en Google.</p>
+    <a href="#servicios" class="btn-cta">Ver propuesta completa ↓</a>
+  </div>
+</section>
+
+<!-- SCORE -->
+<section class="score-section reveal">
+  <div class="score-header">
+    <div class="prop-tag">Score de oportunidad</div>
+    <div class="score-big">{SCORE}</div>
+    <div style="font-size:1.5rem;color:var(--muted)">/10</div>
+    <div class="score-label" style="margin-top:12px">{CLASIFICACION} — {GIRO} en {CIUDAD}</div>
+  </div>
+  <div class="score-bars">
+    <!-- Genera una fila por cada factor evaluado, con su puntaje -->
+    <div class="score-bar-row">
+      <span class="score-bar-label">Presencia web</span>
+      <div class="score-bar-track"><div class="score-bar-fill" data-width="{PCT_WEB}%"></div></div>
+      <span class="score-bar-val">{SCORE_WEB_TEXTO}</span>
+    </div>
+    <div class="score-bar-row">
+      <span class="score-bar-label">Redes sociales</span>
+      <div class="score-bar-track"><div class="score-bar-fill" data-width="{PCT_REDES}%"></div></div>
+      <span class="score-bar-val">{SCORE_REDES_TEXTO}</span>
+    </div>
+    <div class="score-bar-row">
+      <span class="score-bar-label">Google Business</span>
+      <div class="score-bar-track"><div class="score-bar-fill" data-width="{PCT_GBP}%"></div></div>
+      <span class="score-bar-val">{SCORE_GBP_TEXTO}</span>
+    </div>
+    <div class="score-bar-row">
+      <span class="score-bar-label">WhatsApp Business</span>
+      <div class="score-bar-track"><div class="score-bar-fill" data-width="{PCT_WA}%"></div></div>
+      <span class="score-bar-val">{SCORE_WA_TEXTO}</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMA CRÍTICO -->
+<section class="problem-section reveal">
+  <div class="problem-inner">
+    <div class="prop-tag">Situación actual</div>
+    <h2 class="section-title">Lo que está pasando hoy</h2>
+    <div class="alert-box">
+      <h3>🚨 Problema crítico detectado</h3>
+      <p>{PROBLEMA_CRITICO_DESCRIPCION}</p>
+    </div>
+    <p style="color:var(--muted);line-height:1.8">{DIAGNOSTICO_GENERAL_2_PARRAFOS}</p>
+  </div>
+</section>
+
+<!-- DINERO PERDIDO -->
+<section class="money-section reveal">
+  <div class="prop-tag">Lo que estás perdiendo</div>
+  <h2 class="section-title">Estimado de clientes potenciales perdidos</h2>
+  <p style="color:var(--muted);margin-top:12px">En {CIUDAD} hay aproximadamente <strong style="color:var(--accent)">{BUSQUEDAS_MES} búsquedas/mes</strong> para "{KEYWORD_PRINCIPAL}" y actualmente no apareces.</p>
+  <div class="money-grid">
+    <div class="money-card">
+      <div class="money-amount">{CLIENTES_PERDIDOS_MES}</div>
+      <div class="money-label">clientes potenciales perdidos/mes (escenario conservador)</div>
+    </div>
+    <div class="money-card highlight">
+      <div class="money-amount">${DINERO_PERDIDO_MES} MXN</div>
+      <div class="money-label">valor mensual estimado no captado</div>
+    </div>
+    <div class="money-card">
+      <div class="money-amount">${DINERO_PERDIDO_ANUAL} MXN</div>
+      <div class="money-label">valor anual estimado no captado</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section class="services-section" id="servicios">
+  <div class="services-inner">
+    <div class="prop-tag">Nuestra propuesta</div>
+    <h2 class="section-title reveal">Plan de servicios para {NOMBRE_NEGOCIO}</h2>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-num">Servicio 01</div>
+        <h3>Página Web Profesional</h3>
+        <p>Sitio moderno, rápido y optimizado para aparecer en Google cuando busquen {GIRO} en {CIUDAD}. Diseño a medida, mobile-first.</p>
+        <div class="service-price">
+          <span class="price-main">${PRECIO_WEB}</span><span class="price-sub">MXN único</span>
+        </div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">Servicio 02</div>
+        <h3>Marketing en Meta Ads</h3>
+        <p>Campañas en Facebook e Instagram segmentadas en {CIUDAD} y zonas aledañas. Resultados medibles desde la primera semana.</p>
+        <div class="service-price">
+          <span class="price-main">${PRECIO_META_SETUP}</span><span class="price-sub">MXN setup + ${PRECIO_META_MES}/mes medios</span>
+        </div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">Servicio 03</div>
+        <h3>Chatbot WhatsApp</h3>
+        <p>Atención automática 24/7. Responde preguntas frecuentes, agenda citas y captura leads mientras duermes.</p>
+        <div class="service-price">
+          <span class="price-main">${PRECIO_WA_SETUP}</span><span class="price-sub">MXN setup + ${PRECIO_WA_MES}/mes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAN DE ACCIÓN -->
+<section class="plan-section reveal">
+  <div class="prop-tag">Plan de acción</div>
+  <h2 class="section-title">Cómo llegamos ahí</h2>
+  <div style="margin-top:40px">
+    <div class="phase reveal">
+      <div class="phase-header">
+        <div class="phase-num">1</div>
+        <h3>Fundamentos — Semanas 1-2</h3>
+      </div>
+      <ul class="phase-items">
+        <li>{FASE1_ITEM1}</li>
+        <li>{FASE1_ITEM2}</li>
+        <li>{FASE1_ITEM3}</li>
+      </ul>
+    </div>
+    <div class="phase reveal">
+      <div class="phase-header">
+        <div class="phase-num">2</div>
+        <h3>Visibilidad — Semanas 3-6</h3>
+      </div>
+      <ul class="phase-items">
+        <li>{FASE2_ITEM1}</li>
+        <li>{FASE2_ITEM2}</li>
+        <li>{FASE2_ITEM3}</li>
+      </ul>
+    </div>
+    <div class="phase reveal">
+      <div class="phase-header">
+        <div class="phase-num">3</div>
+        <h3>Crecimiento — Mes 2-3</h3>
+      </div>
+      <ul class="phase-items">
+        <li>{FASE3_ITEM1}</li>
+        <li>{FASE3_ITEM2}</li>
+        <li>{FASE3_ITEM3}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section reveal">
+  <div class="prop-tag">¿Listo para crecer?</div>
+  <h2>Agenda una llamada sin costo</h2>
+  <p>30 minutos para revisar tu caso específico y resolver todas tus dudas. Sin compromiso.</p>
+  <a href="https://wa.me/{TELEFONO_MIGUEL}?text=Hola%20Miguel,%20vi%20la%20propuesta%20de%20{NOMBRE_NEGOCIO_ENCODED}%20y%20me%20interesa" class="btn-wa">
+    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Agendar llamada por WhatsApp
+  </a>
+  <p style="margin-top:20px;font-size:.85rem">o escríbenos a <strong style="color:var(--accent)">contacto@humanio.digital</strong></p>
+</section>
+
+<footer>
+  <p>Propuesta preparada por <span>Humanio Marketing</span> · humanio.digital · Confidencial — Solo para {NOMBRE_NEGOCIO}</p>
+</footer>
+
+<script>
+// Animate score bars on scroll
+const barObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.score-bar-fill').forEach(bar=>{
+        bar.style.transform=`scaleX(${parseFloat(bar.dataset.width)/100})`;
+      });
+      barObs.unobserve(e.target);
+    }
+  });
+},{threshold:.3});
+document.querySelectorAll('.score-section').forEach(s=>barObs.observe(s));
+
+// Reveal on scroll
+const revObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');revObs.unobserve(e.target);}});
+},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+</script>
+</body>
+</html>
+```
+
+**Variables a reemplazar de los datos del Qualifier:**
+- `{SCORE}`, `{CLASIFICACION}`, `{GIRO}`, `{CIUDAD}`
+- `{PCT_WEB/REDES/GBP/WA}` — porcentaje para la barra (0-100)
+- `{SCORE_WEB/REDES/GBP/WA_TEXTO}` — texto del puntaje (ej: "4/4 pts")
+- `{PROBLEMA_CRITICO_DESCRIPCION}` — el problema principal detectado
+- `{DIAGNOSTICO_GENERAL_2_PARRAFOS}` — resumen del diagnóstico
+- `{BUSQUEDAS_MES}`, `{KEYWORD_PRINCIPAL}`
+- `{CLIENTES_PERDIDOS_MES}`, `{DINERO_PERDIDO_MES}`, `{DINERO_PERDIDO_ANUAL}`
+- `{PRECIO_WEB}`, `{PRECIO_META_SETUP}`, `{PRECIO_META_MES}`, `{PRECIO_WA_SETUP}`, `{PRECIO_WA_MES}`
+- `{FASE1/2/3_ITEM1/2/3}` — items del plan de acción
+- `{TELEFONO_MIGUEL}` — tu número de WhatsApp para el CTA
+
+Guarda el archivo en `/tmp/proposal-{slug}/propuesta.html`.
+
+### 7.5 Actualizar nav del index.html
+
+Asegúrate de que el `index.html` principal tenga los 3 links en el nav:
+
+```html
+<li><a href="./propuesta">Propuesta</a></li>
+<li><a href="./reporte">Reporte SEO</a></li>
+```
+
+### 8. Solicitar aprobación antes de publicar
 
 ```
 ## Propuesta lista para publicar — {NOMBRE_NEGOCIO}
@@ -650,7 +970,8 @@ Si no hay diagnóstico disponible aún, omite este paso — el Qualifier lo gene
 - Marquee infinito pausable
 
 **Páginas:**
-- `/` — Propuesta web del negocio
+- `/` — Página premium de presentación
+- `/propuesta` — Propuesta comercial con precios y plan de acción
 - `/reporte` — Reporte SEO gratuito (si disponible)
 
 **URL destino:** https://humanio-{slug}.surge.sh
@@ -668,6 +989,7 @@ DOMAIN="humanio-${SLUG}.surge.sh"
 SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-$SLUG $DOMAIN
 
 echo "Sitio publicado: https://${DOMAIN}"
+echo "Propuesta: https://${DOMAIN}/propuesta"
 echo "Reporte: https://${DOMAIN}/reporte"
 ```
 
@@ -708,7 +1030,8 @@ Inmediatamente después del deploy exitoso, crea este ticket:
 ## Propuesta web publicada ✅
 
 **Cliente:** {NOMBRE_NEGOCIO}
-**URL propuesta:** https://humanio-{slug}.surge.sh
+**URL principal:** https://humanio-{slug}.surge.sh
+**URL propuesta:** https://humanio-{slug}.surge.sh/propuesta
 **URL reporte:** https://humanio-{slug}.surge.sh/reporte
 **Ticket Outreach:** creado ✅
 ```
