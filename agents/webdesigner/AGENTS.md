@@ -41,8 +41,8 @@ Every page must look premium, dark, and modern — no generic designs.
 
 ## Deploy
 
-Use Netlify CLI directly — netlify is pre-installed in the container.
-Always use: NETLIFY_AUTH_TOKEN=$NETLIFY_AUTH_TOKEN netlify deploy --dir=/tmp/proposal-{slug} --prod --site-name="humanio-{slug}"
+Use Surge CLI — surge is pre-installed in the container.
+Always use: SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-{slug} humanio-{slug}.surge.sh
 
 ## Routing rules
 

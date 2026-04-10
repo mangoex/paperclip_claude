@@ -171,8 +171,8 @@ agents:
           kind: "secret"
           default: ""
           requirement: "optional"
-        NETLIFY_AUTH_TOKEN:
-          description: "Provide NETLIFY_AUTH_TOKEN for agent webdesigner"
+        SURGE_TOKEN:
+          description: "Surge.sh deploy token — run `surge token` to get it"
           kind: "secret"
           default: ""
           requirement: "optional"

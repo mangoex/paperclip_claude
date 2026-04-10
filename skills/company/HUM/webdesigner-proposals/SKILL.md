@@ -652,29 +652,28 @@ Si no hay diagnóstico disponible aún, omite este paso — el Qualifier lo gene
 - `/` — Propuesta web del negocio
 - `/reporte` — Reporte SEO gratuito (si disponible)
 
-**URL destino:** https://humanio-{slug}.netlify.app
+**URL destino:** https://humanio-{slug}.surge.sh
 
 ¿Apruebas publicar?
 ```
 
-### 8. Publicar en Netlify
+### 8. Publicar en Surge.sh
 
 ```bash
 SLUG=$(echo "{NOMBRE_NEGOCIO}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
+DOMAIN="humanio-${SLUG}.surge.sh"
 
-NETLIFY_AUTH_TOKEN=$NETLIFY_AUTH_TOKEN netlify deploy \
-  --dir=/tmp/proposal-$SLUG \
-  --prod \
-  --site-name="humanio-$SLUG" \
-  --message="Propuesta {NOMBRE_NEGOCIO} — Humanio Marketing"
+# Deploy con token de autenticación (sin login interactivo)
+SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-$SLUG $DOMAIN
 
-echo "Sitio publicado: https://humanio-${SLUG}.netlify.app"
-echo "Reporte: https://humanio-${SLUG}.netlify.app/reporte"
+echo "Sitio publicado: https://${DOMAIN}"
+echo "Reporte: https://${DOMAIN}/reporte"
 ```
 
-Si el deploy falla con error de site name ocupado, añade un sufijo numérico:
+Si el dominio ya existe (error 409), añade sufijo numérico:
 ```bash
---site-name="humanio-${SLUG}-2"
+DOMAIN="humanio-${SLUG}-2.surge.sh"
+SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-$SLUG $DOMAIN
 ```
 
 ### 9. Notificar al CEO
@@ -683,8 +682,8 @@ Si el deploy falla con error de site name ocupado, añade un sufijo numérico:
 ## Propuesta web publicada ✅
 
 **Cliente:** {NOMBRE_NEGOCIO}
-**URL propuesta:** https://humanio-{slug}.netlify.app
-**URL reporte:** https://humanio-{slug}.netlify.app/reporte
+**URL propuesta:** https://humanio-{slug}.surge.sh
+**URL reporte:** https://humanio-{slug}.surge.sh/reporte
 **Efectos:** parallax, magnetic buttons, 3D tilt, split-text, scroll progress, AOS cúbico, counters easeOut, blur-up images
 
 **Siguiente paso:** Outreach tiene ambas URLs para incluir en la propuesta comercial
