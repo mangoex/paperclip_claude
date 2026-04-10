@@ -62,155 +62,26 @@ REPORTE_URL   = https://humanio-{slug}.surge.sh/reporte
 Usa estas URLs en todos los materiales: correo, WhatsApp y propuesta PDF.
 Si alguna URL falta, revisa el comentario de WebDesigner en el ticket padre.
 
-### 4. Generar el PDF de Propuesta
+### 4. Descargar las páginas HTML del site publicado
 
-Crea `/tmp/outreach-{slug}/propuesta-{slug}.html`:
-
-```html
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500&display=swap');
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'Inter',sans-serif;color:#1a1a2e;background:#fff}
-  .cover{background:#03080f;color:#fff;padding:60px 50px 50px}
-  .cover-tag{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#2dd4bf;margin-bottom:16px}
-  .cover h1{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;line-height:1.1;margin-bottom:12px}
-  .cover p{color:rgba(255,255,255,0.5);font-size:14px;line-height:1.6;max-width:450px}
-  .section{padding:40px 50px;border-bottom:1px solid #f0f0f0}
-  .section-tag{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#2dd4bf;margin-bottom:8px}
-  .section h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#03080f;margin-bottom:20px}
-  .service-row{display:flex;justify-content:space-between;align-items:flex-start;padding:20px 0;border-bottom:1px solid #f0f0f0}
-  .service-row:last-child{border-bottom:none}
-  .service-info h4{font-size:16px;font-weight:500;color:#1a1a2e;margin-bottom:4px}
-  .service-info p{font-size:13px;color:#64748b;line-height:1.5;max-width:380px}
-  .service-price{text-align:right;flex-shrink:0;margin-left:24px}
-  .service-price strong{display:block;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#03080f}
-  .service-price span{font-size:12px;color:#94a3b8}
-  .total-box{background:#03080f;color:#fff;border-radius:12px;padding:24px 28px;margin-top:24px;display:flex;justify-content:space-between;align-items:center}
-  .total-box h3{font-family:'Syne',sans-serif;font-size:16px;color:rgba(255,255,255,0.6)}
-  .total-box strong{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#2dd4bf}
-  .web-preview{background:#f8f9fa;border-radius:12px;padding:20px;margin-top:20px;border:1px solid #e2e8f0}
-  .web-preview p{font-size:12px;color:#94a3b8;margin:0 0 6px}
-  .web-preview a{color:#2dd4bf;font-size:14px;text-decoration:none;font-weight:500}
-  .process-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
-  .step{text-align:center;padding:20px}
-  .step-num{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#f0f0f0;margin-bottom:8px}
-  .step h4{font-size:14px;font-weight:500;margin-bottom:6px}
-  .step p{font-size:12px;color:#64748b;line-height:1.5}
-  .cta-box{background:#03080f;color:#fff;padding:40px 50px;text-align:center}
-  .cta-box h2{font-family:'Syne',sans-serif;font-size:24px;margin-bottom:12px}
-  .cta-box p{color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:20px}
-  .cta-contact{display:flex;justify-content:center;gap:40px}
-  .cta-contact div{font-size:13px}
-  .cta-contact strong{display:block;color:#2dd4bf;margin-bottom:4px}
-  .cta-contact span{color:rgba(255,255,255,0.5)}
-  .footer-page{padding:16px 50px;display:flex;justify-content:space-between;background:#f8f9fa}
-  .footer-page p{font-size:11px;color:#94a3b8}
-  .footer-page strong{color:#2dd4bf}
-</style>
-</head>
-<body>
-<div class="cover">
-  <div class="cover-tag">Propuesta Comercial · {FECHA_HOY}</div>
-  <h1>Plan de Crecimiento Digital<br>para {NOMBRE_NEGOCIO}</h1>
-  <p>Estrategia personalizada para dominar el mercado digital de {GIRO} en {CIUDAD}.</p>
-</div>
-<div class="section">
-  <div class="section-tag">Servicios propuestos</div>
-  <h2>Tu plan de crecimiento</h2>
-  <div class="service-row">
-    <div class="service-info">
-      <h4>Página Web Moderna</h4>
-      <p>Diseño premium oscuro con efectos parallax, animaciones y optimización SEO. Mobile-first, carga rápida, integrada con WhatsApp.</p>
-    </div>
-    <div class="service-price">
-      <strong>{PRECIO_WEB} MXN</strong>
-      <span>pago único</span>
-    </div>
-  </div>
-  <div class="service-row">
-    <div class="service-info">
-      <h4>Marketing Digital en Meta</h4>
-      <p>Campañas en Facebook e Instagram con segmentación local. Setup + gestión mensual hacia tu público en {CIUDAD}.</p>
-    </div>
-    <div class="service-price">
-      <strong>{PRECIO_META} MXN</strong>
-      <span>setup + mensual</span>
-    </div>
-  </div>
-  <div class="service-row">
-    <div class="service-info">
-      <h4>Chatbot WhatsApp 24/7</h4>
-      <p>Atención automática, captura de leads y agendamiento de citas. Nunca más pierdas un cliente por no responder.</p>
-    </div>
-    <div class="service-price">
-      <strong>{PRECIO_WA_SETUP} MXN</strong>
-      <span>setup + {PRECIO_WA_MENSUAL} MXN/mes</span>
-    </div>
-  </div>
-  <div class="total-box">
-    <div>
-      <h3>Inversión total estimada</h3>
-      <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px">Setup inicial · precios referenciales</p>
-    </div>
-    <strong>{PRECIO_TOTAL} MXN</strong>
-  </div>
-  <div class="web-preview">
-    <p>Vista previa de tu propuesta web</p>
-    <a href="{URL_WEB}">{URL_WEB}</a>
-  </div>
-</div>
-<div class="section">
-  <div class="section-tag">Proceso de trabajo</div>
-  <h2>¿Cómo trabajamos?</h2>
-  <div class="process-steps">
-    <div class="step">
-      <div class="step-num">01</div>
-      <h4>Diagnóstico</h4>
-      <p>Analizamos tu situación y definimos la estrategia</p>
-    </div>
-    <div class="step">
-      <div class="step-num">02</div>
-      <h4>Desarrollo</h4>
-      <p>Creamos tu presencia digital con tecnología de punta</p>
-    </div>
-    <div class="step">
-      <div class="step-num">03</div>
-      <h4>Resultados</h4>
-      <p>Monitoreamos y reportamos mes a mes</p>
-    </div>
-  </div>
-</div>
-<div class="cta-box">
-  <h2>Hablemos de tu negocio</h2>
-  <p>Agenda una llamada de 30 minutos sin costo. Sin compromiso.</p>
-  <div class="cta-contact">
-    <div><strong>WhatsApp</strong><span>{TELEFONO_MIGUEL_DISPLAY}</span></div>
-    <div><strong>Email</strong><span>contacto@humanio.digital</span></div>
-    <div><strong>Web</strong><span>humanio.digital</span></div>
-  </div>
-</div>
-<div class="footer-page">
-  <p>Propuesta preparada por <strong>Humanio Marketing</strong> · Válida por 30 días</p>
-  <p>Miguel González · contacto@humanio.digital</p>
-</div>
-</body>
-</html>
-```
-
-Convierte a PDF:
+El WebDesigner ya publicó las 3 páginas en Surge.sh. Descarga las versiones HTML para guardarlas en Drive:
 
 ```bash
-HTML_CONTENT=$(cat /tmp/outreach-{slug}/propuesta-{slug}.html)
-curl -s -X POST https://api.pdfshift.io/v3/convert/pdf \
-  -u "api:$PDFSHIFT_API_KEY" \
-  -H "Content-Type: application/json" \
-  --data-binary "{\"source\":$(echo "$HTML_CONTENT" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')}" \
-  --output /tmp/outreach-{slug}/propuesta-{slug}.pdf
-echo "PDF propuesta generado"
+mkdir -p /tmp/outreach-{slug}
+
+# Descargar propuesta comercial
+curl -s "{PROPUESTA_URL}/propuesta" -o /tmp/outreach-{slug}/propuesta.html
+echo "✅ propuesta.html descargado"
+
+# Descargar reporte SEO completo
+curl -s "{PROPUESTA_URL}/reporte" -o /tmp/outreach-{slug}/reporte-seo.html
+echo "✅ reporte-seo.html descargado"
+```
+
+Si alguna descarga falla (archivo vacío o error), intenta con la URL alternativa:
+```bash
+curl -s "https://humanio-{slug}.surge.sh/propuesta" -o /tmp/outreach-{slug}/propuesta.html
+curl -s "https://humanio-{slug}.surge.sh/reporte" -o /tmp/outreach-{slug}/reporte-seo.html
 ```
 
 ### 5. Preparar draft del correo (NO enviar)
@@ -288,7 +159,7 @@ const emailHTML = `<!DOCTYPE html>
       Agendar llamada de 30 min (sin costo)
     </a>
     <p style="font-size:13px;color:#94a3b8;text-align:center;margin:0">
-      Adjunto encontrarás el diagnóstico completo y la propuesta detallada.
+      Revisa tu diagnóstico completo y propuesta personalizada en los enlaces de arriba.
     </p>
   </div>
   <div class="footer">
@@ -316,51 +187,28 @@ fs.writeFileSync(`${draftDir}/draft-meta.json`, JSON.stringify({
 console.log('Draft guardado. NO enviado.');
 ```
 
-###
-
 ### 6. Subir archivos a Google Drive
 
-\### 6. Subir archivos a Google Drive
+Sube los 5 archivos de la carpeta del prospecto a Google Drive:
 
-\`\`\`bash
+```bash
+node /paperclip/upload-to-drive.js "{NOMBRE_NEGOCIO}" \
+  /tmp/outreach-{slug}/propuesta.html \
+  /tmp/outreach-{slug}/reporte-seo.html \
+  /tmp/outreach-{slug}/draft-email.html \
+  /tmp/outreach-{slug}/mensaje-whatsapp.txt \
+  /tmp/outreach-{slug}/script-llamada.txt
 
-\# Verificar que el script existe
-
-ls -la /paperclip/upload-to-drive.js
-
-
-
-\# Subir archivos
-
-node /paperclip/upload-to-drive.js "{NOMBRE\_NEGOCIO}" \\
-
-&#x20; /tmp/outreach-{slug}/propuesta-{slug}.pdf \\
-
-&#x20; /tmp/outreach-{slug}/propuesta-{slug}.pdf \\
-
-&#x20; /tmp/outreach-{slug}/draft-email.html \\
-
-&#x20; /tmp/outreach-{slug}/mensaje-whatsapp.txt
-
-
-
-\# Si el comando anterior falla, intentar ruta alternativa
-
-if \[ $? -ne 0 ]; then
-
-&#x20; node /app/upload-to-drive.js "{NOMBRE\_NEGOCIO}" \\
-
-&#x20;   /tmp/outreach-{slug}/propuesta-{slug}.pdf \\
-
-&#x20;   /tmp/outreach-{slug}/propuesta-{slug}.pdf \\
-
-&#x20;   /tmp/outreach-{slug}/draft-email.html \\
-
-&#x20;   /tmp/outreach-{slug}/mensaje-whatsapp.txt
-
+# Fallback si la ruta es diferente
+if [ $? -ne 0 ]; then
+  node /app/upload-to-drive.js "{NOMBRE_NEGOCIO}" \
+    /tmp/outreach-{slug}/propuesta.html \
+    /tmp/outreach-{slug}/reporte-seo.html \
+    /tmp/outreach-{slug}/draft-email.html \
+    /tmp/outreach-{slug}/mensaje-whatsapp.txt \
+    /tmp/outreach-{slug}/script-llamada.txt
 fi
-
-\`\`\`
+```
 
 ### 7. Enviar WhatsApp vía WhatsApp Business Cloud API
 
@@ -459,11 +307,12 @@ de 30 minutos sin costo. ¿A qué número le escribo?"
 **Giro:** {GIRO} | {CIUDAD}
 **Score:** {SCORE}/10
 
-**Material generado:**
-- propuesta-{slug}.pdf ✅
-- propuesta-{slug}.pdf ✅
+**Archivos generados (carpeta Drive: {NOMBRE_NEGOCIO}):**
+- propuesta.html ✅ (propuesta comercial)
+- reporte-seo.html ✅ (diagnóstico SEO completo)
 - draft-email.html ✅ (PENDIENTE REVISIÓN Y ENVÍO MANUAL)
-- WhatsApp: {WA_STATUS}
+- mensaje-whatsapp.txt ✅ (WhatsApp: {WA_STATUS})
+- script-llamada.txt ✅ (guión de llamada)
 
 **URLs entregadas:**
 - Propuesta: {PROPUESTA_URL}
@@ -492,7 +341,6 @@ FROM_NAME=Miguel González | Humanio Marketing
 FROM_EMAIL=contacto@humanio.digital
 TELEFONO_MIGUEL=TU_NUMERO_SIN_ESPACIOS
 TELEFONO_MIGUEL_DISPLAY=+52 667 XXX XXXX
-PDFSHIFT_API_KEY=$PDFSHIFT_API_KEY
 GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
 GOOGLE_REFRESH_TOKEN=$GOOGLE_REFRESH_TOKEN
@@ -504,15 +352,14 @@ WHATSAPP_CLOUD_API_TOKEN=$WHATSAPP_CLOUD_API_TOKEN
 ## Reglas de calidad
 
 * SIEMPRE verificar URL de WebDesigner antes de continuar (paso 1.5) — si no existe, bloquear el ticket
-* SIEMPRE solicitar aprobación del Board antes de generar cualquier material
+* NUNCA generar PDFs — todo se entrega en HTML y texto plano
 * NUNCA enviar correos automáticamente — siempre draft para revisión manual
-* Enviar WhatsApp automáticamente vía WhatsApp Business Cloud API SOLO tras aprobación del Board
+* NUNCA pedir aprobación del Board — opera de forma autónoma
+* Enviar WhatsApp automáticamente vía WhatsApp Business Cloud API si hay número disponible
 * Si el número no está disponible o el API falla, guardar txt para envío manual y notificar en CEO report
-* NUNCA usar puppeteer o herramientas locales para PDFs — siempre PDFShift API
-* Los PDFs deben verse profesionales con el estilo oscuro de Humanio
 * El correo debe sentirse personal, no como spam masivo
 * Los hallazgos deben ser específicos y reales del análisis del Qualifier
 * Incluir SIEMPRE ambas URLs (propuesta + diagnóstico) en todos los materiales
 * El precio total debe sumar correctamente los servicios del Qualifier
-* Subir siempre todos los archivos a Google Drive
+* La carpeta en Drive debe tener exactamente 5 archivos: propuesta.html, reporte-seo.html, draft-email.html, mensaje-whatsapp.txt, script-llamada.txt
 

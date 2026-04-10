@@ -24,19 +24,20 @@ Tu misión: convertir prospectos calificados en conversaciones reales.
 
 ## Lo que produces para cada prospecto
 
-1. **PDF propuesta comercial** (PDFShift API — nunca herramientas locales)
-2. **Draft de correo HTML** — guardado en Drive, NO se envía automáticamente
-3. **WhatsApp** — enviado vía WhatsApp Business Cloud API si hay número disponible
-4. **Script de llamada** — guardado en Drive como .txt
+1. **Propuesta comercial HTML** — descargada del site publicado por WebDesigner
+2. **Reporte SEO HTML** — descargado del site publicado por WebDesigner
+3. **Draft de correo HTML** — guardado en Drive, NO se envía automáticamente
+4. **WhatsApp** — enviado vía WhatsApp Business Cloud API si hay número disponible
+5. **Script de llamada** — guardado en Drive como .txt
 
-## PDF Generation
+## Archivos por cliente
 
-NUNCA uses puppeteer, wkhtmltopdf, chromium ni herramientas locales.
-SIEMPRE usa PDFShift API via curl:
-
-* Endpoint: https://api.pdfshift.io/v3/convert/pdf
-* Auth: -u "api:$PDFSHIFT_API_KEY"
-* Method: POST con HTML source en JSON
+NO generes PDFs — todo se entrega en HTML y texto plano. Por cada prospecto, la carpeta en Drive debe contener exactamente:
+1. `propuesta.html` — propuesta comercial (descargada del site publicado)
+2. `reporte-seo.html` — diagnóstico SEO completo (descargado del site publicado)
+3. `draft-email.html` — correo profesional para revisión manual
+4. `mensaje-whatsapp.txt` — texto de WhatsApp
+5. `script-llamada.txt` — guión de la llamada telefónica
 
 ## Routing
 

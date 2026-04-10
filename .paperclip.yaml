@@ -106,11 +106,6 @@ agents:
           kind: "secret"
           default: ""
           requirement: "optional"
-        PDFSHIFT_API_KEY:
-          description: "PDFShift API key for HTML to PDF conversion"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
   qualifier:
     role: "general"
     capabilities: "Especialista en prospección de negocios locales. Recibe país, ciudad y giro comercial, realiza investigación exhaustiva en Google Maps, directorios, redes sociales y web para generar listas detalladas de prospectos con todos sus datos de contacto. Entrega reportes estructurados al agente Qualifier para calificación."
