@@ -543,10 +543,11 @@ const io=new IntersectionObserver(entries=>{
 document.querySelectorAll('.stats').forEach(s=>io.observe(s));
 
 // SPLIT TEXT REVEAL for h1
+// USA innerText (NO innerHTML) — innerHTML parte los <span> y los muestra como texto literal
 const h1=document.querySelector('h1');
 if(h1){
-  const words=h1.innerHTML.split(' ');
-  h1.innerHTML=words.map((w,i)=>`<span style="display:inline-block;opacity:0;transform:translateY(30px);transition:opacity .6s ${i*.08}s ease,transform .6s ${i*.08}s ease">${w}&nbsp;</span>`).join('');
+  const words=h1.innerText.trim().split(/\s+/);
+  h1.innerHTML=words.map((w,i)=>`<span style="display:inline-block;opacity:0;transform:translateY(30px);transition:opacity .7s ${i*.09}s cubic-bezier(0.16,1,0.3,1),transform .7s ${i*.09}s cubic-bezier(0.16,1,0.3,1)">${w}</span>`).join(' ');
   setTimeout(()=>{
     h1.querySelectorAll('span').forEach(s=>{s.style.opacity='1';s.style.transform='translateY(0)'});
   },200);
@@ -676,7 +677,32 @@ DOMAIN="humanio-${SLUG}-2.surge.sh"
 SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-$SLUG $DOMAIN
 ```
 
-### 9. Notificar al CEO
+### 9. Crear ticket para Outreach
+
+Inmediatamente después del deploy exitoso, crea este ticket:
+
+* Título: `Outreach: {NOMBRE_NEGOCIO}`
+* Prioridad: High
+* Asignado a: Outreach
+* parentId: el ticket actual del WebDesigner
+
+```
+## Brief de outreach — {NOMBRE_NEGOCIO}
+
+**Negocio:** {NOMBRE_NEGOCIO}
+**Giro:** {GIRO}
+**Ciudad:** {CIUDAD}
+**Teléfono:** {TELEFONO}
+**WhatsApp:** {WHATSAPP}
+**Email:** {EMAIL si existe}
+**Score:** {SCORE}/10
+**URL propuesta web:** https://humanio-{slug}.surge.sh
+**URL reporte SEO:** https://humanio-{slug}.surge.sh/reporte
+**Argumento principal:** {del brief del Qualifier}
+**Servicios propuestos:** {servicios y precios del Qualifier}
+```
+
+### 10. Notificar al CEO
 
 ```
 ## Propuesta web publicada ✅
@@ -684,9 +710,7 @@ SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-$SLUG $DOMAIN
 **Cliente:** {NOMBRE_NEGOCIO}
 **URL propuesta:** https://humanio-{slug}.surge.sh
 **URL reporte:** https://humanio-{slug}.surge.sh/reporte
-**Efectos:** parallax, magnetic buttons, 3D tilt, split-text, scroll progress, AOS cúbico, counters easeOut, blur-up images
-
-**Siguiente paso:** Outreach tiene ambas URLs para incluir en la propuesta comercial
+**Ticket Outreach:** creado ✅
 ```
 
 ## Reglas de calidad
@@ -699,5 +723,5 @@ SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-$SLUG $DOMAIN
 * El slug debe ser solo letras minúsculas y guiones
 * `{TELEFONO_LIMPIO}` solo dígitos sin espacios ni guiones
 * Las imágenes de Unsplash pueden tardar — si falla usar color de fondo sólido
-* Si Netlify falla con el nombre, agregar `-mx` al slug y reintentar
+* Si Surge falla con error 409 (dominio ocupado), agregar `-2` al slug y reintentar
 
