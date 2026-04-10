@@ -37,6 +37,16 @@ Antes de generar el HTML, confirma que tienes:
 - Lista de quick wins con esfuerzo e impacto
 - Propuesta de servicios con precios
 
+**Nuevas variables para las secciones 2-7:**
+- Keywords: `{KW_1}` a `{KW_5}`, `{VOL_1}` a `{VOL_5}`, `{VOL_TOTAL}`
+- Competidores: `{COMP_1_NOMBRE}`, `{COMP_1_WEB}`, `{COMP_1_GBP}`, `{COMP_1_RESENAS}`, `{COMP_1_POS}`, `{COMP_1_VENTAJA}` (repetir para COMP_2 y COMP_3)
+- Fortalezas: `{FORTALEZA_1}`, `{FORTALEZA_2}`, `{FORTALEZA_3}`
+- Brechas: `{BRECHA_1}`, `{BRECHA_2}`, `{BRECHA_3}`
+- Redes: `{EXISTE_IG}`, `{SEG_IG}`, `{ESTADO_IG}`, `{PROBLEMA_IG}` (repetir para FB, WA, TT, GBP2, EMAIL)
+- Dinero perdido: `{PERDIDA_MES_MIN}`, `{PERDIDA_MES_MAX}`, `{PERDIDA_ANUAL}`, `{CALCULO_PERDIDA_DETALLE}`
+- Posicionamiento: `{ESTADO_GBP_POS}`, `{OBS_GBP}`, `{ESTADO_LOCAL_PACK}`, `{OBS_LOCAL_PACK}`, `{DESCRIPCION_COMPETIDORES_LOCAL_PACK}`
+- Técnico: `{ESTADO_WEB}`, `{HALLAZGO_WEB}`, `{IMPACTO_WEB}` (repetir para TITLE, META, H1, CONTENIDO_WEB, HTTPS, MOBILE, SCHEMA, CONTACTO, VELOCIDAD, GBP)
+
 ## Proceso
 
 ### 1. Calcular nivel global
@@ -365,10 +375,234 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
   </div>
 </div>
 
-<!-- SECCIÓN 2: HALLAZGOS CRÍTICOS -->
+<!-- SECCIÓN 2: DIAGNÓSTICO TÉCNICO SEO -->
 <div class="section">
   <div class="section-inner">
     <div class="section-tag">Sección 2</div>
+    <h2>Diagnóstico Técnico SEO</h2>
+    <p class="section-desc">Auditoría de los elementos técnicos que determinan si Google puede indexar y posicionar el sitio de {NOMBRE_NEGOCIO}.</p>
+    <table class="qw-table">
+      <thead>
+        <tr><th>Elemento</th><th>Estado</th><th>Hallazgo específico</th><th>Impacto</th></tr>
+      </thead>
+      <tbody>
+        <!-- Repite <tr> por cada elemento analizado. Usa ✅ ⚠️ ❌ en Estado -->
+        <tr><td>Sitio web propio</td><td>{ESTADO_WEB}</td><td>{HALLAZGO_WEB}</td><td style="color:{COLOR_IMP_WEB};font-size:.8rem">{IMPACTO_WEB}</td></tr>
+        <tr><td>Title tag</td><td>{ESTADO_TITLE}</td><td>{HALLAZGO_TITLE}</td><td style="color:{COLOR_IMP_TITLE};font-size:.8rem">{IMPACTO_TITLE}</td></tr>
+        <tr><td>Meta description</td><td>{ESTADO_META}</td><td>{HALLAZGO_META}</td><td style="color:{COLOR_IMP_META};font-size:.8rem">{IMPACTO_META}</td></tr>
+        <tr><td>H1 principal</td><td>{ESTADO_H1}</td><td>{HALLAZGO_H1}</td><td style="color:{COLOR_IMP_H1};font-size:.8rem">{IMPACTO_H1}</td></tr>
+        <tr><td>Contenido</td><td>{ESTADO_CONTENIDO_WEB}</td><td>{HALLAZGO_CONTENIDO_WEB}</td><td style="color:{COLOR_IMP_CONTENIDO};font-size:.8rem">{IMPACTO_CONTENIDO}</td></tr>
+        <tr><td>HTTPS / SSL</td><td>{ESTADO_HTTPS}</td><td>{HALLAZGO_HTTPS}</td><td style="color:var(--muted);font-size:.8rem">{IMPACTO_HTTPS}</td></tr>
+        <tr><td>Mobile-friendly</td><td>{ESTADO_MOBILE}</td><td>{HALLAZGO_MOBILE}</td><td style="color:{COLOR_IMP_MOBILE};font-size:.8rem">{IMPACTO_MOBILE}</td></tr>
+        <tr><td>Schema markup</td><td>{ESTADO_SCHEMA}</td><td>{HALLAZGO_SCHEMA}</td><td style="color:{COLOR_IMP_SCHEMA};font-size:.8rem">{IMPACTO_SCHEMA}</td></tr>
+        <tr><td>Datos de contacto</td><td>{ESTADO_CONTACTO}</td><td>{HALLAZGO_CONTACTO}</td><td style="color:{COLOR_IMP_CONTACTO};font-size:.8rem">{IMPACTO_CONTACTO}</td></tr>
+        <tr><td>Velocidad de carga</td><td>{ESTADO_VELOCIDAD}</td><td>{HALLAZGO_VELOCIDAD}</td><td style="color:{COLOR_IMP_VELOCIDAD};font-size:.8rem">{IMPACTO_VELOCIDAD}</td></tr>
+        <tr><td>Google Business Profile</td><td>{ESTADO_GBP}</td><td>{HALLAZGO_GBP}</td><td style="color:{COLOR_IMP_GBP};font-size:.8rem">{IMPACTO_GBP}</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:1rem">✅ Correcto &nbsp;⚠️ Mejorable &nbsp;❌ Ausente o crítico</p>
+  </div>
+</div>
+
+<!-- SECCIÓN 3: POSICIONAMIENTO EN GOOGLE -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-tag">Sección 3</div>
+    <h2>Posicionamiento en Google</h2>
+    <p class="section-desc">Visibilidad actual de {NOMBRE_NEGOCIO} en búsquedas locales y en el Local Pack de {CIUDAD}.</p>
+    <table class="qw-table">
+      <thead>
+        <tr><th>Métrica</th><th>Estado</th><th>Observación</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Google Business Profile</td><td>{ESTADO_GBP_POS}</td><td>{OBS_GBP}</td></tr>
+        <tr><td>Aparece en Local Pack</td><td>{ESTADO_LOCAL_PACK}</td><td>{OBS_LOCAL_PACK}</td></tr>
+        <tr><td>Búsqueda "{KEYWORD_PRINCIPAL}"</td><td>{ESTADO_BUSQ_1}</td><td>{OBS_BUSQ_1}</td></tr>
+        <tr><td>Búsqueda "{KEYWORD_SECUNDARIA}"</td><td>{ESTADO_BUSQ_2}</td><td>{OBS_BUSQ_2}</td></tr>
+        <tr><td>Búsqueda por nombre</td><td>{ESTADO_BUSQ_NOMBRE}</td><td>{OBS_BUSQ_NOMBRE}</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:1.5rem;padding:1.25rem;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:12px">
+      <p style="font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.7"><strong style="color:#ef4444">¿Quién domina el Local Pack ahora?</strong><br>{DESCRIPCION_COMPETIDORES_LOCAL_PACK}</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECCIÓN 4: KEYWORDS DE OPORTUNIDAD -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-tag">Sección 4</div>
+    <h2>Keywords de Mayor Oportunidad</h2>
+    <p class="section-desc">Búsquedas mensuales estimadas en {CIUDAD} para {GIRO}s. {NOMBRE_NEGOCIO} actualmente no aparece en estas posiciones.</p>
+    <table class="qw-table">
+      <thead>
+        <tr><th>#</th><th>Keyword</th><th>Búsquedas/mes*</th><th>Intención</th><th>Dificultad</th></tr>
+      </thead>
+      <tbody>
+        <!-- Mínimo 5 keywords, máximo 10. Ordena por volumen descendente -->
+        <tr>
+          <td style="color:var(--muted);font-family:'JetBrains Mono',monospace">1</td>
+          <td>{KW_1}</td>
+          <td style="color:var(--accent);font-family:'JetBrains Mono',monospace">~{VOL_1}</td>
+          <td><span class="pill high">Transaccional</span></td>
+          <td><span class="pill med">Media</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--muted);font-family:'JetBrains Mono',monospace">2</td>
+          <td>{KW_2}</td>
+          <td style="color:var(--accent);font-family:'JetBrains Mono',monospace">~{VOL_2}</td>
+          <td><span class="pill high">Transaccional</span></td>
+          <td><span class="pill low">Baja</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--muted);font-family:'JetBrains Mono',monospace">3</td>
+          <td>{KW_3}</td>
+          <td style="color:var(--accent);font-family:'JetBrains Mono',monospace">~{VOL_3}</td>
+          <td><span class="pill high">Transaccional</span></td>
+          <td><span class="pill low">Baja</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--muted);font-family:'JetBrains Mono',monospace">4</td>
+          <td>{KW_4}</td>
+          <td style="color:var(--accent);font-family:'JetBrains Mono',monospace">~{VOL_4}</td>
+          <td><span class="pill med">Informacional</span></td>
+          <td><span class="pill low">Baja</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--muted);font-family:'JetBrains Mono',monospace">5</td>
+          <td>{KW_5}</td>
+          <td style="color:var(--accent);font-family:'JetBrains Mono',monospace">~{VOL_5}</td>
+          <td><span class="pill high">Transaccional</span></td>
+          <td><span class="pill low">Baja</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:1rem;padding:1rem 1.25rem;background:var(--bg2);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+      <div>
+        <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Volumen total estimado</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--accent)">{VOL_TOTAL}/mes</div>
+      </div>
+      <div style="font-size:.85rem;color:rgba(255,255,255,.4);max-width:400px;line-height:1.6">{NOMBRE_NEGOCIO} actualmente captura <strong style="color:#ef4444">0%</strong> de este tráfico. {RAZON_CERO_TRAFICO}</div>
+    </div>
+    <p style="font-size:.75rem;color:rgba(255,255,255,.2);margin-top:.75rem">*Estimado — sin herramienta de keywords conectada. Basado en datos demográficos y benchmarks del sector en ciudades comparables.</p>
+  </div>
+</div>
+
+<!-- SECCIÓN 5: ANÁLISIS COMPETITIVO -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-tag">Sección 5</div>
+    <h2>Análisis Competitivo</h2>
+    <p class="section-desc">Comparación de {NOMBRE_NEGOCIO} contra los competidores que sí aparecen en Google para las búsquedas objetivo en {CIUDAD}.</p>
+    <table class="qw-table">
+      <thead>
+        <tr><th>Competidor</th><th>Web</th><th>GBP</th><th>Reseñas</th><th>Pos. Google</th><th>Ventaja vs {NOMBRE_NEGOCIO_CORTO}</th></tr>
+      </thead>
+      <tbody>
+        <!-- 3-4 competidores reales detectados en el análisis -->
+        <tr>
+          <td style="font-weight:500">{COMP_1_NOMBRE}</td>
+          <td>{COMP_1_WEB}</td>
+          <td>{COMP_1_GBP}</td>
+          <td style="font-size:.82rem">{COMP_1_RESENAS}</td>
+          <td style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.82rem">{COMP_1_POS}</td>
+          <td style="font-size:.82rem;color:rgba(255,255,255,.45)">{COMP_1_VENTAJA}</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">{COMP_2_NOMBRE}</td>
+          <td>{COMP_2_WEB}</td>
+          <td>{COMP_2_GBP}</td>
+          <td style="font-size:.82rem">{COMP_2_RESENAS}</td>
+          <td style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.82rem">{COMP_2_POS}</td>
+          <td style="font-size:.82rem;color:rgba(255,255,255,.45)">{COMP_2_VENTAJA}</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">{COMP_3_NOMBRE}</td>
+          <td>{COMP_3_WEB}</td>
+          <td>{COMP_3_GBP}</td>
+          <td style="font-size:.82rem">{COMP_3_RESENAS}</td>
+          <td style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.82rem">{COMP_3_POS}</td>
+          <td style="font-size:.82rem;color:rgba(255,255,255,.45)">{COMP_3_VENTAJA}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div style="padding:1.25rem;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:12px">
+        <div style="font-size:.75rem;color:#10b981;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem">✅ Fortalezas de {NOMBRE_NEGOCIO_CORTO}</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:.4rem">
+          <li style="font-size:.85rem;color:rgba(255,255,255,.6)">{FORTALEZA_1}</li>
+          <li style="font-size:.85rem;color:rgba(255,255,255,.6)">{FORTALEZA_2}</li>
+          <li style="font-size:.85rem;color:rgba(255,255,255,.6)">{FORTALEZA_3}</li>
+        </ul>
+      </div>
+      <div style="padding:1.25rem;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:12px">
+        <div style="font-size:.75rem;color:#ef4444;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem">❌ Brechas a cerrar</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:.4rem">
+          <li style="font-size:.85rem;color:rgba(255,255,255,.6)">{BRECHA_1}</li>
+          <li style="font-size:.85rem;color:rgba(255,255,255,.6)">{BRECHA_2}</li>
+          <li style="font-size:.85rem;color:rgba(255,255,255,.6)">{BRECHA_3}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECCIÓN 6: REDES SOCIALES -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-tag">Sección 6</div>
+    <h2>Redes Sociales y Presencia Digital</h2>
+    <p class="section-desc">Estado actual de cada canal digital de {NOMBRE_NEGOCIO} y oportunidades no aprovechadas.</p>
+    <table class="qw-table">
+      <thead>
+        <tr><th>Canal</th><th>¿Existe?</th><th>Seguidores</th><th>Estado</th><th>Problema detectado</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Instagram</td><td>{EXISTE_IG}</td><td>{SEG_IG}</td><td>{ESTADO_IG}</td><td style="font-size:.82rem;color:rgba(255,255,255,.45)">{PROBLEMA_IG}</td></tr>
+        <tr><td>Facebook</td><td>{EXISTE_FB}</td><td>{SEG_FB}</td><td>{ESTADO_FB}</td><td style="font-size:.82rem;color:rgba(255,255,255,.45)">{PROBLEMA_FB}</td></tr>
+        <tr><td>WhatsApp Business</td><td>{EXISTE_WA}</td><td>—</td><td>{ESTADO_WA}</td><td style="font-size:.82rem;color:rgba(255,255,255,.45)">{PROBLEMA_WA}</td></tr>
+        <tr><td>TikTok</td><td>{EXISTE_TT}</td><td>{SEG_TT}</td><td>{ESTADO_TT}</td><td style="font-size:.82rem;color:rgba(255,255,255,.45)">{PROBLEMA_TT}</td></tr>
+        <tr><td>Google Business Profile</td><td>{EXISTE_GBP2}</td><td>—</td><td>{ESTADO_GBP2}</td><td style="font-size:.82rem;color:rgba(255,255,255,.45)">{PROBLEMA_GBP2}</td></tr>
+        <tr><td>Email marketing</td><td>{EXISTE_EMAIL}</td><td>—</td><td>{ESTADO_EMAIL}</td><td style="font-size:.82rem;color:rgba(255,255,255,.45)">{PROBLEMA_EMAIL}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECCIÓN 7: DINERO PERDIDO -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-tag">Sección 7</div>
+    <h2>Lo Que Estás Perdiendo 💸</h2>
+    <p class="section-desc">En {CIUDAD}, aproximadamente <strong style="color:var(--accent)">{VOL_TOTAL} personas</strong> buscan {GIRO}s cada mes. Sin presencia digital optimizada, ese tráfico va a la competencia.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-top:2rem">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.75rem;text-align:center">
+        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Escenario Conservador</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Captura del 3% del tráfico objetivo</div>
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:#f59e0b">${PERDIDA_MES_MIN} MXN</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.3);margin-top:.25rem">valor mensual no captado</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid rgba(var(--accent-rgb),.2);border-radius:16px;padding:1.75rem;text-align:center">
+        <div style="font-size:.72rem;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Escenario Optimista</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Captura del 10% del tráfico objetivo</div>
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--accent)">${PERDIDA_MES_MAX} MXN</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.3);margin-top:.25rem">valor mensual no captado</div>
+      </div>
+      <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:16px;padding:1.75rem;text-align:center">
+        <div style="font-size:.72rem;color:#ef4444;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Valor Anual Estimado</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:1rem">No captado por falta de presencia digital</div>
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:#ef4444">${PERDIDA_ANUAL} MXN</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.3);margin-top:.25rem">valor anual no captado</div>
+      </div>
+    </div>
+    <p style="font-size:.82rem;color:rgba(255,255,255,.3);margin-top:1.25rem;line-height:1.7">{CALCULO_PERDIDA_DETALLE}</p>
+  </div>
+</div>
+
+<!-- SECCIÓN 8: HALLAZGOS CRÍTICOS -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-tag">Sección 8</div>
     <h2>Hallazgos críticos 🔴</h2>
     <p class="section-desc">{N_CRITICOS} problemas identificados que están frenando activamente el posicionamiento.</p>
 
@@ -422,10 +656,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
   </div>
 </div>
 
-<!-- SECCIÓN 3: HALLAZGOS IMPORTANTES -->
+<!-- SECCIÓN 9: HALLAZGOS IMPORTANTES -->
 <div class="section">
   <div class="section-inner">
-    <div class="section-tag">Sección 3</div>
+    <div class="section-tag">Sección 9</div>
     <h2>Hallazgos importantes 🟡</h2>
     <p class="section-desc">Oportunidades de mejora con impacto significativo en visibilidad y conversión.</p>
 
@@ -447,10 +681,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
   </div>
 </div>
 
-<!-- SECCIÓN 4: QUICK WINS -->
+<!-- SECCIÓN 10: QUICK WINS -->
 <div class="section">
   <div class="section-inner">
-    <div class="section-tag">Sección 4</div>
+    <div class="section-tag">Sección 10</div>
     <h2>Quick Wins ⚡</h2>
     <p class="section-desc">Acciones implementables en menos de 7 días con impacto inmediato en posicionamiento.</p>
     <table class="qw-table">
@@ -505,10 +739,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
   </div>
 </div>
 
-<!-- SECCIÓN 5: PLAN DE ACCIÓN -->
+<!-- SECCIÓN 11: PLAN DE ACCIÓN -->
 <div class="section">
   <div class="section-inner">
-    <div class="section-tag">Sección 5</div>
+    <div class="section-tag">Sección 11</div>
     <h2>Plan de acción priorizado</h2>
     <p class="section-desc">Roadmap en 3 fases para transformar la presencia digital de {NOMBRE_NEGOCIO}.</p>
 
@@ -554,10 +788,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
   </div>
 </div>
 
-<!-- SECCIÓN 6: PROPUESTA HUMANIO -->
+<!-- SECCIÓN 12: PROPUESTA HUMANIO -->
 <div class="section">
   <div class="section-inner">
-    <div class="section-tag">¿Quieres que lo hagamos por ti?</div>
+    <div class="section-tag">Sección 12 — ¿Quieres que lo hagamos por ti?</div>
     <h2>Solución completa Humanio</h2>
     <div class="proposal-banner">
       <h3>Transformamos tu presencia digital en 30 días</h3>
