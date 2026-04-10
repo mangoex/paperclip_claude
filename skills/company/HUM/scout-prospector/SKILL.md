@@ -125,6 +125,18 @@ Prospectos sin Instagram: {N}
 Ver reporte completo en el documento adjunto: reporte-{giro}-{ciudad}.md
 ```
 
+### 8. Despertar al Qualifier
+
+Inmediatamente después de crear el ticket, envía un mensaje directo al agente **Qualifier**:
+
+```
+Hola Qualifier — tienes {N} prospectos nuevos de {giro} en {ciudad} listos para calificar.
+Ticket: {TICKET_ID}
+Procesa todos en un solo run sin pausas.
+```
+
+Esto activa al Qualifier sin necesidad de intervención manual.
+
 ## Reglas importantes
 
 * Verifica cada dato antes de incluirlo — no inventes información

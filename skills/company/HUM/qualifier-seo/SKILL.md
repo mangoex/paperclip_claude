@@ -137,8 +137,19 @@ Umbral mínimo para generar propuesta completa: **score ≥ 6**
 Se generará y adjuntará en comentario posterior.
 Inclúyelo en el deploy como página secundaria (`/reporte`). Nómbralo `reporte.html`.
 Al terminar, responde a este ticket con ambas URLs:
-- URL propuesta: https://humanio-{slug}.netlify.app
-- URL reporte: https://humanio-{slug}.netlify.app/reporte
+- URL propuesta: https://humanio-{slug}.surge.sh
+- URL reporte: https://humanio-{slug}.surge.sh/reporte
+```
+
+### 4.1 Despertar al WebDesigner
+
+Inmediatamente después de crear cada ticket de WebDesigner, envíale un mensaje directo:
+
+```
+Hola WebDesigner — tienes un nuevo brief listo para {NOMBRE_NEGOCIO} ({GIRO} en {CIUDAD}).
+Ticket: {TICKET_ID}
+Score: {SCORE}/10
+Procesa este y todos los tickets pendientes en un solo run.
 ```
 
 ### 5. Generar propuesta personalizada

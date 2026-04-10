@@ -963,7 +963,7 @@ DOMAIN="humanio-${SLUG}-2.surge.sh"
 SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-$SLUG $DOMAIN
 ```
 
-### 9. Crear ticket para Outreach
+### 9. Crear ticket para Outreach y despertarlo
 
 Inmediatamente después del deploy exitoso, crea este ticket:
 
@@ -986,6 +986,16 @@ Inmediatamente después del deploy exitoso, crea este ticket:
 **URL reporte SEO:** https://humanio-{slug}.surge.sh/reporte
 **Argumento principal:** {del brief del Qualifier}
 **Servicios propuestos:** {servicios y precios del Qualifier}
+```
+
+Después de crear el ticket, envía un mensaje directo al agente **Outreach**:
+
+```
+Hola Outreach — tienes un brief nuevo listo para {NOMBRE_NEGOCIO} ({GIRO} en {CIUDAD}).
+Ticket: {TICKET_ID}
+Propuesta: https://humanio-{slug}.surge.sh
+Reporte: https://humanio-{slug}.surge.sh/reporte
+Procesa este y todos los tickets pendientes en un solo run.
 ```
 
 ### 10. Notificar al CEO
