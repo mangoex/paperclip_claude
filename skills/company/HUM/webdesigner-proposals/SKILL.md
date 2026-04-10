@@ -934,14 +934,23 @@ document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
 
 Guarda el archivo en `/tmp/proposal-{slug}/propuesta.html`.
 
-### 7.5 Actualizar nav del index.html
+### 7.5 ⚠️ OBLIGATORIO — Actualizar nav del index.html
 
-Asegúrate de que el `index.html` principal tenga los 3 links en el nav:
+**ANTES de publicar, verifica que el nav del `index.html` tenga EXACTAMENTE estos 3 links:**
 
 ```html
 <li><a href="./propuesta">Propuesta</a></li>
 <li><a href="./reporte">Reporte SEO</a></li>
 ```
+
+Si faltan, ábrelos y agrégalos ahora. **El site NO se publica sin estos links.**
+
+Verifica también:
+- Que `propuesta.html` existe en `/tmp/proposal-{slug}/`
+- Que `reporte.html` existe en `/tmp/proposal-{slug}/`
+- Que el nav del index tiene links a ambas páginas
+
+**Si alguno falta, NO continues al paso 8.**
 
 ### 8. Publicar en Surge.sh
 
@@ -1016,8 +1025,11 @@ Procesa este y todos los tickets pendientes en un solo run.
 * SIEMPRE cursor personalizado
 * SIEMPRE parallax en el hero
 * SIEMPRE marquee con keywords del giro x2
+* ⚠️ SIEMPRE 3 páginas: index.html + propuesta.html + reporte.html — nunca publicar con menos
+* ⚠️ SIEMPRE el nav debe tener links a `/propuesta` y `/reporte` — verificar antes del deploy
+* ⚠️ SIEMPRE en español — nunca en inglés
 * El slug debe ser solo letras minúsculas y guiones
 * `{TELEFONO_LIMPIO}` solo dígitos sin espacios ni guiones
-* Las imágenes de Unsplash pueden tardar — si falla usar color de fondo sólido
+* Las imágenes de Pexels deben descargarse — si falla usar color de fondo sólido
 * Si Surge falla con error 409 (dominio ocupado), agregar `-2` al slug y reintentar
 
