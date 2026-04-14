@@ -3,7 +3,7 @@ name: closer-sales
 slug: closer-sales
 ---
 
-# Closer Sales — Ejecución de Seguimiento Comercial | Humanio Marketing
+# Closer Sales — Ejecución de Seguimiento Comercial | Humanio
 
 ## Identidad
 
@@ -83,53 +83,43 @@ Si no encuentras nada nuevo, usa un hallazgo del diagnóstico original que NO se
 DATO_NUEVO = hallazgos_originales[i] donde i != hallazgo_usado_msg1
 ```
 
-### 4. Componer mensaje 2 — WhatsApp
+### 4. Generar todos los archivos (día 3 — generación anticipada completa)
 
-Aplica el template del skill `sales-copywriting` → sección "WHATSAPP — Mensaje 2".
+> **Principio clave:** Genera TODOS los archivos el día que te activas — msg 2, msg 3, log.
+> Súbelos a Drive ANTES de enviar cualquier cosa.
+> Así Miguel puede revisar el plan completo antes de que salga ningún mensaje.
+> El msg 2 se envía hoy. El msg 3 se guarda para envío en día 7 (solo si no hay respuesta).
 
 ```bash
-# Composición
-WA_MSG2="Hola {NOMBRE_CONTACTO}, soy Miguel de Humanio 👋
-
-Te escribí hace unos días sobre {NOMBRE_NEGOCIO}.
-
-{DATO_NUEVO_DE_VALOR}
-
-¿Tuviste chance de ver la propuesta? Si tienes alguna duda, con gusto te la resuelvo por aquí.
-
-— Miguel"
-
-# Guardar
 mkdir -p /tmp/closer-{slug}
-echo "$WA_MSG2" > /tmp/closer-{slug}/seguimiento-2-whatsapp.txt
-
-# Enviar vía WhatsApp Business Cloud API
-WA_RESPONSE=$(curl -s -X POST \
-  "https://graph.facebook.com/v18.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
-  -H "Authorization: Bearer $WHATSAPP_CLOUD_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"messaging_product\": \"whatsapp\",
-    \"to\": \"{TELEFONO_PROSPECTO_E164}\",
-    \"type\": \"text\",
-    \"text\": {
-      \"preview_url\": true,
-      \"body\": $(echo "$WA_MSG2" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
-    }
-  }")
-
-WA_MSG_ID=$(echo "$WA_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['messages'][0]['id'])" 2>/dev/null)
-
-if [ -n "$WA_MSG_ID" ]; then
-  echo "✅ WhatsApp msg 2 enviado — ID: $WA_MSG_ID"
-  WA2_STATUS="ENVIADO — ID: $WA_MSG_ID"
-else
-  echo "⚠️ WhatsApp msg 2 falló"
-  WA2_STATUS="PENDIENTE ENVÍO MANUAL"
-fi
 ```
 
-### 5. Componer mensaje 2 — Email (draft)
+#### 4a. Mensaje 2 — WhatsApp
+
+Sigue el framework VALOR del skill `sales-copywriting` → "WHATSAPP — Mensaje 2":
+- Abre con nombre del contacto (no con "Hola 👋" ni "Soy Miguel")
+- Aporta UN dato nuevo que no estaba en el mensaje 1
+- Semilla de IA opcional solo si fluye naturalmente con el dato
+- Pregunta abierta de micro-compromiso
+- Máximo 8 líneas
+
+```bash
+WA_MSG2="{NOMBRE_CONTACTO}, soy Miguel de Humanio.
+
+Te escribí hace unos días sobre {NOMBRE_NEGOCIO}.
+{DATO_NUEVO_DE_VALOR}
+
+¿Tuviste chance de ver la propuesta?
+{PROPUESTA_URL}
+
+Si tienes alguna duda, aquí estoy.
+— Miguel"
+
+echo "$WA_MSG2" > /tmp/closer-{slug}/seguimiento-2-whatsapp.txt
+echo "✅ seguimiento-2-whatsapp.txt generado"
+```
+
+#### 4b. Mensaje 2 — Email (draft, no enviar)
 
 ```javascript
 const fs = require('fs');
@@ -153,12 +143,13 @@ const email2HTML = `<!DOCTYPE html>
   <p>Quería saber si tuviste chance de revisar el análisis que te envié.</p>
   <p>{DATO_NUEVO_DE_VALOR}</p>
   <p>La propuesta sigue disponible aquí: <a href="{PROPUESTA_URL}">{PROPUESTA_URL}</a></p>
-  <p>Si tienes alguna pregunta o quieres que te explique algo en particular, me puedes escribir por aquí o por WhatsApp.</p>
+  <p>Si tienes alguna pregunta, me puedes escribir por aquí o por WhatsApp.</p>
   <p>Saludos,<br>Miguel</p>
   <div class="signature">
-    <p><strong>Miguel González</strong> · Humanio Marketing<br>
-    contacto@humanio.digital · humanio.digital<br>
-    WhatsApp: {TELEFONO_MIGUEL_DISPLAY}</p>
+    <p><strong>Miguel González</strong><br>
+    Humanio &mdash; Inteligencia Artificial para negocios<br>
+    contacto@humanio.digital &middot; humanio.digital<br>
+    {TELEFONO_MIGUEL_DISPLAY}</p>
   </div>
 </div>
 </body>
@@ -170,45 +161,39 @@ fs.writeFileSync('/tmp/closer-{slug}/seguimiento-2-meta.json', JSON.stringify({
   to: '{EMAIL_PROSPECTO}',
   subject: 'Re: Análisis digital de {NOMBRE_NEGOCIO}',
   from: 'contacto@humanio.digital',
-  fromName: 'Miguel González | Humanio Marketing',
-  inReplyTo: '{MESSAGE_ID_MSG1}',  // ID del email original para threading
+  fromName: 'Miguel González | Humanio',
+  inReplyTo: '{MESSAGE_ID_MSG1}',
   status: 'DRAFT_PENDING_REVIEW',
+  scheduledFor: '{FECHA_MSG2}',
   createdAt: new Date().toISOString()
 }, null, 2));
+console.log('✅ seguimiento-2-email.html generado');
 ```
 
-### 6. Monitorear respuestas (día 3-7)
+#### 4c. Mensaje 3 — WhatsApp (generado ahora, enviado en día 7)
 
-Si el prospecto responde por WhatsApp entre el mensaje 2 y el 3:
-
-1. Leer el mensaje entrante (via webhook de WhatsApp Business API o revisión manual)
-2. Clasificar la intención:
-   - `PRECIO` → responder con referencia a propuesta web
-   - `INTERES` → escalar a CEO para agendar llamada
-   - `RECHAZO` → cerrar con gracia, no enviar mensaje 3
-   - `PREGUNTA_TECNICA` → responder con datos del diagnóstico del Qualifier
-   - `OBJECION` → manejar según guía del skill sales-copywriting
-3. Registrar en `closer-log.txt`
-
-### 7. Componer mensaje 3 — WhatsApp (día 7, solo si no hay respuesta)
+Sigue el template "WHATSAPP — Mensaje 3" del skill `sales-copywriting`:
+- Declarar que es el último mensaje (elimina presión)
+- No introducir temas nuevos
+- Dejar puerta abierta con calidez
+- Máximo 5 líneas
 
 ```bash
-WA_MSG3="Hola {NOMBRE_CONTACTO} 👋
+WA_MSG3="{NOMBRE_CONTACTO}, este es mi último mensaje sobre el tema.
 
-Este es mi último mensaje sobre el tema. Entiendo que hay mil cosas en el día a día de un negocio.
+Entiendo que el día a día de {NOMBRE_NEGOCIO} es lo primero.
 
-Solo quería que supieras que el análisis de {NOMBRE_NEGOCIO} sigue disponible: {PROPUESTA_URL}
+El análisis sigue disponible cuando quieras:
+{PROPUESTA_URL}
 
-Si en algún momento quieres retomarlo, me encuentras aquí. Éxito con todo 🙌
-
+Éxito con todo.
 — Miguel"
 
 echo "$WA_MSG3" > /tmp/closer-{slug}/seguimiento-3-whatsapp.txt
-
-# Enviar (mismo proceso de API que mensaje 2)
+echo "✅ seguimiento-3-whatsapp.txt generado (programado para día 7 si no hay respuesta)"
 ```
 
-### 8. Componer mensaje 3 — Email (día 7)
+#### 4d. Mensaje 3 — Email (generado ahora, enviado en día 7)
 
 ```javascript
 const email3HTML = `<!DOCTYPE html>
@@ -227,72 +212,145 @@ const email3HTML = `<!DOCTYPE html>
 <body>
 <div class="container">
   <p>Hola {NOMBRE_CONTACTO},</p>
-  <p>No quiero ser insistente — sé que el día a día de {NOMBRE_NEGOCIO} es lo primero.</p>
+  <p>No quiero ser insistente &mdash; sé que el día a día de {NOMBRE_NEGOCIO} es lo primero.</p>
   <p>Tu análisis y propuesta siguen disponibles aquí: <a href="{PROPUESTA_URL}">{PROPUESTA_URL}</a></p>
-  <p>Si en algún momento te interesa explorarlo, me encuentras en este correo o en WhatsApp ({TELEFONO_MIGUEL_DISPLAY}).</p>
+  <p>Si en algún momento te interesa explorarlo, me encuentras en este correo o por WhatsApp ({TELEFONO_MIGUEL_DISPLAY}).</p>
   <p>Te deseo mucho éxito.</p>
-  <p>Miguel González<br>Humanio Marketing</p>
+  <p>Miguel González<br>Humanio &mdash; Inteligencia Artificial para negocios</p>
 </div>
 </body>
 </html>`;
 
 fs.writeFileSync('/tmp/closer-{slug}/seguimiento-3-email.html', email3HTML);
+fs.writeFileSync('/tmp/closer-{slug}/seguimiento-3-meta.json', JSON.stringify({
+  to: '{EMAIL_PROSPECTO}',
+  subject: 'Re: Análisis digital de {NOMBRE_NEGOCIO}',
+  from: 'contacto@humanio.digital',
+  fromName: 'Miguel González | Humanio',
+  status: 'DRAFT_PENDING_REVIEW',
+  scheduledFor: '{FECHA_MSG3}',
+  note: 'Enviar solo si no hubo respuesta al mensaje 2',
+  createdAt: new Date().toISOString()
+}, null, 2));
+console.log('✅ seguimiento-3-email.html generado');
 ```
 
-### 9. Generar closer-log.txt
+### 5. Generar closer-log.txt (estado inicial)
 
-```
+```bash
+cat > /tmp/closer-{slug}/closer-log.txt << 'EOF'
 ═══════════════════════════════════════════════════════════
 REGISTRO DE SEGUIMIENTO — {NOMBRE_NEGOCIO}
 ═══════════════════════════════════════════════════════════
 
-Prospecto: {NOMBRE_NEGOCIO}
-Contacto: {NOMBRE_CONTACTO}
-Giro: {GIRO} | Ciudad: {CIUDAD}
-Score: {SCORE}/10
+Prospecto : {NOMBRE_NEGOCIO}
+Contacto  : {NOMBRE_CONTACTO}
+Giro      : {GIRO} | {CIUDAD}
+Score     : {SCORE}/10
+Propuesta : {PROPUESTA_URL}
 
-SECUENCIA DE MENSAJES:
-─────────────────────
-[{FECHA_MSG1}] MSG 1 (Outreach)
-  Canal: {CANAL_MSG1}
-  Status: Enviado
-  Hallazgo usado: {HALLAZGO_PRINCIPAL_MSG1}
+SECUENCIA PLANIFICADA:
+──────────────────────
+[{FECHA_MSG1}] MSG 1 — Outreach
+  Canal    : {CANAL_MSG1}
+  Hallazgo : {HALLAZGO_PRINCIPAL_MSG1}
+  Status   : Enviado
 
-[{FECHA_MSG2}] MSG 2 (Closer)
-  Canal: Email (draft) + WhatsApp ({WA2_STATUS})
+[{FECHA_MSG2}] MSG 2 — Closer (hoy)
+  Canal    : Email (draft) + WhatsApp
   Dato nuevo: {DATO_NUEVO_DE_VALOR}
-  Status: {STATUS_MSG2}
+  Status   : PENDIENTE ENVÍO
 
-[{FECHA_MSG3}] MSG 3 (Closer)
-  Canal: Email (draft) + WhatsApp ({WA3_STATUS})
-  Status: {STATUS_MSG3}
+[{FECHA_MSG3}] MSG 3 — Closer (día 7)
+  Canal    : Email (draft) + WhatsApp
+  Status   : PROGRAMADO — solo si no hay respuesta al msg 2
 
 RESPUESTAS DEL PROSPECTO:
-─────────────────────────
-{REGISTRO_RESPUESTAS}
+──────────────────────────
+(sin respuestas aún)
 
-ESTADO FINAL: {ESTADO_FINAL}
-ACCIÓN RECOMENDADA: {ACCION}
-
+ESTADO: EN_SEGUIMIENTO
 ═══════════════════════════════════════════════════════════
+EOF
+echo "✅ closer-log.txt generado"
 ```
 
-### 10. Subir archivos a Drive
-
-Sube los archivos nuevos a la MISMA carpeta del prospecto que creó Outreach:
+### 6. Subir TODOS los archivos a Drive (antes de enviar)
 
 ```bash
-# Los archivos de Outreach ya existen en la carpeta
-# Agregar los del Closer:
 node /paperclip/upload-to-drive.js "{NOMBRE_NEGOCIO}" \
-  /tmp/closer-{slug}/seguimiento-2-email.html \
   /tmp/closer-{slug}/seguimiento-2-whatsapp.txt \
-  /tmp/closer-{slug}/seguimiento-3-email.html \
+  /tmp/closer-{slug}/seguimiento-2-email.html \
   /tmp/closer-{slug}/seguimiento-3-whatsapp.txt \
+  /tmp/closer-{slug}/seguimiento-3-email.html \
   /tmp/closer-{slug}/closer-log.txt
+
+if [ $? -ne 0 ]; then
+  node /app/upload-to-drive.js "{NOMBRE_NEGOCIO}" \
+    /tmp/closer-{slug}/seguimiento-2-whatsapp.txt \
+    /tmp/closer-{slug}/seguimiento-2-email.html \
+    /tmp/closer-{slug}/seguimiento-3-whatsapp.txt \
+    /tmp/closer-{slug}/seguimiento-3-email.html \
+    /tmp/closer-{slug}/closer-log.txt
+fi
+echo "✅ Todos los archivos subidos a Drive"
 ```
 
-### 11. Notificar al CEO
+### 7. Enviar mensaje 2 por WhatsApp
+
+```bash
+WA_RESPONSE=$(curl -s -X POST \
+  "https://graph.facebook.com/v18.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
+  -H "Authorization: Bearer $WHATSAPP_CLOUD_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"messaging_product\": \"whatsapp\",
+    \"to\": \"{TELEFONO_PROSPECTO_E164}\",
+    \"type\": \"text\",
+    \"text\": {
+      \"preview_url\": true,
+      \"body\": $(cat /tmp/closer-{slug}/seguimiento-2-whatsapp.txt | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+    }
+  }")
+
+WA_MSG_ID=$(echo "$WA_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['messages'][0]['id'])" 2>/dev/null)
+
+if [ -n "$WA_MSG_ID" ]; then
+  echo "✅ WhatsApp msg 2 enviado — ID: $WA_MSG_ID"
+  WA2_STATUS="ENVIADO — ID: $WA_MSG_ID"
+else
+  echo "⚠️ WhatsApp msg 2 no enviado — PENDIENTE ENVÍO MANUAL"
+  WA2_STATUS="PENDIENTE ENVÍO MANUAL"
+fi
+```
+
+### 8. Manejo de respuestas y envío de mensaje 3 (día 7)
+
+Si el prospecto responde entre el día 3 y el día 7:
+
+1. Clasificar la intención:
+   - `PRECIO` → referir a la propuesta web, no dar precio por escrito
+   - `INTERES` → escalar a CEO para agendar llamada, NO enviar mensaje 3
+   - `RECHAZO` → cerrar con gracia, NO enviar mensaje 3, actualizar ticket
+   - `PREGUNTA_TECNICA` → responder con datos reales del Qualifier
+   - `OBJECION` → manejar según skill `sales-copywriting`
+2. Registrar toda interacción en `closer-log.txt`
+
+**Envío de mensaje 3 (día 7):**
+```bash
+HOY=$(date +%Y-%m-%d)
+if [ "$HOY" >= "$FECHA_MSG3" ] && [ "$STATUS_RESPUESTA" = "sin_respuesta" ]; then
+  # Enviar seguimiento-3-whatsapp.txt (ya generado y en Drive)
+  cat /tmp/closer-{slug}/seguimiento-3-whatsapp.txt | \
+  # [mismo curl del paso 7]
+  echo "✅ Mensaje 3 enviado"
+  WA3_STATUS="ENVIADO"
+else
+  WA3_STATUS="NO APLICA — prospecto respondió o aún no es día 7"
+fi
+```
+
+### 9. Notificar al CEO
 
 Reporta con el template definido en AGENTS.md del Closer.
 
