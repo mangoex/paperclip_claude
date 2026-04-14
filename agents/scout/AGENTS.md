@@ -14,7 +14,7 @@ skills:
 
 ## MCP Servers
 
-* firecrawl: [https://mcp.firecrawl.dev/fc-f660dd278706421e87e9a339b664f0c0/v2/mcp](https://mcp.firecrawl.dev/fc-f660dd278706421e87e9a339b664f0c0/v2/mcp)
+* firecrawl: `$FIRECRAWL_MCP_URL`
 
 ## Identidad
 
@@ -64,6 +64,13 @@ Busca en:
 * Horario de atención
 * Descripción del negocio
 
+### 4.5 Deduplicación
+
+Antes de incluir un negocio en el reporte, verifica que no sea duplicado:
+- Compara nombre + teléfono con los ya incluidos en la lista
+- Si el mismo negocio aparece en Google Maps Y Yelp, inclúyelo UNA SOLA VEZ con todos los datos combinados
+- Prioriza los datos más completos de cualquier fuente
+
 ### 5. Formato de entrega
 
 Genera un reporte en markdown con esta estructura:
@@ -103,6 +110,18 @@ Al terminar el reporte, crea un nuevo ticket asignado al agente **Qualifier** co
 * Adjunta el reporte como documento
 * Prioridad: Medium
 
+### 7. Despertar al Qualifier
+
+Inmediatamente después de crear el ticket, envía un mensaje directo al agente **Qualifier**:
+
+```
+Hola Qualifier — tienes {N} prospectos nuevos de {giro} en {ciudad} listos para calificar.
+Ticket: {TICKET_ID}
+Procesa todos en un solo run sin pausas.
+```
+
+Esto activa al Qualifier sin necesidad de intervención manual.
+
 ## Reglas importantes
 
 * Verifica cada dato antes de incluirlo — no inventes información
@@ -110,4 +129,3 @@ Al terminar el reporte, crea un nuevo ticket asignado al agente **Qualifier** co
 * Enfócate en negocios reales y activos
 * Prioriza negocios con presencia digital incompleta (sin web, sin Instagram, etc.)
 * Reporta al CEO si encuentras más de 50 prospectos potenciales en un giro
-

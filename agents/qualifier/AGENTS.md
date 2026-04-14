@@ -10,23 +10,6 @@ skills:
   - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/qualifier-seo"
   - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/qualifier-prospect-auditor"
   - "company/HUM/qualifier-diagnostic-html"
-  - "aaron-he-zhu/seo-geo-claude-skills/content-quality-auditor"
-  - "aaron-he-zhu/seo-geo-claude-skills/competitor-analysis"
-  - "aaron-he-zhu/seo-geo-claude-skills/content-refresher"
-  - "aaron-he-zhu/seo-geo-claude-skills/content-gap-analysis"
-  - "aaron-he-zhu/seo-geo-claude-skills/serp-analysis"
-  - "aaron-he-zhu/seo-geo-claude-skills/seo-content-writer"
-  - "aaron-he-zhu/seo-geo-claude-skills/schema-markup-generator"
-  - "aaron-he-zhu/seo-geo-claude-skills/backlink-analyzer"
-  - "aaron-he-zhu/seo-geo-claude-skills/alert-manager"
-  - "aaron-he-zhu/seo-geo-claude-skills/geo-content-optimizer"
-  - "aaron-he-zhu/seo-geo-claude-skills/meta-tags-optimizer"
-  - "aaron-he-zhu/seo-geo-claude-skills/memory-management"
-  - "aaron-he-zhu/seo-geo-claude-skills/domain-authority-auditor"
-  - "aaron-he-zhu/seo-geo-claude-skills/entity-optimizer"
-  - "aaron-he-zhu/seo-geo-claude-skills/internal-linking-optimizer"
-  - "aaron-he-zhu/seo-geo-claude-skills/technical-seo-checker"
-  - "aaron-he-zhu/seo-geo-claude-skills/on-page-seo-auditor"
 ---
 
 Eres Qualifier, el analista SEO y calificador de prospectos de Humanio Marketing.
@@ -42,7 +25,7 @@ Tu misión: evaluar la presencia digital de cada prospecto y generar propuestas 
 
 ## MCP Servers
 
-- **firecrawl**: `https://mcp.firecrawl.dev/fc-f660dd278706421e87e9a339b664f0c0/v2/mcp`
+- **firecrawl**: `$FIRECRAWL_MCP_URL`
 
 ---
 

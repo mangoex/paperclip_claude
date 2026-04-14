@@ -29,7 +29,7 @@ agents:
         maxConcurrentRuns: 1
   outreach:
     role: "general"
-    capabilities: "Especialista en comunicación comercial de Humanio Marketing. Recibe prospectos calificados, genera diagnósticos profesionales de marketing digital, crea propuestas personalizadas en PDF, y las envía por correo o WhatsApp según los datos disponibles del prospecto. Representa la imagen premium de Humanio ante cada cliente potencial."
+    capabilities: "Especialista en prospección comercial de Humanio Marketing. Recibe prospectos con sitio publicado en Surge.sh, descarga propuesta y reporte HTML, genera draft de correo, mensaje de WhatsApp y script de llamada, sube los 5 archivos a Google Drive y notifica al CEO con los URLs."
     adapter:
       config:
         dangerouslySkipPermissions: true
@@ -108,7 +108,7 @@ agents:
           requirement: "optional"
   qualifier:
     role: "general"
-    capabilities: "Especialista en prospección de negocios locales. Recibe país, ciudad y giro comercial, realiza investigación exhaustiva en Google Maps, directorios, redes sociales y web para generar listas detalladas de prospectos con todos sus datos de contacto. Entrega reportes estructurados al agente Qualifier para calificación."
+    capabilities: "Analista SEO y calificador de prospectos de Humanio Marketing. Recibe reportes de Scout con listas de negocios locales, evalúa su presencia digital, calcula un score de oportunidad (1-10) y genera diagnósticos HTML visuales para los prospectos con score ≥ 6. Crea tickets para WebDesigner con briefs completos."
     adapter:
       config:
         model: "claude-sonnet-4-5-20250929"
@@ -120,10 +120,15 @@ agents:
     inputs:
       env:
         FIRECRAWL_API_KEY:
-          description: "Provide FIRECRAWL_API_KEY for agent qualifier"
+          description: "Firecrawl API key — requerida para analizar sitios web de prospectos"
           kind: "secret"
           default: ""
-          requirement: "optional"
+          requirement: "required"
+        FIRECRAWL_MCP_URL:
+          description: "URL del MCP server de Firecrawl — formato: https://mcp.firecrawl.dev/{TOKEN}/v2/mcp"
+          kind: "secret"
+          default: ""
+          requirement: "required"
   scout:
     role: "general"
     capabilities: "Especialista en prospección de negocios locales. Recibe país, ciudad y giro comercial, realiza investigación exhaustiva en Google Maps, directorios, redes sociales y web para generar listas detalladas de prospectos con todos sus datos de contacto. Entrega reportes estructurados al agente Qualifier para calificación."
@@ -138,13 +143,18 @@ agents:
     inputs:
       env:
         FIRECRAWL_API_KEY:
-          description: "Provide FIRECRAWL_API_KEY for agent scout"
+          description: "Firecrawl API key — requerida para buscar y scrape de negocios locales"
           kind: "secret"
           default: ""
-          requirement: "optional"
+          requirement: "required"
+        FIRECRAWL_MCP_URL:
+          description: "URL del MCP server de Firecrawl — formato: https://mcp.firecrawl.dev/{TOKEN}/v2/mcp"
+          kind: "secret"
+          default: ""
+          requirement: "required"
   webdesigner:
     role: "general"
-    capabilities: "Experto en diseño web moderno, UX/UI y usabilidad. Recibe prospectos calificados del Qualifier y crea propuestas web personalizadas con diseño profesional: efectos parallax en hero, animaciones de imágenes y mouse, paleta de colores acorde al giro del negocio. Genera imágenes con IA usando Google Imagen, construye el sitio en HTML/CSS/JS y lo publica en Netlify como propuesta para el cliente."
+    capabilities: "Diseñador web premium de Humanio Marketing. Recibe briefs del Qualifier y genera sitios web de 3 páginas (presentación, propuesta comercial, reporte SEO) en HTML/CSS/JS vanilla con estilos visuales únicos por prospecto. Publica en Surge.sh y crea ticket para Outreach al terminar."
     adapter:
       config:
         dangerouslySkipPermissions: true
@@ -156,28 +166,18 @@ agents:
         maxConcurrentRuns: 1
     inputs:
       env:
-        GITHUB_TOKEN:
-          description: "Provide GITHUB_TOKEN for agent webdesigner"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_AI_API_KEY:
-          description: "Provide GOOGLE_AI_API_KEY for agent webdesigner"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
         SURGE_TOKEN:
-          description: "Surge.sh deploy token — run `surge token` to get it"
+          description: "Surge.sh deploy token — obtener con `surge token` en terminal"
           kind: "secret"
           default: ""
-          requirement: "optional"
-        TWENTY_FIRST_API_KEY:
-          description: "Provide TWENTY_FIRST_API_KEY for agent webdesigner"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
+          requirement: "required"
         PEXELS_API_KEY:
-          description: "Pexels API key for hero images"
+          description: "Pexels API key para imágenes hero de los sitios — pexels.com/api"
+          kind: "secret"
+          default: ""
+          requirement: "required"
+        TWENTY_FIRST_API_KEY:
+          description: "21st.dev API key para componentes UI premium opcionales — 21st.dev"
           kind: "secret"
           default: ""
           requirement: "optional"
@@ -189,7 +189,7 @@ projects:
     status: "in_progress"
 routines:
   qualifier-revisar-tickets-pendientes:
-    status: "paused"
+    status: "active"
     triggers:
       -
         kind: "schedule"
@@ -210,7 +210,7 @@ routines:
         label: "weekly-monday-9am"
         timezone: "America/Mazatlan"
   webdesigner-revisar-briefs-pendientes:
-    status: "paused"
+    status: "active"
     triggers:
       -
         kind: "schedule"
