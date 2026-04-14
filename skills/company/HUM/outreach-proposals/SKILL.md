@@ -86,6 +86,17 @@ curl -s "https://humanio-{slug}.surge.sh/reporte" -o /tmp/outreach-{slug}/report
 
 ### 5. Preparar draft del correo (NO enviar)
 
+#### Reglas obligatorias del email (del skill `sales-copywriting`)
+
+Antes de escribir el HTML, determina estas variables:
+
+- **`{NOMBRE_CONTACTO_O_NEGOCIO}`**: nombre del contacto si el Qualifier lo identificó; si no, usa el nombre del negocio. NUNCA dejar en blanco ni usar `[Nombre Contacto]`.
+- **`{OBSERVACION_POSITIVA}`**: UNA cosa real y específica que destaca positivamente del negocio según el análisis del Qualifier. Debe ser verificable y genuina. Ejemplos: "Vi que tienen 4.9★ con 114 reseñas en Google — eso habla de años de trabajo bien hecho", "Vi que su feed de Instagram muestra trabajos de colorimetría realmente cuidados", "Vi que llevan {N} años en el mercado y sus clientes los recomiendan constantemente". NUNCA frases genéricas como "vi su negocio" o "hice un análisis".
+- **`{HALLAZGO_CENTRAL}`**: El hallazgo MÁS importante. UNO solo, en una oración. Debe explicar la consecuencia de no actuar. Ejemplo: "Actualmente {NOMBRE_NEGOCIO} no aparece en los primeros resultados, lo que significa que esas búsquedas van directo a la competencia." NO listar múltiples hallazgos.
+- **`{SUBJECT}`**: Máximo 6 palabras, sin emojis. Formato: `Análisis digital de {NOMBRE_NEGOCIO}` o variante equivalente.
+
+**Excepción URGENTE**: Si el negocio tiene una situación crítica real (sitio caído, Google Business sin reclamar, dirección equivocada en Maps), el subject puede reflejar urgencia — pero solo si es un hecho verificado, no exageración. Ej: `Tu sitio {dominio} está caído` (5 palabras ✓).
+
 ```javascript
 const fs = require('fs');
 
@@ -96,76 +107,54 @@ const emailHTML = `<!DOCTYPE html>
 <style>
   body{font-family:'Inter',Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px}
   .container{max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden}
-  .header{background:#03080f;padding:32px 36px}
-  .header h1{font-size:22px;font-weight:800;color:#fff;margin:0 0 6px}
-  .header h1 span{color:#2dd4bf}
-  .header p{color:rgba(255,255,255,0.4);font-size:13px;margin:0}
+  .header{background:#03080f;padding:28px 36px}
+  .header p{color:rgba(255,255,255,0.9);font-size:16px;font-weight:500;margin:0 0 4px}
+  .header small{color:rgba(255,255,255,0.35);font-size:12px}
   .body{padding:32px 36px}
-  .greeting{font-size:16px;color:#1a1a2e;margin-bottom:20px;line-height:1.6}
-  .highlight{background:#f0fdf9;border-left:3px solid #2dd4bf;padding:16px 20px;border-radius:0 8px 8px 0;margin:20px 0}
-  .highlight h3{font-size:14px;font-weight:600;color:#0f766e;margin-bottom:8px}
-  .highlight ul{margin:0;padding-left:18px}
-  .highlight ul li{font-size:13px;color:#374151;line-height:1.8}
-  .services{margin:24px 0}
-  .service-item{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f0f0}
-  .service-item:last-child{border-bottom:none}
-  .service-item span{font-size:14px;color:#374151}
-  .service-item strong{font-size:14px;color:#03080f}
-  .cta-btn{display:block;background:#2dd4bf;color:#03080f;text-decoration:none;text-align:center;padding:14px 24px;border-radius:100px;font-weight:600;font-size:15px;margin:28px 0}
-  .web-link{background:#f8f9fa;border-radius:8px;padding:14px 18px;margin:16px 0}
-  .web-link p{font-size:12px;color:#94a3b8;margin:0 0 4px}
-  .web-link a{color:#2dd4bf;font-size:14px;text-decoration:none;font-weight:500}
-  .footer{background:#f8f9fa;padding:20px 36px;text-align:center}
-  .footer p{font-size:12px;color:#94a3b8;line-height:1.6;margin:0}
-  .footer strong{color:#2dd4bf}
+  .intro{font-size:15px;color:#1a1a2e;line-height:1.75;margin-bottom:24px}
+  .stat-block{background:#f0fdf9;border-left:3px solid #2dd4bf;padding:16px 20px;border-radius:0 8px 8px 0;margin:24px 0}
+  .stat-block p{font-size:14px;color:#374151;line-height:1.7;margin:0}
+  .stat-block strong{color:#0f766e}
+  .cta-area{margin:28px 0;text-align:center}
+  .cta-btn{display:inline-block;background:#2dd4bf;color:#03080f;text-decoration:none;padding:14px 36px;border-radius:100px;font-weight:700;font-size:15px}
+  .cta-sub{font-size:13px;color:#94a3b8;margin-top:12px;line-height:1.5}
+  .footer{background:#f8f9fa;padding:20px 36px}
+  .footer p{font-size:12px;color:#94a3b8;line-height:1.8;margin:0}
+  .footer strong{color:#374151;font-weight:600}
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <h1>Hola, <span>{NOMBRE_CONTACTO}</span></h1>
-    <p>Humanio — Inteligencia Artificial para negocios · humanio.digital</p>
+    <p>Hola, {NOMBRE_CONTACTO_O_NEGOCIO}</p>
+    <small>Humanio &mdash; Inteligencia Artificial para negocios</small>
   </div>
   <div class="body">
-    <p class="greeting">
-      Mi nombre es Miguel González, fundador de <strong>Humanio</strong>.
-      Hice un análisis de la presencia digital de <strong>{NOMBRE_NEGOCIO}</strong>
-      y encontré algunas oportunidades importantes que me gustaría compartirte.
+    <p class="intro">
+      {OBSERVACION_POSITIVA}. Eso me llamó la atención y me puse a revisar
+      cómo aparece <strong>{NOMBRE_NEGOCIO}</strong> en las búsquedas de Google en {CIUDAD}.
     </p>
-    <div class="highlight">
-      <h3>Lo que encontramos en el análisis</h3>
-      <ul>
-        <li>{HALLAZGO_1}</li>
-        <li>{HALLAZGO_2}</li>
-        <li>{HALLAZGO_3}</li>
-      </ul>
+    <div class="stat-block">
+      <p>
+        En {CIUDAD} hay <strong>{BUSQUEDAS_MES} búsquedas mensuales</strong> de
+        &ldquo;{KEYWORD_PRINCIPAL}&rdquo;. {HALLAZGO_CENTRAL}.
+      </p>
     </div>
-    <p style="font-size:14px;color:#374151;line-height:1.7;margin:20px 0">
-      En {CIUDAD} hay aproximadamente <strong>{BUSQUEDAS_MES} búsquedas mensuales</strong>
-      para "{KEYWORD_PRINCIPAL}". Con la estrategia correcta, {NOMBRE_NEGOCIO}
-      puede capturar una parte significativa de ese tráfico.
+    <p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 24px">
+      Preparé un diagnóstico completo con una propuesta concreta para {NOMBRE_NEGOCIO}.
     </p>
-    <div class="services">
-      <p style="font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Nuestra propuesta</p>
-      <div class="service-item"><span>Página Web Moderna</span><strong>{PRECIO_WEB} MXN</strong></div>
-      <div class="service-item"><span>Marketing Meta (Facebook + Instagram)</span><strong>{PRECIO_META} MXN/mes</strong></div>
-      <div class="service-item"><span>Chatbot WhatsApp 24/7</span><strong>{PRECIO_WA} MXN/mes</strong></div>
+    <div class="cta-area">
+      <a href="{PROPUESTA_URL}" class="cta-btn">Ver mi análisis completo</a>
+      <p class="cta-sub">Si te interesa, con gusto te explico los puntos clave<br>por WhatsApp o en una llamada corta.</p>
     </div>
-    <div class="web-link">
-      <p>Vista previa de tu propuesta web</p>
-      <a href="{URL_WEB}">{URL_WEB}</a>
-    </div>
-    <a href="https://wa.me/52{TELEFONO_MIGUEL}" class="cta-btn">
-      Agendar llamada de 30 min (sin costo)
-    </a>
-    <p style="font-size:13px;color:#94a3b8;text-align:center;margin:0">
-      Revisa tu diagnóstico completo y propuesta personalizada en los enlaces de arriba.
-    </p>
   </div>
   <div class="footer">
-    <p><strong>Miguel González</strong> · Humanio — Inteligencia Artificial para negocios<br>
-    contacto@humanio.digital · humanio.digital<br>
-    WhatsApp: {TELEFONO_MIGUEL_DISPLAY}</p>
+    <p>
+      <strong>Miguel González</strong><br>
+      Humanio &mdash; Inteligencia Artificial para negocios<br>
+      contacto@humanio.digital &middot; humanio.digital<br>
+      {TELEFONO_MIGUEL_DISPLAY}
+    </p>
   </div>
 </div>
 </body>
@@ -176,10 +165,10 @@ fs.mkdirSync(draftDir, {recursive: true});
 fs.writeFileSync(`${draftDir}/draft-email.html`, emailHTML);
 fs.writeFileSync(`${draftDir}/draft-meta.json`, JSON.stringify({
   to: '{EMAIL_PROSPECTO}',
-  subject: 'Análisis digital de {NOMBRE_NEGOCIO} — {N} oportunidades encontradas',
+  subject: 'Análisis digital de {NOMBRE_NEGOCIO}',
   from: 'contacto@humanio.digital',
   fromName: 'Miguel González | Humanio',
-  attachments: ['propuesta-{slug}.pdf', 'propuesta-{slug}.pdf'],
+  attachments: [],
   smtpConfig: {host: 'smtpout.secureserver.net', port: 465, secure: true, user: 'contacto@humanio.digital'},
   status: 'DRAFT_PENDING_REVIEW',
   createdAt: new Date().toISOString()
@@ -215,26 +204,52 @@ fi
 > **Nota:** El envío es automático una vez completados los pasos anteriores.
 > Usa exclusivamente `curl` con la API oficial de Meta — no usar librerías locales.
 
+#### Reglas obligatorias del mensaje WhatsApp (del skill `sales-copywriting`)
+
+El mensaje WhatsApp sigue el framework **VALOR**. Antes de componerlo, determina:
+
+- **`{NOMBRE_CONTACTO_O_NEGOCIO}`**: nombre del contacto si existe; si no, nombre del negocio. Nunca dejar vacío.
+- **`{OBSERVACION_POSITIVA_CORTA}`**: una frase corta con algo genuinamente positivo y específico del negocio. Real y verificable. Ej: "vi que tienen 4.8★ en Google con más de 80 reseñas", "vi que su Instagram tiene trabajos de colorimetría muy bien documentados", "vi que llevan {N} años en el mercado".
+- **`{DATO_LOCAL}`**: número concreto de búsquedas mensuales para la keyword principal en la ciudad.
+- **`{DATO_OPORTUNIDAD}`**: en una frase, el problema específico. Ej: "actualmente {NOMBRE_NEGOCIO} no aparece entre los primeros 5 resultados", "el sitio {dominio} no resuelve".
+
+**Prohibido en WhatsApp:**
+- ❌ Abrir con "Hola 👋" o "Soy Miguel de Humanio" — va al final
+- ❌ Listar hallazgos negativos (❌❌❌) — suena a regaño
+- ❌ Mencionar precios bajo ningún concepto
+- ❌ Incluir dos URLs — solo `{PROPUESTA_URL}`, nunca el reporte por separado
+- ❌ Pedir "30 min de llamada" — es demasiado compromiso
+- ❌ Usar "sin compromiso" — implica que normalmente sí hay
+- ❌ Superar 8 líneas visibles antes del corte "ver más" de WhatsApp
+
+**Excepción URGENTE**: Si hay una situación crítica real (sitio caído, dominio expirado), puede abrirse directo con el hecho urgente. El tono es de aviso, no de venta. La estructura cambia: urgencia → dato → propuesta → micro-CTA. Sigue sin precios, sin 2 URLs, sin "30 min de llamada".
+
 Compone el mensaje y envíalo:
 
 ```bash
-# Composición del mensaje
-WA_MESSAGE="Hola {NOMBRE_CONTACTO} 👋
+# Composición del mensaje — caso NORMAL
+# Estructura: apertura positiva → dato local + oportunidad → 1 URL → micro-CTA
+WA_MESSAGE="{NOMBRE_CONTACTO_O_NEGOCIO}, {OBSERVACION_POSITIVA_CORTA}.
 
-Soy Miguel de *Humanio*. Analicé la presencia digital de *{NOMBRE_NEGOCIO}* y encontré oportunidades importantes:
+Estuve revisando cómo aparece {NOMBRE_NEGOCIO} en Google: en {CIUDAD} hay {DATO_LOCAL} búsquedas/mes de \"{KEYWORD}\" y {DATO_OPORTUNIDAD}.
 
-❌ {HALLAZGO_CORTO_1}
-❌ {HALLAZGO_CORTO_2}
-✅ {FORTALEZA_CORTA}
+Te preparé un análisis con propuesta concreta:
+{PROPUESTA_URL}
 
-En {CIUDAD} hay +{BUSQUEDAS_MES} búsquedas/mes para \"{KEYWORD}\" y actualmente no aparecen en los primeros resultados.
+¿Quieres que te explique los puntos clave?
+-- Miguel, Humanio"
 
-Preparé un diagnóstico completo y una propuesta concreta 👇
-
-🌐 Propuesta: {PROPUESTA_URL}
-📊 Diagnóstico SEO: {REPORTE_URL}
-
-¿Tienes 30 min esta semana para una llamada sin compromiso?"
+# Si la situación es URGENTE (sitio caído, dominio expirado, etc.) — caso excepcional
+# WA_MESSAGE="{NOMBRE_CONTACTO_O_NEGOCIO}, detecté que {SITUACION_CRITICA_ESPECIFICA}.
+#
+# Cada día de {IMPACTO_CONCRETO}. En {CIUDAD} hay {DATO_LOCAL} búsquedas/mes de \"{KEYWORD}\"
+# y ahorita ese tráfico va a tu competencia.
+#
+# Preparé una propuesta de rescate concreto:
+# {PROPUESTA_URL}
+#
+# ¿Quieres que te explique cómo lo resolvemos?
+# -- Miguel, Humanio"
 
 # Envío vía WhatsApp Business Cloud API
 WA_RESPONSE=$(curl -s -X POST \
@@ -272,30 +287,69 @@ fi
 
 ### 8. Generar script de llamada
 
-Guarda en `/tmp/outreach-{slug}/script-llamada.txt`:
+El script debe adaptarse al giro, la situación específica del prospecto y los hallazgos del Qualifier. NO es un template genérico — usa los datos reales del brief.
+
+Guarda en `/tmp/outreach-{slug}/script-llamada.txt` con esta estructura:
 
 ```
 SCRIPT DE LLAMADA — {NOMBRE_NEGOCIO}
+Giro: {GIRO} | Ciudad: {CIUDAD} | Teléfono: {TELEFONO_PROSPECTO}
 Duración estimada: 5-7 minutos
+Objetivo: conseguir permiso para enviar el análisis (NO cerrar venta en esta llamada)
 
-APERTURA:
-"Hola, ¿hablo con {NOMBRE_CONTACTO}? Soy Miguel González de Humanio.
-Le llamo porque hice un análisis de {NOMBRE_NEGOCIO} y encontré oportunidades
-de crecimiento digital que creo que le pueden interesar. ¿Tiene 5 minutos?"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-DIAGNÓSTICO:
-"Estuve revisando su presencia en Google y noté que {HALLAZGO_1} y {HALLAZGO_2}.
+APERTURA (30 segundos):
+"Hola, ¿hablo con {NOMBRE_CONTACTO_O_RESPONSABLE}?
+Soy Miguel González de Humanio. Le llamo porque {OBSERVACION_POSITIVA_ESPECIFICA}
+y me puse a revisar cómo aparece {NOMBRE_NEGOCIO} en Google. Encontré algo que
+creo que le puede interesar. ¿Tiene 5 minutos?"
+
+[Si no puede ahora]
+"Sin problema. ¿Cuándo sería mejor? Puedo llamarle mañana o enviarle
+el análisis por WhatsApp para que lo revise con calma."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DIAGNÓSTICO (2 minutos):
+[Adaptar con los hallazgos reales del Qualifier — NO improvisar datos]
+"Estuve revisando su presencia en Google y noté {HALLAZGO_CENTRAL_ESPECIFICO}.
 En {CIUDAD} hay más de {BUSQUEDAS_MES} búsquedas mensuales para '{KEYWORD}'
-y actualmente {NOMBRE_NEGOCIO} no aparece en los primeros resultados."
+y actualmente {DATO_POSICIONAMIENTO_REAL}.
+[Agregar hallazgo secundario relevante si existe en el brief del Qualifier]"
 
-PROPUESTA:
-"Tenemos un plan específico que incluye página web moderna, marketing en Meta
-y chatbot de WhatsApp. ¿Le puedo enviar un análisis completo por correo o
-WhatsApp para que lo revise con calma?"
+VALIDACIÓN:
+"¿Eso les resuena? ¿Han notado {PREGUNTA_DE_VALIDACION_ESPECIFICA_AL_GIRO}?"
+[Escuchar — no interrumpir]
 
-CIERRE:
-"Perfecto. Le mando el análisis hoy mismo y si le interesa agendamos una llamada
-de 30 minutos sin costo. ¿A qué número le escribo?"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PROPUESTA (2 minutos):
+[Mencionar los servicios del paquete recomendado por el Qualifier, no genéricos]
+"Trabajamos con negocios de {GIRO} para {BENEFICIO_ESPECIFICO_AL_GIRO}.
+El paquete que recomendamos para {NOMBRE_NEGOCIO} incluye: {LISTA_SERVICIOS_DEL_QUALIFIER}.
+Con eso, {ROI_ESPECIFICO_AL_GIRO_Y_TICKET_PROMEDIO}."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OBJECIONES:
+[Generar 3-5 objeciones específicas para este giro y situación — con respuestas concretas]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CIERRE (1 minuto):
+"Le mando el análisis completo ahora mismo:
+- Propuesta: {PROPUESTA_URL}
+¿A qué número de WhatsApp se lo envío? ¿Al {TELEFONO_PROSPECTO}?"
+
+[Confirmar canal preferido y despedirse]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOTAS POST-LLAMADA:
+□ Resultado: interesado / no interesado / reagendar / no contestó
+□ Actualizar ticket con resultado
+□ Enviar materiales si hubo interés
 ```
 
 ### 9. Notificar al CEO
@@ -321,11 +375,8 @@ de 30 minutos sin costo. ¿A qué número le escribo?"
 **Archivos en Google Drive:** carpeta Humanio - Outreach
 **Servidor:** /tmp/outreach-{slug}/
 
-**Propuesta:**
-- Web: {PRECIO_WEB} MXN
-- Meta Ads: {PRECIO_META} MXN/mes
-- WhatsApp Bot: {PRECIO_WA} MXN/mes
-- Total setup: {PRECIO_TOTAL} MXN
+**Paquete recomendado:** {PAQUETE} — {PRECIO_USD}/mes
+(Los precios detallados viven en la propuesta web: {PROPUESTA_URL})
 
 **Siguiente paso:** Seguimiento en 3 días si no hay respuesta.
 ```
@@ -400,15 +451,22 @@ WHATSAPP_CLOUD_API_TOKEN=$WHATSAPP_CLOUD_API_TOKEN
 
 ## Reglas de calidad
 
+**Proceso:**
 * SIEMPRE verificar URL de WebDesigner antes de continuar (paso 1.5) — si no existe, bloquear el ticket
 * NUNCA generar PDFs — todo se entrega en HTML y texto plano
 * NUNCA enviar correos automáticamente — siempre draft para revisión manual
 * NUNCA pedir aprobación del Board — opera de forma autónoma
 * Enviar WhatsApp automáticamente vía WhatsApp Business Cloud API si hay número disponible
 * Si el número no está disponible o el API falla, guardar txt para envío manual y notificar en CEO report
-* El correo debe sentirse personal, no como spam masivo
-* Los hallazgos deben ser específicos y reales del análisis del Qualifier
-* Incluir SIEMPRE ambas URLs (propuesta + diagnóstico) en todos los materiales
-* El precio total debe sumar correctamente los servicios del Qualifier
 * La carpeta en Drive debe tener exactamente 5 archivos: propuesta.html, reporte-seo.html, draft-email.html, mensaje-whatsapp.txt, script-llamada.txt
+
+**Copywriting — aplicar siempre el framework VALOR del skill `sales-copywriting`:**
+* Abrir con algo positivo y específico del negocio — nunca con "Soy Miguel" ni con lista de problemas
+* UN solo hallazgo central por mensaje — no listas de 3 negativos
+* Los hallazgos y datos deben ser reales y verificados por el Qualifier — NUNCA inventar cifras
+* `{NOMBRE_CONTACTO_O_NEGOCIO}` siempre lleno — si no hay contacto, usar nombre del negocio
+* **Email**: subject máximo 6 palabras, sin emojis; NO incluir precios; CTA de micro-compromiso ("si te interesa...")
+* **WhatsApp**: máximo 8 líneas; solo `{PROPUESTA_URL}` (nunca el reporte por separado); sin precios; sin "sin compromiso"; sin pedir "30 min de llamada"
+* **Script de llamada**: adaptar al giro y situación específica del prospecto — usar los datos reales del Qualifier
+* Los precios viven en la propuesta web ({PROPUESTA_URL}) — el prospecto los descubre cuando está listo
 
