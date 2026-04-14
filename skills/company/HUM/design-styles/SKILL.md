@@ -1,11 +1,18 @@
 ---
 name: "design-styles"
-description: "Catálogo de 10 estilos visuales únicos para propuestas web de Humanio Marketing — tipografía, paleta, modo, efectos CSS y giros recomendados"
+description: "Catálogo de 10 estilos visuales únicos para propuestas web de Humanio — tipografía, paleta, modo, efectos CSS y giros recomendados. El WebDesigner DEBE seleccionar un estilo diferente para cada prospecto."
 slug: "design-styles"
-key: "company/HUM/design-styles"
+metadata:
+  paperclip:
+    slug: "design-styles"
+    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/design-styles"
+    paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/design-styles"
+  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/design-styles"
+  key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/design-styles"
+key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/design-styles"
 ---
 
-# Design Styles — Catálogo Visual | Humanio Marketing
+# Design Styles — Catálogo Visual | Humanio
 
 Antes de escribir cualquier HTML, elige UN estilo de este catálogo. Documenta el estilo elegido en el ticket. No repitas el mismo estilo en prospectos consecutivos.
 

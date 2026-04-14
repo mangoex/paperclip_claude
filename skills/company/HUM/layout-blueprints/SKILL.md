@@ -1,11 +1,18 @@
 ---
 name: "layout-blueprints"
-description: "6 arquetipos de layout para propuestas web de Humanio Marketing — wireframes ASCII, CSS listo, variantes de testimonios/CTAs/footers y tabla de compatibilidad estilo↔layout"
+description: "6 arquetipos de layout para propuestas web de Humanio — wireframes ASCII, CSS listo, variantes de testimonios/CTAs/footers y tabla de compatibilidad estilo↔layout. Combinar con design-styles para variedad total."
 slug: "layout-blueprints"
-key: "company/HUM/layout-blueprints"
+metadata:
+  paperclip:
+    slug: "layout-blueprints"
+    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/layout-blueprints"
+    paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/layout-blueprints"
+  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/layout-blueprints"
+  key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/layout-blueprints"
+key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/layout-blueprints"
 ---
 
-# Layout Blueprints — Arquetipos de Layout | Humanio Marketing
+# Layout Blueprints — Arquetipos de Layout | Humanio
 
 Elige UN layout de este catálogo. Combina con el estilo visual del skill `design-styles`. Documenta la combinación en el ticket antes de escribir HTML.
 
