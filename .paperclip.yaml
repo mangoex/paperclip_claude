@@ -16,23 +16,57 @@ agents:
     permissions:
       canCreateAgents: true
 
-  dataanalyst:
-    role: "researcher"
-    icon: "database"
-    capabilities: "Experto en evaluación y análisis de datos, creación de reportes y tableros de control, indicadores, OKRs. Identifica oportunidades de mercado a través de análisis de datos."
+  scout:
+    role: "general"
+    capabilities: "Especialista en prospección de negocios locales de Humanio. Recibe país, ciudad y giro comercial, realiza investigación exhaustiva en Google Maps, directorios, redes sociales y web para generar listas detalladas de prospectos con todos sus datos de contacto. Al terminar crea ticket para Qualifier y le envía mensaje directo."
     adapter:
       config:
-        dangerouslySkipPermissions: true
         model: "claude-sonnet-4-5-20250929"
       type: "claude_local"
     runtime:
       heartbeat:
         intervalSec: 300
       maxConcurrentRuns: 1
+    inputs:
+      env:
+        FIRECRAWL_API_KEY:
+          description: "Firecrawl API key — requerida para buscar y analizar negocios locales"
+          kind: "secret"
+          default: ""
+          requirement: "required"
+        FIRECRAWL_MCP_URL:
+          description: "URL del MCP server de Firecrawl — formato: https://mcp.firecrawl.dev/{TOKEN}/v2/mcp"
+          kind: "secret"
+          default: ""
+          requirement: "required"
 
-  outreach:
+  qualifier:
     role: "general"
-    capabilities: "Especialista en comunicación comercial de Humanio. Recibe prospectos calificados, genera diagnósticos profesionales de marketing digital, crea propuestas personalizadas en HTML, y las envía por correo o WhatsApp según los datos disponibles del prospecto. Representa la imagen premium de Humanio ante cada cliente potencial."
+    capabilities: "Analista SEO y calificador de prospectos de Humanio. Recibe reportes de Scout, evalúa presencia digital de cada negocio, calcula score de oportunidad (1-10) y genera diagnósticos completos para prospectos con score >= 6. Crea tickets para WebDesigner con briefs completos y le envía mensaje directo."
+    adapter:
+      config:
+        model: "claude-sonnet-4-5-20250929"
+      type: "claude_local"
+    runtime:
+      heartbeat:
+        intervalSec: 300
+      maxConcurrentRuns: 1
+    inputs:
+      env:
+        FIRECRAWL_API_KEY:
+          description: "Firecrawl API key — requerida para analizar sitios web de prospectos"
+          kind: "secret"
+          default: ""
+          requirement: "required"
+        FIRECRAWL_MCP_URL:
+          description: "URL del MCP server de Firecrawl — formato: https://mcp.firecrawl.dev/{TOKEN}/v2/mcp"
+          kind: "secret"
+          default: ""
+          requirement: "required"
+
+  webdesigner:
+    role: "general"
+    capabilities: "Diseñador web premium de Humanio. Recibe briefs del Qualifier y genera sitios de 3 páginas (presentación, propuesta comercial, reporte SEO) en HTML/CSS/JS con estilos visuales únicos por prospecto y efectos JS premium obligatorios. Publica en Surge.sh, crea ticket para Outreach y le envía mensaje directo."
     adapter:
       config:
         dangerouslySkipPermissions: true
@@ -44,58 +78,93 @@ agents:
       maxConcurrentRuns: 1
     inputs:
       env:
-        FROM_EMAIL:
-          description: "Provide FROM_EMAIL for agent outreach"
+        SURGE_TOKEN:
+          description: "Surge.sh deploy token — obtener con 'surge token' en terminal"
+          kind: "secret"
+          default: ""
+          requirement: "required"
+        PEXELS_API_KEY:
+          description: "Pexels API key para imágenes hero de los sitios — pexels.com/api"
+          kind: "secret"
+          default: ""
+          requirement: "required"
+        TWENTY_FIRST_API_KEY:
+          description: "21st.dev API key para componentes UI premium opcionales"
           kind: "secret"
           default: ""
           requirement: "optional"
-        FROM_NAME:
-          description: "Provide FROM_NAME for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_CLIENT_ID:
-          description: "Provide GOOGLE_CLIENT_ID for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_CLIENT_SECRET:
-          description: "Provide GOOGLE_CLIENT_SECRET for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_DRIVE_FOLDER_ID:
-          description: "Provide GOOGLE_DRIVE_FOLDER_ID for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_REFRESH_TOKEN:
-          description: "Provide GOOGLE_REFRESH_TOKEN for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
+
+  outreach:
+    role: "general"
+    capabilities: "Especialista en comunicación comercial de Humanio. Recibe prospectos calificados con site publicado en Surge.sh, genera materiales de contacto personalizados (email, WhatsApp, script de llamada), los sube a Google Drive y crea ticket para Closer con mensaje directo."
+    adapter:
+      config:
+        dangerouslySkipPermissions: true
+        model: "claude-sonnet-4-5-20250929"
+      type: "claude_local"
+    runtime:
+      heartbeat:
+        intervalSec: 300
+      maxConcurrentRuns: 1
+    inputs:
+      env:
         SMTP_HOST:
-          description: "Provide SMTP_HOST for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        SMTP_PASS:
-          description: "Provide SMTP_PASS for agent outreach"
+          description: "SMTP host para envío de correos"
           kind: "secret"
           default: ""
           requirement: "optional"
         SMTP_PORT:
-          description: "Provide SMTP_PORT for agent outreach"
+          description: "Puerto SMTP (ej. 465)"
           kind: "secret"
           default: ""
           requirement: "optional"
         SMTP_USER:
-          description: "Provide SMTP_USER for agent outreach"
+          description: "Usuario SMTP"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        SMTP_PASS:
+          description: "Contraseña SMTP"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        FROM_EMAIL:
+          description: "Email remitente (ej. contacto@humanio.digital)"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        FROM_NAME:
+          description: "Nombre remitente (ej. Miguel González | Humanio)"
           kind: "secret"
           default: ""
           requirement: "optional"
         TELEFONO_MIGUEL:
-          description: "Provide TELEFONO_MIGUEL for agent outreach"
+          description: "Número de Miguel sin espacios ni + (ej. 6671234567)"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        TELEFONO_MIGUEL_DISPLAY:
+          description: "Número de Miguel en formato display (ej. +52 667 123 4567)"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_CLIENT_ID:
+          description: "Google OAuth client ID para Drive"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_CLIENT_SECRET:
+          description: "Google OAuth client secret para Drive"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_REFRESH_TOKEN:
+          description: "Google OAuth refresh token para Drive"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_DRIVE_FOLDER_ID:
+          description: "ID de la carpeta raíz en Google Drive"
           kind: "secret"
           default: ""
           requirement: "optional"
@@ -112,7 +181,7 @@ agents:
 
   closer:
     role: "general"
-    capabilities: "Cerrador de ventas de Humanio. Recibe prospectos contactados por Outreach y ejecuta secuencia de seguimiento: mensaje 2 (día 3) y mensaje 3 (día 7). Clasifica respuestas, maneja objeciones con IA, y escala a CEO para cierre. Usa framework VALOR del skill sales-copywriting."
+    capabilities: "Cerrador de ventas de Humanio. Recibe prospectos contactados por Outreach y ejecuta secuencia de seguimiento: genera todos los archivos (msg2 + msg3 + log) el día 3, los sube a Drive, envía msg2 y programa msg3 para día 7 si no hay respuesta. Maneja objeciones con IA y escala a CEO para cierre."
     adapter:
       config:
         dangerouslySkipPermissions: true
@@ -124,58 +193,63 @@ agents:
       maxConcurrentRuns: 1
     inputs:
       env:
-        FROM_EMAIL:
-          description: "Provide FROM_EMAIL for agent closer"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        FROM_NAME:
-          description: "Provide FROM_NAME for agent closer"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_CLIENT_ID:
-          description: "Provide GOOGLE_CLIENT_ID for agent closer"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_CLIENT_SECRET:
-          description: "Provide GOOGLE_CLIENT_SECRET for agent closer"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_DRIVE_FOLDER_ID:
-          description: "Provide GOOGLE_DRIVE_FOLDER_ID for agent closer"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_REFRESH_TOKEN:
-          description: "Provide GOOGLE_REFRESH_TOKEN for agent closer"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
         SMTP_HOST:
-          description: "Provide SMTP_HOST for agent closer"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        SMTP_PASS:
-          description: "Provide SMTP_PASS for agent closer"
+          description: "SMTP host para envío de correos"
           kind: "secret"
           default: ""
           requirement: "optional"
         SMTP_PORT:
-          description: "Provide SMTP_PORT for agent closer"
+          description: "Puerto SMTP"
           kind: "secret"
           default: ""
           requirement: "optional"
         SMTP_USER:
-          description: "Provide SMTP_USER for agent closer"
+          description: "Usuario SMTP"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        SMTP_PASS:
+          description: "Contraseña SMTP"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        FROM_EMAIL:
+          description: "Email remitente"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        FROM_NAME:
+          description: "Nombre remitente"
           kind: "secret"
           default: ""
           requirement: "optional"
         TELEFONO_MIGUEL:
-          description: "Provide TELEFONO_MIGUEL for agent closer"
+          description: "Número de Miguel sin espacios"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        TELEFONO_MIGUEL_DISPLAY:
+          description: "Número de Miguel en formato display"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_CLIENT_ID:
+          description: "Google OAuth client ID para Drive"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_CLIENT_SECRET:
+          description: "Google OAuth client secret para Drive"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_REFRESH_TOKEN:
+          description: "Google OAuth refresh token para Drive"
+          kind: "secret"
+          default: ""
+          requirement: "optional"
+        GOOGLE_DRIVE_FOLDER_ID:
+          description: "ID de la carpeta raíz en Google Drive"
           kind: "secret"
           default: ""
           requirement: "optional"
@@ -190,149 +264,10 @@ agents:
           default: ""
           requirement: "optional"
 
-  qualifier:
-    role: "general"
-    capabilities: "Especialista en prospección de negocios locales. Recibe país, ciudad y giro comercial, realiza investigación exhaustiva en Google Maps, directorios, redes sociales y web para generar listas detalladas de prospectos con todos sus datos de contacto. Entrega reportes estructurados al agente Qualifier para calificación."
-    adapter:
-      config:
-        model: "claude-sonnet-4-5-20250929"
-      type: "claude_local"
-    runtime:
-      heartbeat:
-        intervalSec: 300
-      maxConcurrentRuns: 1
-    inputs:
-      env:
-        FIRECRAWL_API_KEY:
-          description: "Provide FIRECRAWL_API_KEY for agent qualifier"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-
-  scout:
-    role: "general"
-    capabilities: "Especialista en prospección de negocios locales. Recibe país, ciudad y giro comercial, realiza investigación exhaustiva en Google Maps, directorios, redes sociales y web para generar listas detalladas de prospectos con todos sus datos de contacto. Entrega reportes estructurados al agente Qualifier para calificación."
-    adapter:
-      config:
-        model: "claude-sonnet-4-5-20250929"
-      type: "claude_local"
-    runtime:
-      heartbeat:
-        intervalSec: 300
-      maxConcurrentRuns: 1
-    inputs:
-      env:
-        FIRECRAWL_API_KEY:
-          description: "Provide FIRECRAWL_API_KEY for agent scout"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-
-  webdesigner:
-    role: "general"
-    capabilities: "Experto en diseño web moderno, UX/UI y usabilidad. Recibe prospectos calificados del Qualifier y crea propuestas web personalizadas con diseño profesional: efectos parallax en hero, animaciones de imágenes y mouse, paleta de colores acorde al giro del negocio. Construye el sitio en HTML/CSS/JS y lo publica en Surge.sh como propuesta para el cliente."
-    adapter:
-      config:
-        dangerouslySkipPermissions: true
-        model: "claude-sonnet-4-5-20250929"
-      type: "claude_local"
-    runtime:
-      heartbeat:
-        intervalSec: 300
-      maxConcurrentRuns: 1
-    inputs:
-      env:
-        GITHUB_TOKEN:
-          description: "Provide GITHUB_TOKEN for agent webdesigner"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_AI_API_KEY:
-          description: "Provide GOOGLE_AI_API_KEY for agent webdesigner"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        SURGE_TOKEN:
-          description: "Surge.sh deploy token — run surge token to get it"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        TWENTY_FIRST_API_KEY:
-          description: "Provide TWENTY_FIRST_API_KEY for agent webdesigner"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        PEXELS_API_KEY:
-          description: "Pexels API key for hero images"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-
-company:
-  logoPath: "images/company-logo.png"
-
-projects:
-  onboarding:
-    color: "#6366f1"
-    status: "in_progress"
-
-routines:
-  qualifier-revisar-tickets-pendientes:
-    status: "paused"
-    triggers:
-      - kind: "schedule"
-        cronExpression: "10 * * * *"
-        label: "schedule"
-        timezone: "America/Mazatlan"
-      - kind: "schedule"
-        cronExpression: "10 * * * *"
-        label: "schedule-2"
-        timezone: "America/Mazatlan"
-  dataanalyst-pipeline-semanal:
-    status: "active"
-    triggers:
-      - kind: "schedule"
-        cronExpression: "0 9 * * 1"
-        label: "weekly-monday-9am"
-        timezone: "America/Mazatlan"
-  webdesigner-revisar-briefs-pendientes:
-    status: "paused"
-    triggers:
-      - kind: "schedule"
-        cronExpression: "10 * * * *"
-        label: "schedule"
-        timezone: "America/Mazatlan"
-
-sidebar:
-  agents:
-    - "ceo"
-    - "closer"
-    - "dataanalyst"
-    - "outreach"
-    - "qualifier"
-    - "scout"
-    - "webdesigner"
-  projects:
-    - "onboarding"schema: "paperclip/v1"
-agents:
-  ceo:
-    role: "ceo"
-    capabilities: "CEO de Humanio Marketing. Coordina Scout, Qualifier, WebDesigner, Outreach y DataAnalyst. Asigna tareas de prospección, aprueba propuestas, monitorea pipeline. Cuando recibe 'prospectar {giro} en {ciudad}', crea ticket para Scout."
-    adapter:
-      config:
-        dangerouslySkipPermissions: true
-        model: "claude-sonnet-4-5-20250929"
-      type: "claude_local"
-    runtime:
-      heartbeat:
-        enabled: true
-        maxConcurrentRuns: 1
-    permissions:
-      canCreateAgents: true
   dataanalyst:
     role: "researcher"
     icon: "database"
-    capabilities: "Experto en evaluación y análisis de datos, creación de reportes y tableros de control, indicadores, OKRs. Identifica oportunidades de mercado a través de análisis de datos."
+    capabilities: "Experto en evaluación y análisis de datos, creación de reportes y tableros de control, indicadores, OKRs. Identifica oportunidades de mercado a través de análisis de datos del pipeline de Humanio."
     adapter:
       config:
         dangerouslySkipPermissions: true
@@ -341,204 +276,51 @@ agents:
     runtime:
       heartbeat:
         intervalSec: 300
-        maxConcurrentRuns: 1
-  outreach:
-    role: "general"
-    capabilities: "Especialista en prospección comercial de Humanio Marketing. Recibe prospectos con sitio publicado en Surge.sh, descarga propuesta y reporte HTML, genera draft de correo, mensaje de WhatsApp y script de llamada, sube los 5 archivos a Google Drive y notifica al CEO con los URLs."
-    adapter:
-      config:
-        dangerouslySkipPermissions: true
-        model: "claude-sonnet-4-5-20250929"
-      type: "claude_local"
-    runtime:
-      heartbeat:
-        intervalSec: 300
-        maxConcurrentRuns: 1
-    inputs:
-      env:
-        FROM_EMAIL:
-          description: "Provide FROM_EMAIL for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        FROM_NAME:
-          description: "Provide FROM_NAME for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_CLIENT_ID:
-          description: "Provide GOOGLE_CLIENT_ID for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_CLIENT_SECRET:
-          description: "Provide GOOGLE_CLIENT_SECRET for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_DRIVE_FOLDER_ID:
-          description: "Provide GOOGLE_DRIVE_FOLDER_ID for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        GOOGLE_REFRESH_TOKEN:
-          description: "Provide GOOGLE_REFRESH_TOKEN for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        SMTP_HOST:
-          description: "Provide SMTP_HOST for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        SMTP_PASS:
-          description: "Provide SMTP_PASS for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        SMTP_PORT:
-          description: "Provide SMTP_PORT for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        SMTP_USER:
-          description: "Provide SMTP_USER for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        TELEFONO_MIGUEL:
-          description: "Provide TELEFONO_MIGUEL for agent outreach"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        WHATSAPP_PHONE_NUMBER_ID:
-          description: "Meta WhatsApp Business phone number ID"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-        WHATSAPP_CLOUD_API_TOKEN:
-          description: "Meta WhatsApp Business Cloud API permanent token"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
-  qualifier:
-    role: "general"
-    capabilities: "Analista SEO y calificador de prospectos de Humanio Marketing. Recibe reportes de Scout con listas de negocios locales, evalúa su presencia digital, calcula un score de oportunidad (1-10) y genera diagnósticos HTML visuales para los prospectos con score ≥ 6. Crea tickets para WebDesigner con briefs completos."
-    adapter:
-      config:
-        model: "claude-sonnet-4-5-20250929"
-      type: "claude_local"
-    runtime:
-      heartbeat:
-        intervalSec: 300
-        maxConcurrentRuns: 1
-    inputs:
-      env:
-        FIRECRAWL_API_KEY:
-          description: "Firecrawl API key — requerida para analizar sitios web de prospectos"
-          kind: "secret"
-          default: ""
-          requirement: "required"
-        FIRECRAWL_MCP_URL:
-          description: "URL del MCP server de Firecrawl — formato: https://mcp.firecrawl.dev/{TOKEN}/v2/mcp"
-          kind: "secret"
-          default: ""
-          requirement: "required"
-  scout:
-    role: "general"
-    capabilities: "Especialista en prospección de negocios locales. Recibe país, ciudad y giro comercial, realiza investigación exhaustiva en Google Maps, directorios, redes sociales y web para generar listas detalladas de prospectos con todos sus datos de contacto. Entrega reportes estructurados al agente Qualifier para calificación."
-    adapter:
-      config:
-        model: "claude-sonnet-4-5-20250929"
-      type: "claude_local"
-    runtime:
-      heartbeat:
-        intervalSec: 300
-        maxConcurrentRuns: 1
-    inputs:
-      env:
-        FIRECRAWL_API_KEY:
-          description: "Firecrawl API key — requerida para buscar y scrape de negocios locales"
-          kind: "secret"
-          default: ""
-          requirement: "required"
-        FIRECRAWL_MCP_URL:
-          description: "URL del MCP server de Firecrawl — formato: https://mcp.firecrawl.dev/{TOKEN}/v2/mcp"
-          kind: "secret"
-          default: ""
-          requirement: "required"
-  webdesigner:
-    role: "general"
-    capabilities: "Diseñador web premium de Humanio Marketing. Recibe briefs del Qualifier y genera sitios web de 3 páginas (presentación, propuesta comercial, reporte SEO) en HTML/CSS/JS vanilla con estilos visuales únicos por prospecto. Publica en Surge.sh y crea ticket para Outreach al terminar."
-    adapter:
-      config:
-        dangerouslySkipPermissions: true
-        model: "claude-sonnet-4-5-20250929"
-      type: "claude_local"
-    runtime:
-      heartbeat:
-        intervalSec: 300
-        maxConcurrentRuns: 1
-    inputs:
-      env:
-        SURGE_TOKEN:
-          description: "Surge.sh deploy token — obtener con `surge token` en terminal"
-          kind: "secret"
-          default: ""
-          requirement: "required"
-        PEXELS_API_KEY:
-          description: "Pexels API key para imágenes hero de los sitios — pexels.com/api"
-          kind: "secret"
-          default: ""
-          requirement: "required"
-        TWENTY_FIRST_API_KEY:
-          description: "21st.dev API key para componentes UI premium opcionales — 21st.dev"
-          kind: "secret"
-          default: ""
-          requirement: "optional"
+      maxConcurrentRuns: 1
+
 company:
   logoPath: "images/company-logo.png"
+
 projects:
   onboarding:
     color: "#6366f1"
     status: "in_progress"
+
 routines:
+  # PAUSADAS — el pipeline se activa por mensajes directos entre agentes (auto-wake)
+  # Activar solo como mecanismo de recuperación si un agente se corta mid-task
   qualifier-revisar-tickets-pendientes:
-    status: "active"
+    status: "paused"
     triggers:
-      -
-        kind: "schedule"
+      - kind: "schedule"
         cronExpression: "10 * * * *"
-        label: "schedule"
+        label: "hourly-recovery"
         timezone: "America/Mazatlan"
-      -
-        kind: "schedule"
+
+  webdesigner-revisar-briefs-pendientes:
+    status: "paused"
+    triggers:
+      - kind: "schedule"
         cronExpression: "10 * * * *"
-        label: "schedule-2"
+        label: "hourly-recovery"
         timezone: "America/Mazatlan"
+
   dataanalyst-pipeline-semanal:
     status: "active"
     triggers:
-      -
-        kind: "schedule"
+      - kind: "schedule"
         cronExpression: "0 9 * * 1"
         label: "weekly-monday-9am"
         timezone: "America/Mazatlan"
-  webdesigner-revisar-briefs-pendientes:
-    status: "active"
-    triggers:
-      -
-        kind: "schedule"
-        cronExpression: "10 * * * *"
-        label: "schedule"
-        timezone: "America/Mazatlan"
+
 sidebar:
   agents:
     - "ceo"
-    - "dataanalyst"
-    - "outreach"
-    - "qualifier"
     - "scout"
+    - "qualifier"
     - "webdesigner"
+    - "outreach"
+    - "closer"
+    - "dataanalyst"
   projects:
     - "onboarding"
