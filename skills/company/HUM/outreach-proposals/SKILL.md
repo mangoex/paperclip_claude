@@ -86,9 +86,11 @@ curl -s "https://humanio-{slug}.surge.sh/reporte" -o /tmp/outreach-{slug}/report
 
 ### 5. Enviar correo inicial (SMTP directo) + registrar en Chatwoot (CRM)
 
-> **Arquitectura híbrida:** El email inicial se envía por **SMTP directo** (evita el bug de Chatwoot con `message_id` nil en conversaciones nuevas sin email entrante previo).
-> Chatwoot se usa como **CRM de registro**: se crea el contacto + conversación + nota privada con el email enviado.
-> El `chatwoot_conversation_id` se guarda para que el Closer responda vía Chatwoot API cuando el prospecto haya contestado (en ese caso SÍ hay un email entrante de referencia).
+> ⚠️ **REGLA CRÍTICA — NO NEGOCIABLE:**
+> El email SIEMPRE se envía por **SMTP directo** con `nodemailer` (smtpout.secureserver.net:465).
+> **NUNCA uses la API de Chatwoot para enviar el email inicial** — hay un bug conocido en Chatwoot v4.11 que causa `undefined method 'message_id' for nil` al intentar enviar outgoing email en conversaciones nuevas.
+> Chatwoot se usa SOLO como CRM de registro (contacto + conversación + nota privada).
+> Si no hay `SMTP_PASS` en las variables de entorno, reporta el error al CEO y detente — **no intentes enviar vía Chatwoot como fallback**.
 
 #### Reglas obligatorias del email (del skill `sales-copywriting`)
 
@@ -267,7 +269,6 @@ try {
     headers: cwHeaders,
     body: JSON.stringify({
       content: `📧 **Email enviado vía SMTP** (${smtpStatus})\n\nPara: {EMAIL_PROSPECTO}\nAsunto: Análisis digital de {NOMBRE_NEGOCIO}\nFecha: ${new Date().toISOString()}\n\nEl prospecto responderá a contacto@humanio.digital. Cuando Chatwoot reciba su reply, n8n notificará al Closer.`,
-      message_type: 'outgoing',
       private: true
     })
   });
