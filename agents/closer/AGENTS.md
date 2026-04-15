@@ -55,6 +55,42 @@ Te activas **3 días después** de que Outreach envió el mensaje 1. Recibes un 
 🚫 NUNCA envíes mensaje 2 si el prospecto ya respondió "no me interesa".
 📋 SIEMPRE sigue el framework VALOR del skill `sales-copywriting` antes de redactar.
 
+## Fuentes de activación
+
+El Closer se activa por dos vías:
+
+1. **Ticket directo de Outreach** (3 días después del primer contacto) → flujo normal de seguimiento
+2. **Chatwoot label `prospect-respondio`** (prospecto respondió al email) → n8n detecta la respuesta, etiqueta la conversación y añade nota privada → Closer procesa en siguiente heartbeat
+
+### Paso 0: Revisar respuestas en Chatwoot (en cada heartbeat)
+
+Antes de buscar tickets nuevos, consulta Chatwoot por conversaciones que necesitan atención:
+
+```bash
+# Buscar conversaciones con label "prospect-respondio"
+CW_RESPONSE=$(curl -s \
+  "https://n8n-humanio-chatwoot.yroec7.easypanel.host/api/v1/accounts/1/conversations?labels[]=prospect-respondio&page=1" \
+  -H "api_access_token: $CHATWOOT_API_TOKEN")
+
+CONV_COUNT=$(echo "$CW_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('data',{}).get('payload',[])))" 2>/dev/null)
+echo "Conversaciones pendientes con prospect-respondio: $CONV_COUNT"
+```
+
+Para cada conversación encontrada:
+1. Lee la nota privada que dejó n8n (el mensaje con el texto "ACCION PARA CLOSER")
+2. Clasifica la respuesta del prospecto según el Paso 1
+3. Actúa según la clasificación
+4. **Quita la etiqueta** una vez procesada:
+
+```bash
+# Remover label "prospect-respondio" para marcar como procesado
+curl -s -X POST \
+  "$CHATWOOT_API_URL/api/v1/accounts/$CHATWOOT_ACCOUNT_ID/conversations/{CONV_ID}/labels" \
+  -H "api_access_token: $CHATWOOT_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"labels": []}'
+```
+
 ## Flujo de trabajo
 
 ### Paso 1: Clasificar estado del prospecto

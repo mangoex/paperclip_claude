@@ -41,6 +41,7 @@ hallazgos_originales:
   - "{HALLAZGO_2}"
   - "{HALLAZGO_3}"
 hallazgo_usado_msg1: "{HALLAZGO_PRINCIPAL_MSG1}"  # para no repetir
+chatwoot_conversation_id: {CHATWOOT_CONV_ID}       # ID de conversación en Chatwoot — para responder en mismo hilo
 ```
 
 ### 2. Calcular timing
@@ -119,7 +120,10 @@ echo "$WA_MSG2" > /tmp/closer-{slug}/seguimiento-2-whatsapp.txt
 echo "✅ seguimiento-2-whatsapp.txt generado"
 ```
 
-#### 4b. Mensaje 2 — Email (draft, no enviar)
+#### 4b. Mensaje 2 — Email (vía Chatwoot, mismo hilo del mensaje 1)
+
+> El email de seguimiento se envía como reply en la conversación de Chatwoot creada por Outreach.
+> Usa el `chatwoot_conversation_id` del ticket. Si no existe, guarda el HTML para envío manual.
 
 ```javascript
 const fs = require('fs');
@@ -157,13 +161,47 @@ const email2HTML = `<!DOCTYPE html>
 
 fs.mkdirSync('/tmp/closer-{slug}', {recursive: true});
 fs.writeFileSync('/tmp/closer-{slug}/seguimiento-2-email.html', email2HTML);
+
+// Enviar via Chatwoot en el mismo hilo del mensaje 1
+const CHATWOOT_URL   = process.env.CHATWOOT_API_URL;
+const CHATWOOT_TOKEN = process.env.CHATWOOT_API_TOKEN;
+const ACCOUNT_ID     = process.env.CHATWOOT_ACCOUNT_ID;
+const CONV_ID        = '{CHATWOOT_CONVERSATION_ID}'; // del ticket de Outreach
+
+let email2Status = 'PENDIENTE_ENVIO_MANUAL';
+let email2MsgId  = null;
+
+if (CONV_ID && CONV_ID !== 'null' && CONV_ID !== '') {
+  const msgResp = await fetch(
+    `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations/${CONV_ID}/messages`,
+    {
+      method: 'POST',
+      headers: { 'api_access_token': CHATWOOT_TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: email2HTML,
+        message_type: 'outgoing',
+        content_type: 'html',
+        private: false
+      })
+    }
+  );
+  const msgData = await msgResp.json();
+  if (msgData.id) {
+    email2MsgId  = msgData.id;
+    email2Status = 'ENVIADO_VIA_CHATWOOT';
+    console.log(`✅ Email msg 2 enviado en Chatwoot conv ${CONV_ID} — mensaje ID: ${email2MsgId}`);
+  } else {
+    console.error('⚠️ Error Chatwoot msg 2:', JSON.stringify(msgData));
+  }
+} else {
+  console.log('⚠️ Sin chatwoot_conversation_id — email msg 2 marcado como PENDIENTE_ENVIO_MANUAL');
+}
+
 fs.writeFileSync('/tmp/closer-{slug}/seguimiento-2-meta.json', JSON.stringify({
-  to: '{EMAIL_PROSPECTO}',
+  chatwoot_conversation_id: CONV_ID,
+  chatwoot_message_id: email2MsgId,
   subject: 'Re: Análisis digital de {NOMBRE_NEGOCIO}',
-  from: 'contacto@humanio.digital',
-  fromName: 'Miguel González | Humanio',
-  inReplyTo: '{MESSAGE_ID_MSG1}',
-  status: 'DRAFT_PENDING_REVIEW',
+  status: email2Status,
   scheduledFor: '{FECHA_MSG2}',
   createdAt: new Date().toISOString()
 }, null, 2));
@@ -193,7 +231,10 @@ echo "$WA_MSG3" > /tmp/closer-{slug}/seguimiento-3-whatsapp.txt
 echo "✅ seguimiento-3-whatsapp.txt generado (programado para día 7 si no hay respuesta)"
 ```
 
-#### 4d. Mensaje 3 — Email (generado ahora, enviado en día 7)
+#### 4d. Mensaje 3 — Email (generado ahora, enviado en día 7 vía Chatwoot)
+
+> El HTML se genera ahora. El envío ocurre en el Paso 8 (día 7) solo si no hay respuesta.
+> Usa el mismo `chatwoot_conversation_id` para mantener el hilo completo en Chatwoot.
 
 ```javascript
 const email3HTML = `<!DOCTYPE html>
@@ -223,16 +264,14 @@ const email3HTML = `<!DOCTYPE html>
 
 fs.writeFileSync('/tmp/closer-{slug}/seguimiento-3-email.html', email3HTML);
 fs.writeFileSync('/tmp/closer-{slug}/seguimiento-3-meta.json', JSON.stringify({
-  to: '{EMAIL_PROSPECTO}',
+  chatwoot_conversation_id: '{CHATWOOT_CONVERSATION_ID}',
   subject: 'Re: Análisis digital de {NOMBRE_NEGOCIO}',
-  from: 'contacto@humanio.digital',
-  fromName: 'Miguel González | Humanio',
-  status: 'DRAFT_PENDING_REVIEW',
+  status: 'PENDIENTE_DIA_7',
   scheduledFor: '{FECHA_MSG3}',
-  note: 'Enviar solo si no hubo respuesta al mensaje 2',
+  note: 'Enviar solo si no hubo respuesta al mensaje 2 — ver Paso 8',
   createdAt: new Date().toISOString()
 }, null, 2));
-console.log('✅ seguimiento-3-email.html generado');
+console.log('✅ seguimiento-3-email.html generado (se enviará en día 7 si no hay respuesta)');
 ```
 
 ### 5. Generar closer-log.txt (estado inicial)
@@ -340,11 +379,61 @@ Si el prospecto responde entre el día 3 y el día 7:
 ```bash
 HOY=$(date +%Y-%m-%d)
 if [ "$HOY" >= "$FECHA_MSG3" ] && [ "$STATUS_RESPUESTA" = "sin_respuesta" ]; then
-  # Enviar seguimiento-3-whatsapp.txt (ya generado y en Drive)
-  cat /tmp/closer-{slug}/seguimiento-3-whatsapp.txt | \
-  # [mismo curl del paso 7]
-  echo "✅ Mensaje 3 enviado"
-  WA3_STATUS="ENVIADO"
+
+  # ── Mensaje 3 WhatsApp (mismo curl del paso 7) ──────────────────────────
+  WA_RESPONSE=$(curl -s -X POST \
+    "https://graph.facebook.com/v18.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
+    -H "Authorization: Bearer $WHATSAPP_CLOUD_API_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"messaging_product\": \"whatsapp\",
+      \"to\": \"{TELEFONO_PROSPECTO_E164}\",
+      \"type\": \"text\",
+      \"text\": {
+        \"preview_url\": true,
+        \"body\": $(cat /tmp/closer-{slug}/seguimiento-3-whatsapp.txt | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+      }
+    }")
+
+  WA3_MSG_ID=$(echo "$WA_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['messages'][0]['id'])" 2>/dev/null)
+  if [ -n "$WA3_MSG_ID" ]; then
+    echo "✅ WhatsApp msg 3 enviado — ID: $WA3_MSG_ID"
+    WA3_STATUS="ENVIADO — ID: $WA3_MSG_ID"
+  else
+    echo "⚠️ WhatsApp msg 3 no enviado — PENDIENTE ENVÍO MANUAL"
+    WA3_STATUS="PENDIENTE ENVÍO MANUAL"
+  fi
+
+  # ── Mensaje 3 Email (reply en Chatwoot, mismo hilo) ─────────────────────
+  node -e "
+const fs = require('fs');
+const email3HTML = fs.readFileSync('/tmp/closer-{slug}/seguimiento-3-email.html', 'utf8');
+const CONV_ID = '{CHATWOOT_CONVERSATION_ID}';
+
+if (!CONV_ID || CONV_ID === 'null') {
+  console.log('⚠️ Sin chatwoot_conversation_id — email msg 3 PENDIENTE ENVÍO MANUAL');
+  process.exit(0);
+}
+
+(async () => {
+  const resp = await fetch(
+    \`\${process.env.CHATWOOT_API_URL}/api/v1/accounts/\${process.env.CHATWOOT_ACCOUNT_ID}/conversations/\${CONV_ID}/messages\`,
+    {
+      method: 'POST',
+      headers: { 'api_access_token': process.env.CHATWOOT_API_TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: email3HTML, message_type: 'outgoing', content_type: 'html', private: false })
+    }
+  );
+  const data = await resp.json();
+  if (data.id) {
+    console.log('✅ Email msg 3 enviado en Chatwoot conv ' + CONV_ID + ' — mensaje ID: ' + data.id);
+  } else {
+    console.error('⚠️ Error Chatwoot msg 3:', JSON.stringify(data));
+  }
+})();
+"
+
+  echo "✅ Mensaje 3 completo (WA + Email)"
 else
   WA3_STATUS="NO APLICA — prospecto respondió o aún no es día 7"
 fi

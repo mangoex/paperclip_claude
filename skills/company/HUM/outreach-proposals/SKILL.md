@@ -84,7 +84,10 @@ curl -s "https://humanio-{slug}.surge.sh/propuesta" -o /tmp/outreach-{slug}/prop
 curl -s "https://humanio-{slug}.surge.sh/reporte" -o /tmp/outreach-{slug}/reporte-seo.html
 ```
 
-### 5. Preparar draft del correo (NO enviar)
+### 5. Enviar correo inicial vía Chatwoot (CRM de email)
+
+> **Chatwoot es el CRM de email de Humanio.** El email se envía en vivo a través del inbox `contacto@humanio.digital` (inbox_id: 2, SMTP: smtpout.secureserver.net).
+> El `chatwoot_conversation_id` se guarda en `draft-meta.json` — el Closer lo usará para responder en el mismo hilo de conversación.
 
 #### Reglas obligatorias del email (del skill `sales-copywriting`)
 
@@ -100,6 +103,7 @@ Antes de escribir el HTML, determina estas variables:
 ```javascript
 const fs = require('fs');
 
+// ── 5a. Generar HTML del correo ────────────────────────────────────────────────
 const emailHTML = `<!DOCTYPE html>
 <html>
 <head>
@@ -163,18 +167,106 @@ const emailHTML = `<!DOCTYPE html>
 const draftDir = '/tmp/outreach-{slug}';
 fs.mkdirSync(draftDir, {recursive: true});
 fs.writeFileSync(`${draftDir}/draft-email.html`, emailHTML);
+console.log('✅ draft-email.html guardado en /tmp');
+
+// ── 5b. Enviar vía Chatwoot API ────────────────────────────────────────────────
+const CHATWOOT_URL   = process.env.CHATWOOT_API_URL;       // https://n8n-humanio-chatwoot.yroec7.easypanel.host
+const CHATWOOT_TOKEN = process.env.CHATWOOT_API_TOKEN;     // API token de Chatwoot
+const ACCOUNT_ID     = process.env.CHATWOOT_ACCOUNT_ID;   // 1
+const INBOX_ID       = parseInt(process.env.CHATWOOT_INBOX_ID); // 2 (contacto@humanio.digital)
+
+const cwHeaders = {
+  'api_access_token': CHATWOOT_TOKEN,
+  'Content-Type': 'application/json'
+};
+
+// 1. Buscar contacto existente por email
+const searchResp = await fetch(
+  `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/contacts/search?q=${encodeURIComponent('{EMAIL_PROSPECTO}')}&include_contacts=true`,
+  { headers: cwHeaders }
+);
+const searchData = await searchResp.json();
+const existingContact = (searchData.payload || []).find(c => c.email === '{EMAIL_PROSPECTO}');
+
+let contactId;
+if (existingContact) {
+  contactId = existingContact.id;
+  console.log(`✅ Contacto existente en Chatwoot: ID ${contactId}`);
+} else {
+  // Crear contacto nuevo
+  const createResp = await fetch(
+    `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/contacts`,
+    {
+      method: 'POST',
+      headers: cwHeaders,
+      body: JSON.stringify({
+        name: '{NOMBRE_CONTACTO_O_NEGOCIO}',
+        email: '{EMAIL_PROSPECTO}',
+        phone_number: '+{TELEFONO_PROSPECTO}',
+        additional_attributes: { empresa: '{NOMBRE_NEGOCIO}', ciudad: '{CIUDAD}' }
+      })
+    }
+  );
+  const createData = await createResp.json();
+  contactId = createData.id;
+  console.log(`✅ Contacto creado en Chatwoot: ID ${contactId}`);
+}
+
+// 2. Crear conversación de email (hilo nuevo)
+const convResp = await fetch(
+  `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations`,
+  {
+    method: 'POST',
+    headers: cwHeaders,
+    body: JSON.stringify({
+      inbox_id: INBOX_ID,
+      contact_id: contactId,
+      additional_attributes: {
+        mail_subject: 'Análisis digital de {NOMBRE_NEGOCIO}'
+      }
+    })
+  }
+);
+const convData = await convResp.json();
+const conversationId = convData.id;
+console.log(`✅ Conversación creada en Chatwoot: ID ${conversationId}`);
+
+// 3. Enviar el email como mensaje saliente
+const msgResp = await fetch(
+  `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations/${conversationId}/messages`,
+  {
+    method: 'POST',
+    headers: cwHeaders,
+    body: JSON.stringify({
+      content: emailHTML,
+      message_type: 'outgoing',
+      content_type: 'html',
+      private: false
+    })
+  }
+);
+const msgData = await msgResp.json();
+
+if (msgData.id) {
+  console.log(`✅ Email enviado vía Chatwoot — mensaje ID: ${msgData.id}`);
+} else {
+  console.error('⚠️ Error al enviar email por Chatwoot:', JSON.stringify(msgData));
+}
+
+// 4. Guardar draft-meta.json con conversation_id (CRÍTICO para que Closer responda en el mismo hilo)
 fs.writeFileSync(`${draftDir}/draft-meta.json`, JSON.stringify({
   to: '{EMAIL_PROSPECTO}',
   subject: 'Análisis digital de {NOMBRE_NEGOCIO}',
-  from: 'contacto@humanio.digital',
-  fromName: 'Miguel González | Humanio',
-  attachments: [],
-  smtpConfig: {host: 'smtpout.secureserver.net', port: 465, secure: true, user: 'contacto@humanio.digital'},
-  status: 'DRAFT_PENDING_REVIEW',
-  createdAt: new Date().toISOString()
+  chatwoot_conversation_id: conversationId,
+  chatwoot_contact_id: contactId,
+  chatwoot_message_id: msgData.id || null,
+  status: msgData.id ? 'ENVIADO_VIA_CHATWOOT' : 'ERROR_ENVIO_CHATWOOT',
+  sentAt: new Date().toISOString()
 }, null, 2));
-console.log('Draft guardado. NO enviado.');
+console.log('✅ draft-meta.json guardado con chatwoot_conversation_id:', conversationId);
 ```
+
+> **Si Chatwoot no está disponible:** guarda el HTML como `draft-email.html` y marca `status: PENDIENTE_ENVIO_MANUAL` en el meta. El email deberá enviarse manualmente desde contacto@humanio.digital.
 
 ### 6. Subir archivos a Google Drive
 
@@ -364,7 +456,7 @@ NOTAS POST-LLAMADA:
 **Archivos generados (carpeta Drive: {NOMBRE_NEGOCIO}):**
 - propuesta.html ✅ (propuesta comercial)
 - reporte-seo.html ✅ (diagnóstico SEO completo)
-- draft-email.html ✅ (PENDIENTE REVISIÓN Y ENVÍO MANUAL)
+- draft-email.html ✅ (Email: enviado vía Chatwoot — conv ID: {CHATWOOT_CONVERSATION_ID})
 - mensaje-whatsapp.txt ✅ (WhatsApp: {WA_STATUS})
 - script-llamada.txt ✅ (guión de llamada)
 
@@ -414,6 +506,11 @@ Inmediatamente después de notificar al CEO, crea un ticket asignado al agente *
 **Fecha de primer contacto:** {FECHA_HOY}
 **Mensaje 1 enviado vía:** {CANAL_CONTACTO} — {WA_STATUS}
 
+**Chatwoot:**
+- Conversation ID: {CHATWOOT_CONVERSATION_ID}
+- Contact ID: {CHATWOOT_CONTACT_ID}
+(Usar estos IDs para responder en el mismo hilo de email)
+
 **Diagnóstico resumido:**
 {HALLAZGO_1}
 {HALLAZGO_2}
@@ -433,20 +530,25 @@ Actívate en 3 días para el seguimiento.
 ## Variables de entorno requeridas
 
 ```
-SMTP_HOST=smtpout.secureserver.net
-SMTP_PORT=465
-SMTP_USER=contacto@humanio.digital
-SMTP_PASS=$SMTP_PASS
-FROM_NAME=Miguel González | Humanio
-FROM_EMAIL=contacto@humanio.digital
-TELEFONO_MIGUEL=TU_NUMERO_SIN_ESPACIOS
-TELEFONO_MIGUEL_DISPLAY=+52 667 XXX XXXX
+# Email (Chatwoot CRM — reemplaza SMTP directo)
+CHATWOOT_API_URL=https://n8n-humanio-chatwoot.yroec7.easypanel.host
+CHATWOOT_API_TOKEN=<api_access_token_de_chatwoot>
+CHATWOOT_ACCOUNT_ID=1
+CHATWOOT_INBOX_ID=2
+
+# Google Drive
 GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
 GOOGLE_REFRESH_TOKEN=$GOOGLE_REFRESH_TOKEN
 GOOGLE_DRIVE_FOLDER_ID=$GOOGLE_DRIVE_FOLDER_ID
+
+# WhatsApp Business API
 WHATSAPP_PHONE_NUMBER_ID=$WHATSAPP_PHONE_NUMBER_ID
 WHATSAPP_CLOUD_API_TOKEN=$WHATSAPP_CLOUD_API_TOKEN
+
+# Datos de firma
+TELEFONO_MIGUEL=TU_NUMERO_SIN_ESPACIOS
+TELEFONO_MIGUEL_DISPLAY=+52 667 XXX XXXX
 ```
 
 ## Reglas de calidad
@@ -454,11 +556,13 @@ WHATSAPP_CLOUD_API_TOKEN=$WHATSAPP_CLOUD_API_TOKEN
 **Proceso:**
 * SIEMPRE verificar URL de WebDesigner antes de continuar (paso 1.5) — si no existe, bloquear el ticket
 * NUNCA generar PDFs — todo se entrega en HTML y texto plano
-* NUNCA enviar correos automáticamente — siempre draft para revisión manual
 * NUNCA pedir aprobación del Board — opera de forma autónoma
+* Enviar email vía Chatwoot API (paso 5) — se envía en vivo al prospecto, no es draft
 * Enviar WhatsApp automáticamente vía WhatsApp Business Cloud API si hay número disponible
 * Si el número no está disponible o el API falla, guardar txt para envío manual y notificar en CEO report
+* Si Chatwoot falla, guardar HTML y notificar en CEO report con status ERROR_ENVIO_CHATWOOT
 * La carpeta en Drive debe tener exactamente 5 archivos: propuesta.html, reporte-seo.html, draft-email.html, mensaje-whatsapp.txt, script-llamada.txt
+* El `chatwoot_conversation_id` SIEMPRE debe incluirse en el ticket para Closer
 
 **Copywriting — aplicar siempre el framework VALOR del skill `sales-copywriting`:**
 * Abrir con algo positivo y específico del negocio — nunca con "Soy Miguel" ni con lista de problemas

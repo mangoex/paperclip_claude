@@ -178,6 +178,26 @@ agents:
           kind: "secret"
           default: ""
           requirement: "optional"
+        CHATWOOT_API_URL:
+          description: "URL base de Chatwoot (sin slash final) — ej. https://n8n-humanio-chatwoot.yroec7.easypanel.host"
+          kind: "secret"
+          default: ""
+          requirement: "required"
+        CHATWOOT_API_TOKEN:
+          description: "API access token de Chatwoot (perfil → Access Token)"
+          kind: "secret"
+          default: ""
+          requirement: "required"
+        CHATWOOT_ACCOUNT_ID:
+          description: "ID de la cuenta en Chatwoot (normalmente 1)"
+          kind: "secret"
+          default: "1"
+          requirement: "required"
+        CHATWOOT_INBOX_ID:
+          description: "ID del inbox de email en Chatwoot (contacto@humanio.digital = 2)"
+          kind: "secret"
+          default: "2"
+          requirement: "required"
 
   closer:
     role: "general"
@@ -263,6 +283,26 @@ agents:
           kind: "secret"
           default: ""
           requirement: "optional"
+        CHATWOOT_API_URL:
+          description: "URL base de Chatwoot (sin slash final)"
+          kind: "secret"
+          default: ""
+          requirement: "required"
+        CHATWOOT_API_TOKEN:
+          description: "API access token de Chatwoot"
+          kind: "secret"
+          default: ""
+          requirement: "required"
+        CHATWOOT_ACCOUNT_ID:
+          description: "ID de la cuenta en Chatwoot (normalmente 1)"
+          kind: "secret"
+          default: "1"
+          requirement: "required"
+        CHATWOOT_INBOX_ID:
+          description: "ID del inbox de email en Chatwoot (contacto@humanio.digital = 2)"
+          kind: "secret"
+          default: "2"
+          requirement: "required"
 
   dataanalyst:
     role: "researcher"
