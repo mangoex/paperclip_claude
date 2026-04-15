@@ -60,35 +60,35 @@ Te activas **3 días después** de que Outreach envió el mensaje 1. Recibes un 
 El Closer se activa por dos vías:
 
 1. **Ticket directo de Outreach** (3 días después del primer contacto) → flujo normal de seguimiento
-2. **Chatwoot label `prospect-respondio`** (prospecto respondió al email) → n8n detecta la respuesta, etiqueta la conversación y añade nota privada → Closer procesa en siguiente heartbeat
+2. **Chatwoot status `pending`** (prospecto respondió al email) → n8n detecta la respuesta, cambia la conversación a status `pending` y añade nota privada → Closer procesa en siguiente heartbeat
 
 ### Paso 0: Revisar respuestas en Chatwoot (en cada heartbeat)
 
-Antes de buscar tickets nuevos, consulta Chatwoot por conversaciones que necesitan atención:
+Antes de buscar tickets nuevos, consulta Chatwoot por conversaciones en status `pending` del inbox 2:
 
 ```bash
-# Buscar conversaciones con label "prospect-respondio"
+# Buscar conversaciones con status "pending" en inbox 2
 CW_RESPONSE=$(curl -s \
-  "https://n8n-humanio-chatwoot.yroec7.easypanel.host/api/v1/accounts/1/conversations?labels[]=prospect-respondio&page=1" \
+  "https://n8n-humanio-chatwoot.yroec7.easypanel.host/api/v1/accounts/1/conversations?inbox_id=2&status=pending&page=1" \
   -H "api_access_token: $CHATWOOT_API_TOKEN")
 
 CONV_COUNT=$(echo "$CW_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('data',{}).get('payload',[])))" 2>/dev/null)
-echo "Conversaciones pendientes con prospect-respondio: $CONV_COUNT"
+echo "Conversaciones pendientes de respuesta Closer: $CONV_COUNT"
 ```
 
 Para cada conversación encontrada:
-1. Lee la nota privada que dejó n8n (el mensaje con el texto "ACCION PARA CLOSER")
-2. Clasifica la respuesta del prospecto según el Paso 1
+1. Lee los mensajes de la conversación para ver la respuesta del prospecto
+2. Clasifica la respuesta según el Paso 1
 3. Actúa según la clasificación
-4. **Quita la etiqueta** una vez procesada:
+4. **Cambia el status a `open`** una vez procesada para no volver a procesarla:
 
 ```bash
-# Remover label "prospect-respondio" para marcar como procesado
-curl -s -X POST \
-  "$CHATWOOT_API_URL/api/v1/accounts/$CHATWOOT_ACCOUNT_ID/conversations/{CONV_ID}/labels" \
+# Marcar como procesado (status: open)
+curl -s -X PATCH \
+  "$CHATWOOT_API_URL/api/v1/accounts/$CHATWOOT_ACCOUNT_ID/conversations/{CONV_ID}/update" \
   -H "api_access_token: $CHATWOOT_API_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"labels": []}'
+  -d '{"status": "open"}'
 ```
 
 ## Flujo de trabajo
