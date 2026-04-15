@@ -162,39 +162,66 @@ const email2HTML = `<!DOCTYPE html>
 fs.mkdirSync('/tmp/closer-{slug}', {recursive: true});
 fs.writeFileSync('/tmp/closer-{slug}/seguimiento-2-email.html', email2HTML);
 
-// Enviar via Chatwoot en el mismo hilo del mensaje 1
+// ⚠️ REGLA CRÍTICA: Enviar SIEMPRE vía SMTP directo — NO usar Chatwoot API para envío de emails.
+// Chatwoot v4.11 tiene un bug 'undefined method message_id for nil' al enviar emails salientes
+// cuando la conversación fue iniciada vía SMTP externo (no vía Chatwoot).
+// Chatwoot se usa SOLO como CRM (notas privadas de registro).
+
 const CHATWOOT_URL   = process.env.CHATWOOT_API_URL;
 const CHATWOOT_TOKEN = process.env.CHATWOOT_API_TOKEN;
 const ACCOUNT_ID     = process.env.CHATWOOT_ACCOUNT_ID;
-const CONV_ID        = '{CHATWOOT_CONVERSATION_ID}'; // del ticket de Outreach
+const CONV_ID        = '{CHATWOOT_CONVERSATION_ID}';
 
-let email2Status = 'PENDIENTE_ENVIO_MANUAL';
+// Obtener source_id del último mensaje entrante para In-Reply-To
+let inReplyTo = null;
+if (CONV_ID && CONV_ID !== 'null' && CONV_ID !== '') {
+  try {
+    const msgsResp = await fetch(
+      `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations/${CONV_ID}/messages`,
+      { headers: { 'api_access_token': CHATWOOT_TOKEN } }
+    );
+    const msgsData = await msgsResp.json();
+    const incoming = (msgsData.payload || []).filter(m => m.message_type === 0 && m.source_id);
+    if (incoming.length > 0) inReplyTo = incoming[incoming.length - 1].source_id;
+  } catch(e) { console.log('No se pudo obtener source_id:', e.message); }
+}
+
+// Enviar vía SMTP directo (igual que Outreach)
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+  host: 'smtpout.secureserver.net', port: 465, secure: true,
+  auth: { user: process.env.SMTP_USER || 'contacto@humanio.digital', pass: process.env.SMTP_PASS }
+});
+
+let email2Status = 'ERROR_SMTP';
 let email2MsgId  = null;
 
+try {
+  const mailOpts = {
+    from: '"Miguel González | Humanio" <contacto@humanio.digital>',
+    to: '{EMAIL_PROSPECTO}',
+    subject: 'Re: Análisis digital de {NOMBRE_NEGOCIO}',
+    html: email2HTML
+  };
+  if (inReplyTo) { mailOpts.inReplyTo = inReplyTo; mailOpts.references = inReplyTo; }
+  const info = await transporter.sendMail(mailOpts);
+  email2MsgId  = info.messageId;
+  email2Status = 'ENVIADO_VIA_SMTP';
+  console.log(`✅ Email msg 2 enviado vía SMTP — messageId: ${email2MsgId}`);
+} catch(err) {
+  console.error('⚠️ Error SMTP msg 2:', err.message);
+  email2Status = 'ERROR_SMTP — ' + err.message;
+}
+
+// Registrar en Chatwoot como nota privada (CRM)
 if (CONV_ID && CONV_ID !== 'null' && CONV_ID !== '') {
-  const msgResp = await fetch(
-    `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations/${CONV_ID}/messages`,
-    {
+  try {
+    await fetch(`${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations/${CONV_ID}/messages`, {
       method: 'POST',
       headers: { 'api_access_token': CHATWOOT_TOKEN, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: email2HTML,
-        message_type: 'outgoing',
-        content_type: 'html',
-        private: false
-      })
-    }
-  );
-  const msgData = await msgResp.json();
-  if (msgData.id) {
-    email2MsgId  = msgData.id;
-    email2Status = 'ENVIADO_VIA_CHATWOOT';
-    console.log(`✅ Email msg 2 enviado en Chatwoot conv ${CONV_ID} — mensaje ID: ${email2MsgId}`);
-  } else {
-    console.error('⚠️ Error Chatwoot msg 2:', JSON.stringify(msgData));
-  }
-} else {
-  console.log('⚠️ Sin chatwoot_conversation_id — email msg 2 marcado como PENDIENTE_ENVIO_MANUAL');
+      body: JSON.stringify({ content: `📧 Follow-up email enviado vía SMTP (${email2Status})\nMessageId: ${email2MsgId}`, private: true })
+    });
+  } catch(e) { console.log('⚠️ No se pudo registrar nota en Chatwoot:', e.message); }
 }
 
 fs.writeFileSync('/tmp/closer-{slug}/seguimiento-2-meta.json', JSON.stringify({
@@ -404,31 +431,52 @@ if [ "$HOY" >= "$FECHA_MSG3" ] && [ "$STATUS_RESPUESTA" = "sin_respuesta" ]; the
     WA3_STATUS="PENDIENTE ENVÍO MANUAL"
   fi
 
-  # ── Mensaje 3 Email (reply en Chatwoot, mismo hilo) ─────────────────────
+  # ── Mensaje 3 Email (vía SMTP directo — NO Chatwoot API) ───────────────
   node -e "
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 const email3HTML = fs.readFileSync('/tmp/closer-{slug}/seguimiento-3-email.html', 'utf8');
 const CONV_ID = '{CHATWOOT_CONVERSATION_ID}';
-
-if (!CONV_ID || CONV_ID === 'null') {
-  console.log('⚠️ Sin chatwoot_conversation_id — email msg 3 PENDIENTE ENVÍO MANUAL');
-  process.exit(0);
-}
+const CW_URL = process.env.CHATWOOT_API_URL;
+const CW_TOKEN = process.env.CHATWOOT_API_TOKEN;
+const ACCOUNT_ID = process.env.CHATWOOT_ACCOUNT_ID;
 
 (async () => {
-  const resp = await fetch(
-    \`\${process.env.CHATWOOT_API_URL}/api/v1/accounts/\${process.env.CHATWOOT_ACCOUNT_ID}/conversations/\${CONV_ID}/messages\`,
-    {
-      method: 'POST',
-      headers: { 'api_access_token': process.env.CHATWOOT_API_TOKEN, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: email3HTML, message_type: 'outgoing', content_type: 'html', private: false })
+  // Obtener source_id del último mensaje entrante para In-Reply-To
+  let inReplyTo = null;
+  if (CONV_ID && CONV_ID !== 'null') {
+    try {
+      const r = await fetch(\`\${CW_URL}/api/v1/accounts/\${ACCOUNT_ID}/conversations/\${CONV_ID}/messages\`,
+        { headers: { 'api_access_token': CW_TOKEN } });
+      const d = await r.json();
+      const incoming = (d.payload || []).filter(m => m.message_type === 0 && m.source_id);
+      if (incoming.length > 0) inReplyTo = incoming[incoming.length - 1].source_id;
+    } catch(e) {}
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtpout.secureserver.net', port: 465, secure: true,
+    auth: { user: process.env.SMTP_USER || 'contacto@humanio.digital', pass: process.env.SMTP_PASS }
+  });
+  const mailOpts = {
+    from: '\"Miguel González | Humanio\" <contacto@humanio.digital>',
+    to: '{EMAIL_PROSPECTO}',
+    subject: 'Re: Análisis digital de {NOMBRE_NEGOCIO}',
+    html: email3HTML
+  };
+  if (inReplyTo) { mailOpts.inReplyTo = inReplyTo; mailOpts.references = inReplyTo; }
+
+  try {
+    const info = await transporter.sendMail(mailOpts);
+    console.log('✅ Email msg 3 enviado vía SMTP — messageId: ' + info.messageId);
+    // Nota privada en Chatwoot
+    if (CONV_ID && CONV_ID !== 'null') {
+      await fetch(\`\${CW_URL}/api/v1/accounts/\${ACCOUNT_ID}/conversations/\${CONV_ID}/messages\`,
+        { method: 'POST', headers: { 'api_access_token': CW_TOKEN, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: '📧 Email msg 3 enviado vía SMTP — ' + info.messageId, private: true }) });
     }
-  );
-  const data = await resp.json();
-  if (data.id) {
-    console.log('✅ Email msg 3 enviado en Chatwoot conv ' + CONV_ID + ' — mensaje ID: ' + data.id);
-  } else {
-    console.error('⚠️ Error Chatwoot msg 3:', JSON.stringify(data));
+  } catch(err) {
+    console.error('⚠️ Error SMTP msg 3:', err.message);
   }
 })();
 "
