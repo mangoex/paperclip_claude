@@ -84,10 +84,11 @@ curl -s "https://humanio-{slug}.surge.sh/propuesta" -o /tmp/outreach-{slug}/prop
 curl -s "https://humanio-{slug}.surge.sh/reporte" -o /tmp/outreach-{slug}/reporte-seo.html
 ```
 
-### 5. Enviar correo inicial vía Chatwoot (CRM de email)
+### 5. Enviar correo inicial (SMTP directo) + registrar en Chatwoot (CRM)
 
-> **Chatwoot es el CRM de email de Humanio.** El email se envía en vivo a través del inbox `contacto@humanio.digital` (inbox_id: 2, SMTP: smtpout.secureserver.net).
-> El `chatwoot_conversation_id` se guarda en `draft-meta.json` — el Closer lo usará para responder en el mismo hilo de conversación.
+> **Arquitectura híbrida:** El email inicial se envía por **SMTP directo** (evita el bug de Chatwoot con `message_id` nil en conversaciones nuevas sin email entrante previo).
+> Chatwoot se usa como **CRM de registro**: se crea el contacto + conversación + nota privada con el email enviado.
+> El `chatwoot_conversation_id` se guarda para que el Closer responda vía Chatwoot API cuando el prospecto haya contestado (en ese caso SÍ hay un email entrante de referencia).
 
 #### Reglas obligatorias del email (del skill `sales-copywriting`)
 
@@ -164,39 +165,74 @@ const emailHTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
+const nodemailer = require('nodemailer');
+const fs = require('fs');
+
 const draftDir = '/tmp/outreach-{slug}';
 fs.mkdirSync(draftDir, {recursive: true});
 fs.writeFileSync(`${draftDir}/draft-email.html`, emailHTML);
 console.log('✅ draft-email.html guardado en /tmp');
 
-// ── 5b. Enviar vía Chatwoot API ────────────────────────────────────────────────
-const CHATWOOT_URL   = process.env.CHATWOOT_API_URL;       // https://n8n-humanio-chatwoot.yroec7.easypanel.host
-const CHATWOOT_TOKEN = process.env.CHATWOOT_API_TOKEN;     // API token de Chatwoot
-const ACCOUNT_ID     = process.env.CHATWOOT_ACCOUNT_ID;   // 1
-const INBOX_ID       = parseInt(process.env.CHATWOOT_INBOX_ID); // 2 (contacto@humanio.digital)
+// ── 5b. Enviar vía SMTP directo ────────────────────────────────────────────────
+// (Chatwoot tiene un bug con message_id nil en conversaciones nuevas sin email entrante)
+const transporter = nodemailer.createTransporter({
+  host: 'smtpout.secureserver.net',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.SMTP_USER || 'contacto@humanio.digital',
+    pass: process.env.SMTP_PASS
+  }
+});
+
+let smtpStatus = 'ERROR';
+let smtpMessageId = null;
+
+try {
+  const info = await transporter.sendMail({
+    from: `"Miguel González | Humanio" <contacto@humanio.digital>`,
+    to: '{EMAIL_PROSPECTO}',
+    subject: 'Análisis digital de {NOMBRE_NEGOCIO}',
+    html: emailHTML
+  });
+  smtpMessageId = info.messageId;
+  smtpStatus = 'ENVIADO_VIA_SMTP';
+  console.log(`✅ Email enviado vía SMTP — messageId: ${smtpMessageId}`);
+} catch (err) {
+  console.error('⚠️ Error SMTP:', err.message);
+  smtpStatus = 'ERROR_SMTP — ' + err.message;
+}
+
+// ── 5c. Registrar en Chatwoot (CRM) ────────────────────────────────────────────
+// Crea contacto + conversación + nota privada con el email enviado
+// NO enviamos via Chatwoot message API para el primer email (bug de message_id nil)
+const CHATWOOT_URL   = process.env.CHATWOOT_API_URL;
+const CHATWOOT_TOKEN = process.env.CHATWOOT_API_TOKEN;
+const ACCOUNT_ID     = process.env.CHATWOOT_ACCOUNT_ID;
+const INBOX_ID       = parseInt(process.env.CHATWOOT_INBOX_ID);
 
 const cwHeaders = {
   'api_access_token': CHATWOOT_TOKEN,
   'Content-Type': 'application/json'
 };
 
-// 1. Buscar contacto existente por email
-const searchResp = await fetch(
-  `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/contacts/search?q=${encodeURIComponent('{EMAIL_PROSPECTO}')}&include_contacts=true`,
-  { headers: cwHeaders }
-);
-const searchData = await searchResp.json();
-const existingContact = (searchData.payload || []).find(c => c.email === '{EMAIL_PROSPECTO}');
+let conversationId = null;
+let contactId = null;
 
-let contactId;
-if (existingContact) {
-  contactId = existingContact.id;
-  console.log(`✅ Contacto existente en Chatwoot: ID ${contactId}`);
-} else {
-  // Crear contacto nuevo
-  const createResp = await fetch(
-    `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/contacts`,
-    {
+try {
+  // 1. Buscar o crear contacto
+  const searchResp = await fetch(
+    `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/contacts/search?q=${encodeURIComponent('{EMAIL_PROSPECTO}')}&include_contacts=true`,
+    { headers: cwHeaders }
+  );
+  const searchData = await searchResp.json();
+  const existing = (searchData.payload || []).find(c => c.email === '{EMAIL_PROSPECTO}');
+
+  if (existing) {
+    contactId = existing.id;
+    console.log(`✅ Contacto existente en Chatwoot: ID ${contactId}`);
+  } else {
+    const createResp = await fetch(`${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/contacts`, {
       method: 'POST',
       headers: cwHeaders,
       body: JSON.stringify({
@@ -205,68 +241,61 @@ if (existingContact) {
         phone_number: '+{TELEFONO_PROSPECTO}',
         additional_attributes: { empresa: '{NOMBRE_NEGOCIO}', ciudad: '{CIUDAD}' }
       })
-    }
-  );
-  const createData = await createResp.json();
-  contactId = createData.id;
-  console.log(`✅ Contacto creado en Chatwoot: ID ${contactId}`);
-}
+    });
+    const createData = await createResp.json();
+    contactId = createData.id;
+    console.log(`✅ Contacto creado en Chatwoot: ID ${contactId}`);
+  }
 
-// 2. Crear conversación de email (hilo nuevo)
-const convResp = await fetch(
-  `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations`,
-  {
+  // 2. Crear conversación (hilo vacío — se llenará cuando el prospecto responda)
+  const convResp = await fetch(`${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations`, {
     method: 'POST',
     headers: cwHeaders,
     body: JSON.stringify({
       inbox_id: INBOX_ID,
       contact_id: contactId,
-      additional_attributes: {
-        mail_subject: 'Análisis digital de {NOMBRE_NEGOCIO}'
-      }
+      additional_attributes: { mail_subject: 'Análisis digital de {NOMBRE_NEGOCIO}' }
     })
-  }
-);
-const convData = await convResp.json();
-const conversationId = convData.id;
-console.log(`✅ Conversación creada en Chatwoot: ID ${conversationId}`);
+  });
+  const convData = await convResp.json();
+  conversationId = convData.id;
+  console.log(`✅ Conversación creada en Chatwoot: ID ${conversationId}`);
 
-// 3. Enviar el email como mensaje saliente
-const msgResp = await fetch(
-  `${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations/${conversationId}/messages`,
-  {
+  // 3. Agregar nota privada con el email enviado (registro CRM)
+  await fetch(`${CHATWOOT_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations/${conversationId}/messages`, {
     method: 'POST',
     headers: cwHeaders,
     body: JSON.stringify({
-      content: emailHTML,
+      content: `📧 **Email enviado vía SMTP** (${smtpStatus})\n\nPara: {EMAIL_PROSPECTO}\nAsunto: Análisis digital de {NOMBRE_NEGOCIO}\nFecha: ${new Date().toISOString()}\n\nEl prospecto responderá a contacto@humanio.digital. Cuando Chatwoot reciba su reply, n8n notificará al Closer.`,
       message_type: 'outgoing',
-      content_type: 'html',
-      private: false
+      private: true
     })
-  }
-);
-const msgData = await msgResp.json();
+  });
+  console.log('✅ Nota de registro añadida en Chatwoot');
 
-if (msgData.id) {
-  console.log(`✅ Email enviado vía Chatwoot — mensaje ID: ${msgData.id}`);
-} else {
-  console.error('⚠️ Error al enviar email por Chatwoot:', JSON.stringify(msgData));
+} catch (cwErr) {
+  console.error('⚠️ Error Chatwoot CRM:', cwErr.message);
 }
 
-// 4. Guardar draft-meta.json con conversation_id (CRÍTICO para que Closer responda en el mismo hilo)
+// 4. Guardar draft-meta.json con conversation_id para el Closer
 fs.writeFileSync(`${draftDir}/draft-meta.json`, JSON.stringify({
   to: '{EMAIL_PROSPECTO}',
   subject: 'Análisis digital de {NOMBRE_NEGOCIO}',
+  smtp_message_id: smtpMessageId,
+  smtp_status: smtpStatus,
   chatwoot_conversation_id: conversationId,
   chatwoot_contact_id: contactId,
-  chatwoot_message_id: msgData.id || null,
-  status: msgData.id ? 'ENVIADO_VIA_CHATWOOT' : 'ERROR_ENVIO_CHATWOOT',
+  status: smtpStatus,
   sentAt: new Date().toISOString()
 }, null, 2));
-console.log('✅ draft-meta.json guardado con chatwoot_conversation_id:', conversationId);
+console.log('✅ draft-meta.json guardado — conversation_id:', conversationId);
 ```
 
-> **Si Chatwoot no está disponible:** guarda el HTML como `draft-email.html` y marca `status: PENDIENTE_ENVIO_MANUAL` en el meta. El email deberá enviarse manualmente desde contacto@humanio.digital.
+> **Resumen del flujo de email:**
+> 1. SMTP envía el email directamente al prospecto ✅
+> 2. Chatwoot registra el contacto y crea el hilo (CRM) ✅
+> 3. Cuando el prospecto responde → Chatwoot recibe el reply → n8n activa al Closer ✅
+> 4. Closer responde vía Chatwoot API (ahora SÍ hay email entrante de referencia) ✅
 
 ### 6. Subir archivos a Google Drive
 
