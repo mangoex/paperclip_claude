@@ -44,7 +44,218 @@ hallazgo_usado_msg1: "{HALLAZGO_PRINCIPAL_MSG1}"  # para no repetir
 chatwoot_conversation_id: {CHATWOOT_CONV_ID}       # ID de conversación en Chatwoot — para responder en mismo hilo
 ```
 
-### 2. Calcular timing
+### 2. Verificar si el prospecto respondió (DECISIÓN DE CAMINO)
+
+Antes de calcular fechas, consulta Chatwoot para saber si el prospecto ya respondió:
+
+```javascript
+const CONV_ID = '{CHATWOOT_CONVERSATION_ID}';
+const CW_URL  = process.env.CHATWOOT_API_URL;
+const CW_TOKEN = process.env.CHATWOOT_API_TOKEN;
+const ACCOUNT_ID = process.env.CHATWOOT_ACCOUNT_ID;
+
+let prospectReplied = false;
+let prospectMessages = [];
+
+if (CONV_ID && CONV_ID !== 'null') {
+  const r = await fetch(
+    `${CW_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations/${CONV_ID}/messages`,
+    { headers: { 'api_access_token': CW_TOKEN } }
+  );
+  const d = await r.json();
+  // message_type 0 = incoming (del prospecto), excluyendo mensajes privados
+  prospectMessages = (d.payload || []).filter(m => m.message_type === 0 && !m.private);
+  prospectReplied = prospectMessages.length > 0;
+}
+
+console.log(`Prospecto respondió: ${prospectReplied} (${prospectMessages.length} mensajes entrantes)`);
+```
+
+**→ Si `prospectReplied === true`: ir al CAMINO B (Cierre Conversacional)**
+**→ Si `prospectReplied === false`: ir al CAMINO A (Seguimientos Programados)**
+
+---
+
+## 🔵 CAMINO B — El prospecto respondió: Cierre Conversacional
+
+> Ejecuta este camino cuando el prospecto haya enviado al menos un mensaje en la conversación.
+> **No envíes follow-ups 2 ni 3.** En su lugar, responde con enfoque de cierre de ventas.
+
+### B1. Leer y clasificar la respuesta
+
+Lee el último mensaje del prospecto y clasifícalo:
+
+| Clasificación | Señales | Acción |
+|--------------|---------|--------|
+| `INTERES_POSITIVO` | "me interesa", "cuánto cuesta", "cuándo podemos hablar", "me llamó la atención" | Proponer llamada de 15 min |
+| `PREGUNTA_TECNICA` | Pregunta sobre cómo funciona SEO, IA, el servicio | Responder con dato del Qualifier + proponer llamada |
+| `OBJECION_PRECIO` | "es caro", "no tengo presupuesto", "cuánto cuesta exactamente" | Manejar objeción + proponer llamada |
+| `OBJECION_TIEMPO` | "estoy muy ocupado", "ahorita no", "en unos meses" | Manejar objeción + proponer llamada |
+| `OBJECION_PROVEEDOR` | "ya tenemos alguien", "ya trabajamos con una agencia" | Posicionar como complementario + proponer llamada |
+| `RECHAZO` | "no gracias", "no me interesa", "no en este momento" | Cerrar con dignidad, no insistir |
+
+### B2. Generar respuesta de cierre
+
+Redacta la respuesta según la clasificación. **Siempre en primera persona como Miguel González.** **Siempre con objetivo de agendar llamada de 15 minutos.**
+
+**Template INTERES_POSITIVO:**
+```
+Hola {NOMBRE_CONTACTO},
+
+Me da gusto que te haya llamado la atención — precisamente por eso quería platicarte los puntos clave del diagnóstico de forma directa.
+
+Tengo listo el análisis completo con oportunidades concretas para {NOMBRE_NEGOCIO}. Son cosas muy específicas que podemos revisar en una llamada corta de 15 minutos.
+
+¿Te funciona alguno de estos horarios esta semana?
+• Martes o miércoles por la mañana
+• Jueves por la tarde
+
+Me ajusto a tu agenda. También podemos hacerlo por videollamada si te resulta más cómodo.
+
+Quedo atento.
+
+Miguel González | Humanio
+```
+
+**Template PREGUNTA_TECNICA:**
+```
+Hola {NOMBRE_CONTACTO},
+
+Buena pregunta — {RESPUESTA_ESPECIFICA_CON_DATO_DEL_QUALIFIER}.
+
+Para que tenga más contexto y pueda mostrarte exactamente cómo aplicaría esto a {NOMBRE_NEGOCIO}, lo más práctico sería una llamada de 15 minutos donde puedo compartir pantalla y mostrarte el diagnóstico completo.
+
+¿Tienes disponibilidad esta semana?
+
+Miguel González | Humanio
+```
+
+**Template OBJECION_PRECIO:**
+```
+Hola {NOMBRE_CONTACTO},
+
+Entiendo la pregunta sobre la inversión — es lo más razonable antes de tomar una decisión.
+
+Lo que quiero mostrarte en el diagnóstico es precisamente eso: qué impacto concreto tendría en {NOMBRE_NEGOCIO} y si los números tienen sentido para tu negocio. Hay opciones para empezar pequeño y escalar.
+
+¿Tienes 15 minutos esta semana para que te explique los puntos clave? Así puedes decidir con información real.
+
+Miguel González | Humanio
+```
+
+**Template OBJECION_TIEMPO:**
+```
+Hola {NOMBRE_CONTACTO},
+
+Lo entiendo perfectamente — el día a día de {NOMBRE_NEGOCIO} siempre es lo primero.
+
+Precisamente por eso trabajamos con un modelo donde nosotros hacemos todo — tú no necesitas aprender ni gestionar nada técnico. La llamada de diagnóstico son solo 15 minutos y la hago yo en el horario que mejor te funcione.
+
+¿Hay algún momento esta semana, aunque sea breve?
+
+Miguel González | Humanio
+```
+
+**Template OBJECION_PROVEEDOR:**
+```
+Hola {NOMBRE_CONTACTO},
+
+Con gusto. Lo que hacemos en Humanio es diferente a una agencia tradicional — integramos IA para automatizar procesos del negocio que generan ventas directas.
+
+El diagnóstico que preparé para {NOMBRE_NEGOCIO} va más allá del SEO — incluye oportunidades de automatización que complementan lo que ya tienen.
+
+¿Le damos 15 minutos para que lo veas? No cuesta nada evaluar.
+
+Miguel González | Humanio
+```
+
+**Template RECHAZO:**
+```
+Hola {NOMBRE_CONTACTO},
+
+Con todo gusto, lo entiendo perfectamente. Si en algún momento el contexto cambia o quieren explorar algo relacionado con IA o presencia digital, aquí estamos.
+
+Le deseo mucho éxito a {NOMBRE_NEGOCIO}.
+
+Miguel González | Humanio
+```
+
+### B3. Enviar respuesta vía SMTP
+
+```javascript
+const nodemailer = require('nodemailer');
+const fs = require('fs');
+
+// Obtener source_id del último mensaje entrante para In-Reply-To
+const lastIncoming = prospectMessages[prospectMessages.length - 1];
+const inReplyTo = lastIncoming?.source_id || null;
+
+const responseHTML = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+  body{font-family:'Inter',Arial,sans-serif;margin:0;padding:20px;background:#f4f4f4}
+  .container{max-width:600px;margin:0 auto;background:#fff;border-radius:8px;padding:32px 36px}
+  p{font-size:15px;color:#1a1a2e;line-height:1.7;margin:0 0 16px}
+  .signature{margin-top:24px;padding-top:16px;border-top:1px solid #f0f0f0}
+  .signature p{font-size:13px;color:#94a3b8;margin:0;line-height:1.6}
+  .signature strong{color:#374151}
+</style></head><body>
+<div class="container">
+  {CONTENIDO_RESPUESTA_HTML}
+  <div class="signature">
+    <p><strong>Miguel González</strong><br>
+    Humanio — Inteligencia Artificial para negocios<br>
+    contacto@humanio.digital · humanio.digital<br>
+    {TELEFONO_MIGUEL_DISPLAY}</p>
+  </div>
+</div></body></html>`;
+
+const transporter = nodemailer.createTransport({
+  host: 'smtpout.secureserver.net', port: 465, secure: true,
+  auth: { user: process.env.SMTP_USER || 'contacto@humanio.digital', pass: process.env.SMTP_PASS }
+});
+
+const mailOpts = {
+  from: '"Miguel González | Humanio" <contacto@humanio.digital>',
+  to: '{EMAIL_PROSPECTO}',
+  subject: 'Re: Análisis digital de {NOMBRE_NEGOCIO}',
+  html: responseHTML
+};
+if (inReplyTo) { mailOpts.inReplyTo = inReplyTo; mailOpts.references = inReplyTo; }
+
+const info = await transporter.sendMail(mailOpts);
+console.log(`✅ Respuesta de cierre enviada vía SMTP — ${info.messageId}`);
+
+// Nota privada en Chatwoot
+await fetch(`${CW_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations/${CONV_ID}/messages`, {
+  method: 'POST',
+  headers: { 'api_access_token': CW_TOKEN, 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    content: `📧 Respuesta de cierre enviada vía SMTP (${'{CLASIFICACION}'})\nPara: {EMAIL_PROSPECTO}\nMessageId: ${info.messageId}`,
+    private: true
+  })
+});
+```
+
+### B4. Acciones post-respuesta según clasificación
+
+- **INTERES_POSITIVO / PREGUNTA_TECNICA / OBJECION (cualquiera):**
+  - Crear ticket para CEO: *"Prospecto {NOMBRE_NEGOCIO} respondió con {CLASIFICACION} — en espera de confirmación de llamada"*
+  - Dejar ticket del Closer en status `in_progress`
+
+- **RECHAZO:**
+  - Actualizar ticket del Closer a `done` con nota: `CERRADO — prospecto rechazó`
+  - No crear ticket para CEO
+
+> **Una vez en Camino B, NO ejecutes nada del Camino A (pasos 3–9).**
+
+---
+
+## 🟠 CAMINO A — Sin respuesta: Seguimientos Programados
+
+> Ejecuta este camino SOLO cuando `prospectReplied === false`.
+
+### 3. Calcular timing
 
 ```bash
 FECHA_MSG1="{FECHA_MSG1}"
@@ -390,17 +601,11 @@ else
 fi
 ```
 
-### 8. Manejo de respuestas y envío de mensaje 3 (día 7)
+### 8. Envío de mensaje 3 (día 7) — SOLO si sin respuesta
 
-Si el prospecto responde entre el día 3 y el día 7:
-
-1. Clasificar la intención:
-   - `PRECIO` → referir a la propuesta web, no dar precio por escrito
-   - `INTERES` → escalar a CEO para agendar llamada, NO enviar mensaje 3
-   - `RECHAZO` → cerrar con gracia, NO enviar mensaje 3, actualizar ticket
-   - `PREGUNTA_TECNICA` → responder con datos reales del Qualifier
-   - `OBJECION` → manejar según skill `sales-copywriting`
-2. Registrar toda interacción en `closer-log.txt`
+> ⚠️ CONDICIÓN OBLIGATORIA: Solo ejecutar si `prospectReplied === false`.
+> Si el prospecto respondió en cualquier momento (aunque sea con un "no gracias"),
+> NO envíes el mensaje 3. Ve al CAMINO B para manejar esa respuesta.
 
 **Envío de mensaje 3 (día 7):**
 ```bash
