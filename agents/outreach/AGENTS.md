@@ -9,7 +9,7 @@ skills:
   - paperclipai/paperclip/para-memory-files
   - company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/outreach-proposals
   - company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/sales-copywriting
-  - gtmagents/gtm-agents/cold-outreach
+  - company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/cold-outreach
   - microsoft/skills/frontend-design-review
   - anthropics/skills/frontend-design
   - microsoft/skills/frontend-ui-dark-ts
