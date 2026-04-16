@@ -9,7 +9,7 @@ skills:
   - "paperclipai/paperclip/para-memory-files"
   - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/qualifier-seo"
   - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/qualifier-prospect-auditor"
-  - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/qualifier-diagnostic-html"
+  - "company/hum/qualifier-diagnostic-html"
   - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-pricing"
   - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/lead-qualification"
 ---
