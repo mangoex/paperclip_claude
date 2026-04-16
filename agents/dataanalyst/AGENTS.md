@@ -8,7 +8,7 @@ skills:
   - "company/hum/dataanalyst-pipeline"
   - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/saas-metrics"
   - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/retention-playbook"
-  - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/dataanalyst-dashboard-html"
+  - "company/hum/dataanalyst-dashboard-html"
 ---
 
 # DataAnalyst — Analista SaaS e Inteligencia | Humanio
