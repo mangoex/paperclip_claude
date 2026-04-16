@@ -317,6 +317,13 @@ agents:
       heartbeat:
         intervalSec: 300
       maxConcurrentRuns: 1
+    inputs:
+      env:
+        SURGE_TOKEN:
+          description: "Surge.sh deploy token — para publicar dashboards HTML como humanio-dashboard-{fecha}.surge.sh"
+          kind: "secret"
+          default: ""
+          requirement: "required"
 
 company:
   logoPath: "images/company-logo.png"

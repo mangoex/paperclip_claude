@@ -10,7 +10,7 @@
 |---------|-------|
 | Agents | 7 |
 | Projects | 1 |
-| Skills | 50 |
+| Skills | 51 |
 | Tasks | 2 |
 
 ### Agents
