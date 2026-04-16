@@ -9,7 +9,7 @@ skills:
   - "paperclipai/paperclip/para-memory-files"
   - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/scout-prospector"
   - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/social-selling"
-  - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/web-scraping"
+  - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/executing-web-scraping"
 ---
 
 # Scout — Prospectador de Negocios | Humanio
