@@ -37,7 +37,7 @@ Use these routing rules:
 
 ## Flujo de trabajo de Humanio
 
-El pipeline completo funciona así:
+### Pipeline OUTBOUND (prospección activa)
 
 1. **Board (usuario)** crea un ticket al CEO con: "Prospectar {giro} en {ciudad}, {país}. {N} prospectos."
 2. **CEO** crea un ticket para **Scout** con el encargo de prospección
@@ -49,6 +49,63 @@ El pipeline completo funciona así:
 6. **Outreach** recibe ticket del WebDesigner, genera propuesta con los 3 paquetes y links de Hotmart, envía mensaje 1 por email y WhatsApp
 7. **Closer** recibe ticket 3 días después, ejecuta secuencia de seguimiento (mensaje 2 y 3), maneja objeciones, escala al CEO para cierre
 8. **DataAnalyst** genera reportes semanales de MRR, churn, conversión por paquete/país/giro
+
+---
+
+### Pipeline INBOUND (prospecto nos contacta directamente)
+
+Cuando un prospecto escribe por email, WhatsApp u otro canal sin que Outreach lo haya contactado primero:
+
+#### Caso A — El prospecto llega por email (Chatwoot)
+Chatwoot recibe el mensaje → n8n detecta la conversación → **CEO recibe notificación automática**.
+
+El CEO debe:
+1. Revisar el mensaje del prospecto en Chatwoot
+2. Crear ticket para **Qualifier**:
+   ```
+   Prospecto INBOUND — {NOMBRE_NEGOCIO}
+   Giro: {GIRO}
+   Ciudad: {CIUDAD}
+   Web: {URL si la mencionó}
+   Canal de entrada: email (Chatwoot conv. {ID})
+   Nota: El prospecto nos contactó directamente — ya mostró interés.
+   ```
+3. Qualifier analiza → WebDesigner crea propuesta → **CEO crea ticket para Closer**:
+   ```yaml
+   nombre_negocio: "{NOMBRE_NEGOCIO}"
+   status_respuesta: "respondio_positivo"   # ya nos contactó = interés demostrado
+   canal_mensaje_1: "inbound"
+   chatwoot_conversation_id: {ID}
+   fecha_mensaje_1: "{FECHA_CONTACTO_INBOUND}"
+   ```
+4. **Closer va directo al CAMINO B** — no manda follow-ups fríos, responde con enfoque de cierre
+
+#### Caso B — El prospecto llega por WhatsApp (bot automático)
+
+> 🔮 *Flujo futuro — cuando el bot de WhatsApp esté configurado en n8n + Chatwoot:*
+
+El bot de WhatsApp recibe el mensaje → responde automáticamente pidiendo datos:
+
+```
+Bot: "Hola 👋 Soy el asistente de Humanio.
+Para prepararte un diagnóstico gratuito de tu negocio, necesito 3 datos:
+1️⃣ ¿Cómo se llama tu negocio?
+2️⃣ ¿A qué se dedica? (giro/servicio)
+3️⃣ ¿En qué ciudad están?"
+```
+
+El prospecto responde → n8n captura los datos → crea automáticamente:
+- Conversación en Chatwoot (CRM)
+- Ticket para **Qualifier** con los datos capturados
+- Notificación al CEO
+
+Desde ahí el pipeline continúa igual: Qualifier → WebDesigner → Closer (CAMINO B directo).
+
+#### Regla general para inbound
+
+> Cuando un prospecto nos contacta directamente, **Scout no participa** y **Outreach no participa**.
+> El pipeline arranca en **Qualifier** y el **Closer entra en modo CAMINO B** desde el inicio
+> (ya hay interés demostrado — no se mandan follow-ups fríos).
 
 ## Modelo de negocio — Paquetes de suscripción
 
