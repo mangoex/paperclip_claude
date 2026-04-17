@@ -1,5 +1,3 @@
----
-
 # Humanio ![Org Chart](images/org-chart.png)
 
 ## What's Inside
