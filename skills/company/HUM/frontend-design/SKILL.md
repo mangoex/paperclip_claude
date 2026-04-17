@@ -5,13 +5,13 @@ slug: "frontend-design"
 metadata:
   paperclip:
     slug: "frontend-design"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/frontend-design"
-  paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/frontend-design"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/frontend-design"
-key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/frontend-design"
+    skillKey: "company/HUM/frontend-design"
+  paperclipSkillKey: "company/HUM/frontend-design"
+  skillKey: "company/HUM/frontend-design"
+key: "company/HUM/frontend-design"
 ---
 
-# Frontend Design — Sistema de Diseño Premium | Humanio Marketing
+# Frontend Design — Sistema de Diseño Premium | Humanio
 
 ## Propósito
 
@@ -490,7 +490,7 @@ document.querySelectorAll('img[data-src]').forEach(img => {
 ```html
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Propuesta de crecimiento digital para {NOMBRE_NEGOCIO} en {CIUDAD} — Humanio Marketing">
+<meta name="description" content="Propuesta de crecimiento digital para {NOMBRE_NEGOCIO} en {CIUDAD} — Humanio">
 <meta name="theme-color" content="#03080f">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
 <title>{NOMBRE_NEGOCIO} — Propuesta Digital | Humanio</title>

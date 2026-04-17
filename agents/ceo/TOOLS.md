@@ -14,7 +14,7 @@ Tu herramienta principal. Toda la delegación, seguimiento y comunicación pasa 
 
 Lectura de conversaciones con prospectos que nos contactan directamente.
 
-- **URL**: `$CHATWOOT_API_URL` (normalmente `https://n8n-humanio-chatwoot.yroec7.easypanel.host`)
+- **URL**: `$CHATWOOT_API_URL` (definido en secrets de Paperclip, sin slash final)
 - **Inbox de email**: ID 2 (`contacto@humanio.digital`)
 - **Listar conversaciones**: `GET /api/v1/accounts/{ACCOUNT_ID}/conversations?inbox_id=2&status=open`
 - **Leer mensajes**: `GET /api/v1/accounts/{ACCOUNT_ID}/conversations/{CONV_ID}/messages`

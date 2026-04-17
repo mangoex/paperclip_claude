@@ -555,20 +555,23 @@ echo "✅ closer-log.txt generado"
 ### 6. Subir TODOS los archivos a Drive (antes de enviar)
 
 ```bash
-node /paperclip/upload-to-drive.js "{NOMBRE_NEGOCIO}" \
-  /tmp/closer-{slug}/seguimiento-2-whatsapp.txt \
-  /tmp/closer-{slug}/seguimiento-2-email.html \
-  /tmp/closer-{slug}/seguimiento-3-whatsapp.txt \
-  /tmp/closer-{slug}/seguimiento-3-email.html \
-  /tmp/closer-{slug}/closer-log.txt
+# IMPORTANTE: pasar NOMBRE_NEGOCIO como env var evita inyección de shell.
+export NOMBRE_NEGOCIO="{NOMBRE_NEGOCIO}"
+
+node /paperclip/upload-to-drive.js "$NOMBRE_NEGOCIO" \
+  "/tmp/closer-{slug}/seguimiento-2-whatsapp.txt" \
+  "/tmp/closer-{slug}/seguimiento-2-email.html" \
+  "/tmp/closer-{slug}/seguimiento-3-whatsapp.txt" \
+  "/tmp/closer-{slug}/seguimiento-3-email.html" \
+  "/tmp/closer-{slug}/closer-log.txt"
 
 if [ $? -ne 0 ]; then
-  node /app/upload-to-drive.js "{NOMBRE_NEGOCIO}" \
-    /tmp/closer-{slug}/seguimiento-2-whatsapp.txt \
-    /tmp/closer-{slug}/seguimiento-2-email.html \
-    /tmp/closer-{slug}/seguimiento-3-whatsapp.txt \
-    /tmp/closer-{slug}/seguimiento-3-email.html \
-    /tmp/closer-{slug}/closer-log.txt
+  node /app/upload-to-drive.js "$NOMBRE_NEGOCIO" \
+    "/tmp/closer-{slug}/seguimiento-2-whatsapp.txt" \
+    "/tmp/closer-{slug}/seguimiento-2-email.html" \
+    "/tmp/closer-{slug}/seguimiento-3-whatsapp.txt" \
+    "/tmp/closer-{slug}/seguimiento-3-email.html" \
+    "/tmp/closer-{slug}/closer-log.txt"
 fi
 echo "✅ Todos los archivos subidos a Drive"
 ```

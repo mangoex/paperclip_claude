@@ -775,12 +775,21 @@ ls -la /tmp/dashboard-{YYYY-MM-DD}/index.html
 ### 4. Desplegar en Surge.sh
 
 ```bash
+# Sufijo aleatorio para que la URL no sea adivinable (dashboards tienen datos internos).
+SUFFIX=$(openssl rand -hex 4)
+DOMAIN="humanio-dashboard-{YYYY-MM-DD}-$SUFFIX.surge.sh"
+
+# NUNCA pases el token como argumento (--token) porque queda en `ps`/historial.
+# `SURGE_TOKEN` debe estar exportado como variable de entorno.
 cd /tmp/dashboard-{YYYY-MM-DD}
-npx surge . humanio-dashboard-{YYYY-MM-DD}.surge.sh --token $SURGE_TOKEN
+npx surge . "$DOMAIN"
+
+echo "✅ Dashboard desplegado en: https://$DOMAIN"
+echo "⚠️  Guarda esta URL — no es adivinable desde fuera."
 ```
 
 **Variables de entorno necesarias:**
-- `$SURGE_TOKEN` — Token de autenticación en Surge.sh (guardar en secrets de Paperclip)
+- `SURGE_TOKEN` — exportado como env var (NO pasarlo como argumento en CLI)
 
 ### 5. Retornar URL al CEO
 
@@ -811,7 +820,7 @@ MRR: ${MRR_ACTUAL} (target: ${MRR_TARGET})
 El flujo de despliegue es:
 
 1. DataAnalyst ejecuta este skill → genera HTML en `/tmp/dashboard-{fecha}/index.html`
-2. DataAnalyst corre: `cd /tmp/dashboard-{fecha} && npx surge . humanio-dashboard-{fecha}.surge.sh --token $SURGE_TOKEN`
+2. DataAnalyst corre con `SURGE_TOKEN` exportado en env: `cd /tmp/dashboard-{fecha} && npx surge . humanio-dashboard-{fecha}-$(openssl rand -hex 4).surge.sh` (el token se lee del entorno, nunca se pasa como argumento)
 3. Retorna la URL al CEO vía Paperclip
 
 **Surge.sh setup:**

@@ -5,10 +5,10 @@ slug: "retention-playbook"
 metadata:
   paperclip:
     slug: "retention-playbook"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/retention-playbook"
-    paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/retention-playbook"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/retention-playbook"
-  key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/retention-playbook"
+    skillKey: "company/HUM/retention-playbook"
+    paperclipSkillKey: "company/HUM/retention-playbook"
+  skillKey: "company/HUM/retention-playbook"
+  key: "company/HUM/retention-playbook"
 ---
 
 # Retention Playbook — Anti-Churn | Humanio
