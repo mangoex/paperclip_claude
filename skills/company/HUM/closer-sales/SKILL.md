@@ -1,6 +1,12 @@
 ---
-name: closer-sales
-slug: closer-sales
+name: "closer-sales"
+description: "Closer Sales — Ejecución de Seguimiento Comercial | Humanio"
+slug: "closer-sales"
+metadata:
+  paperclip:
+    slug: "closer-sales"
+    skillKey: "company/HUM/closer-sales"
+  paperclipSkillKey: "company/HUM/closer-sales"
 ---
 
 # Closer Sales — Ejecución de Seguimiento Comercial | Humanio

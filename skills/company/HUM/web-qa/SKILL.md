@@ -1,8 +1,13 @@
 ---
-name: web-qa
-slug: web-qa
-title: "Web QA — Validación de HTML antes de publicar | Humanio"
+name: "web-qa"
 description: "Valida HTML (sitios y emails) antes de publicar: estructura, links, placeholders, consistencia de marca."
+slug: "web-qa"
+title: "Web QA — Validación de HTML antes de publicar | Humanio"
+metadata:
+  paperclip:
+    slug: "web-qa"
+    skillKey: "company/HUM/web-qa"
+  paperclipSkillKey: "company/HUM/web-qa"
 ---
 
 # Web QA — Validación de HTML antes de publicar | Humanio

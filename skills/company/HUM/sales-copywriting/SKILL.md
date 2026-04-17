@@ -1,8 +1,13 @@
 ---
-name: sales-copywriting
-slug: sales-copywriting
-title: "Sales Copywriting — Framework de Comunicación Comercial | Humanio"
+name: "sales-copywriting"
 description: "Framework VALOR para redactar mensajes comerciales (email, WhatsApp, llamada) alineados con la propuesta de Humanio."
+slug: "sales-copywriting"
+title: "Sales Copywriting — Framework de Comunicación Comercial | Humanio"
+metadata:
+  paperclip:
+    slug: "sales-copywriting"
+    skillKey: "company/HUM/sales-copywriting"
+  paperclipSkillKey: "company/HUM/sales-copywriting"
 ---
 
 # Sales Copywriting — Framework de Comunicación Comercial | Humanio
