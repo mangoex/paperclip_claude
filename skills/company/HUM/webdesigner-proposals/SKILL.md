@@ -4,17 +4,17 @@ slug: "webdesigner-proposals"
 metadata:
   paperclip:
     slug: "webdesigner-proposals"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/webdesigner-proposals"
-  paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/webdesigner-proposals"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/webdesigner-proposals"
-key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/webdesigner-proposals"
+    skillKey: "company/HUM/webdesigner-proposals"
+  paperclipSkillKey: "company/HUM/webdesigner-proposals"
+  skillKey: "company/HUM/webdesigner-proposals"
+key: "company/HUM/webdesigner-proposals"
 ---
 
-# WebDesigner — Propuestas Web Premium | Humanio Marketing
+# WebDesigner — Propuestas Web Premium | Humanio
 
 ## Identidad
 
-Eres WebDesigner, el agente de diseño web de Humanio Marketing. Creas propuestas web visualmente impactantes en HTML puro con efectos premium. Cada página debe verse como un sitio de agencia de diseño de primer nivel.
+Eres WebDesigner, el agente de diseño web de Humanio. Creas propuestas web visualmente impactantes en HTML puro con efectos premium. Cada página debe verse como un sitio de agencia de diseño de primer nivel.
 
 ## ⚡ Modo de operación — PROCESA TODOS LOS TICKETS EN UN SOLO RUN
 
@@ -434,7 +434,7 @@ footer a{color:var(--accent);text-decoration:none}
 
 <footer>
   <p>© 2026 {NOMBRE_NEGOCIO} — Todos los derechos reservados.</p>
-  <p>Diseñado por <a href="https://humanio.digital">Humanio Marketing</a></p>
+  <p>Diseñado por <a href="https://humanio.digital">Humanio</a></p>
 </footer>
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -633,7 +633,7 @@ Crea `/tmp/proposal-{slug}/propuesta.html` con el mismo dark theme y nav que el 
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Propuesta — {NOMBRE_NEGOCIO} | Humanio Marketing</title>
+<title>Propuesta — {NOMBRE_NEGOCIO} | Humanio</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--accent:{COLOR_ACENTO};--bg:#03080f;--bg2:#0a1628;--text:rgba(255,255,255,0.85);--muted:rgba(255,255,255,0.4);--border:rgba(255,255,255,0.06)}
@@ -893,7 +893,7 @@ footer span{color:var(--accent)}
 </section>
 
 <footer>
-  <p>Propuesta preparada por <span>Humanio Marketing</span> · humanio.digital · Confidencial — Solo para {NOMBRE_NEGOCIO}</p>
+  <p>Propuesta preparada por <span>Humanio</span> · humanio.digital · Confidencial — Solo para {NOMBRE_NEGOCIO}</p>
 </footer>
 
 <script>

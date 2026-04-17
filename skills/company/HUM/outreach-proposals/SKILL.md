@@ -4,10 +4,10 @@ slug: "outreach-proposals"
 metadata:
   paperclip:
     slug: "outreach-proposals"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/outreach-proposals"
-  paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/outreach-proposals"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/outreach-proposals"
-key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/outreach-proposals"
+    skillKey: "company/HUM/outreach-proposals"
+  paperclipSkillKey: "company/HUM/outreach-proposals"
+  skillKey: "company/HUM/outreach-proposals"
+key: "company/HUM/outreach-proposals"
 ---
 
 # Outreach — Especialista en Propuestas | Humanio
@@ -177,7 +177,7 @@ console.log('✅ draft-email.html guardado en /tmp');
 
 // ── 5b. Enviar vía SMTP directo ────────────────────────────────────────────────
 // (Chatwoot tiene un bug con message_id nil en conversaciones nuevas sin email entrante)
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: 'smtpout.secureserver.net',
   port: 465,
   secure: true,
@@ -303,21 +303,25 @@ console.log('✅ draft-meta.json guardado — conversation_id:', conversationId)
 Sube los 5 archivos de la carpeta del prospecto a Google Drive:
 
 ```bash
-node /paperclip/upload-to-drive.js "{NOMBRE_NEGOCIO}" \
-  /tmp/outreach-{slug}/propuesta.html \
-  /tmp/outreach-{slug}/reporte-seo.html \
-  /tmp/outreach-{slug}/draft-email.html \
-  /tmp/outreach-{slug}/mensaje-whatsapp.txt \
-  /tmp/outreach-{slug}/script-llamada.txt
+# IMPORTANTE: exportar NOMBRE_NEGOCIO como env var evita inyección de comandos si el nombre contiene caracteres especiales.
+# NUNCA interpoles {NOMBRE_NEGOCIO} directamente en la shell — úsalo como argumento citado.
+export NOMBRE_NEGOCIO="{NOMBRE_NEGOCIO}"
+
+node /paperclip/upload-to-drive.js "$NOMBRE_NEGOCIO" \
+  "/tmp/outreach-{slug}/propuesta.html" \
+  "/tmp/outreach-{slug}/reporte-seo.html" \
+  "/tmp/outreach-{slug}/draft-email.html" \
+  "/tmp/outreach-{slug}/mensaje-whatsapp.txt" \
+  "/tmp/outreach-{slug}/script-llamada.txt"
 
 # Fallback si la ruta es diferente
 if [ $? -ne 0 ]; then
-  node /app/upload-to-drive.js "{NOMBRE_NEGOCIO}" \
-    /tmp/outreach-{slug}/propuesta.html \
-    /tmp/outreach-{slug}/reporte-seo.html \
-    /tmp/outreach-{slug}/draft-email.html \
-    /tmp/outreach-{slug}/mensaje-whatsapp.txt \
-    /tmp/outreach-{slug}/script-llamada.txt
+  node /app/upload-to-drive.js "$NOMBRE_NEGOCIO" \
+    "/tmp/outreach-{slug}/propuesta.html" \
+    "/tmp/outreach-{slug}/reporte-seo.html" \
+    "/tmp/outreach-{slug}/draft-email.html" \
+    "/tmp/outreach-{slug}/mensaje-whatsapp.txt" \
+    "/tmp/outreach-{slug}/script-llamada.txt"
 fi
 ```
 
@@ -560,8 +564,9 @@ Actívate en 3 días para el seguimiento.
 ## Variables de entorno requeridas
 
 ```
-# Email (Chatwoot CRM — reemplaza SMTP directo)
-CHATWOOT_API_URL=https://n8n-humanio-chatwoot.yroec7.easypanel.host
+# Email via SMTP directo (NUNCA uses Chatwoot para enviar — v4.11 bug conocido)
+# Chatwoot se usa SOLO como CRM (nota privada post-envío)
+CHATWOOT_API_URL=<url_chatwoot_sin_slash_final>
 CHATWOOT_API_TOKEN=<api_access_token_de_chatwoot>
 CHATWOOT_ACCOUNT_ID=1
 CHATWOOT_INBOX_ID=2

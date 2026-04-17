@@ -5,10 +5,10 @@ slug: "saas-metrics"
 metadata:
   paperclip:
     slug: "saas-metrics"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/saas-metrics"
-    paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/saas-metrics"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/saas-metrics"
-  key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/saas-metrics"
+    skillKey: "company/HUM/saas-metrics"
+    paperclipSkillKey: "company/HUM/saas-metrics"
+  skillKey: "company/HUM/saas-metrics"
+  key: "company/HUM/saas-metrics"
 ---
 
 # SaaS Metrics — Métricas de Suscripción | Humanio
