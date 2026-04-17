@@ -1,8 +1,8 @@
 ---
 name: web-qa
 slug: web-qa
-title: Web QA — Validación de HTML antes de publicar | Humanio
-description: Valida HTML (sitios y emails) antes de publicar: estructura, links, placeholders, consistencia de marca.
+title: "Web QA — Validación de HTML antes de publicar | Humanio"
+description: "Valida HTML (sitios y emails) antes de publicar: estructura, links, placeholders, consistencia de marca."
 ---
 
 # Web QA — Validación de HTML antes de publicar | Humanio
