@@ -5,7 +5,7 @@ reportsTo: "ceo"
 skills:
   - "paperclipai/paperclip/paperclip"
   - "paperclipai/paperclip/para-memory-files"
-  - "D4Vinci/scrapling"
+  - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/scrapling-official"
   - "company/HUM/qualifier-seo"
   - "company/HUM/qualifier-prospect-auditor"
   - "company/HUM/qualifier-diagnostic-html"
