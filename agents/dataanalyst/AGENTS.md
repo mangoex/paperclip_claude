@@ -5,10 +5,10 @@ reportsTo: "ceo"
 skills:
   - "paperclipai/paperclip/paperclip"
   - "paperclipai/paperclip/para-memory-files"
-  - "company/hum/dataanalyst-pipeline"
+  - "company/HUM/dataanalyst-pipeline"
   - "company/HUM/saas-metrics"
   - "company/HUM/retention-playbook"
-  - "company/hum/dataanalyst-dashboard-html"
+  - "company/HUM/dataanalyst-dashboard-html"
 ---
 
 # DataAnalyst — Analista SaaS e Inteligencia | Humanio
