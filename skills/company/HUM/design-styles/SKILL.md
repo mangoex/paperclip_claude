@@ -5,11 +5,11 @@ slug: "design-styles"
 metadata:
   paperclip:
     slug: "design-styles"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/design-styles"
-    paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/design-styles"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/design-styles"
-  key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/design-styles"
-key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/design-styles"
+    skillKey: "company/HUM/design-styles"
+    paperclipSkillKey: "company/HUM/design-styles"
+  skillKey: "company/HUM/design-styles"
+  key: "company/HUM/design-styles"
+key: "company/HUM/design-styles"
 ---
 
 # Design Styles — Catálogo Visual | Humanio

@@ -5,11 +5,11 @@ slug: "layout-blueprints"
 metadata:
   paperclip:
     slug: "layout-blueprints"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/layout-blueprints"
-    paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/layout-blueprints"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/layout-blueprints"
-  key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/layout-blueprints"
-key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/layout-blueprints"
+    skillKey: "company/HUM/layout-blueprints"
+    paperclipSkillKey: "company/HUM/layout-blueprints"
+  skillKey: "company/HUM/layout-blueprints"
+  key: "company/HUM/layout-blueprints"
+key: "company/HUM/layout-blueprints"
 ---
 
 # Layout Blueprints — Arquetipos de Layout | Humanio

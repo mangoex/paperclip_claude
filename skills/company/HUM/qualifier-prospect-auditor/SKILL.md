@@ -5,15 +5,15 @@ slug: "qualifier-prospect-auditor"
 metadata:
   paperclip:
     slug: "qualifier-prospect-auditor"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/qualifier-prospect-auditor"
-  paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/qualifier-prospect-auditor"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/qualifier-prospect-auditor"
-key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/qualifier-prospect-auditor"
+    skillKey: "company/HUM/qualifier-prospect-auditor"
+  paperclipSkillKey: "company/HUM/qualifier-prospect-auditor"
+  skillKey: "company/HUM/qualifier-prospect-auditor"
+key: "company/HUM/qualifier-prospect-auditor"
 ---
 
 # Qualifier Prospect Auditor
 
-Skill de auditoría profunda para Qualifier — Humanio Marketing.
+Skill de auditoría profunda para Qualifier — Humanio.
 
 Produce un diagnóstico SEO detallado con evidencia específica, análisis competitivo con competidores nombrados, keywords reales con intención, hallazgos técnicos y on-page, y un plan de acción priorizado con fases.
 

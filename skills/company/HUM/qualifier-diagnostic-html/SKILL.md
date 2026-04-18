@@ -10,7 +10,7 @@ metadata:
 key: "company/HUM/qualifier-diagnostic-html"
 ---
 
-# Qualifier — Generador de Diagnóstico SEO Visual | Humanio Marketing
+# Qualifier — Generador de Diagnóstico SEO Visual | Humanio
 
 ## Cuándo usar este skill
 
@@ -283,7 +283,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
       <div class="hero-meta-item"><strong>{FECHA_HOY}</strong>Fecha de análisis</div>
       <div class="hero-meta-item"><strong>{GIRO}</strong>Industria</div>
       <div class="hero-meta-item"><strong>{CIUDAD}</strong>Mercado objetivo</div>
-      <div class="hero-meta-item"><strong>Humanio Marketing</strong>Elaborado por</div>
+      <div class="hero-meta-item"><strong>Humanio</strong>Elaborado por</div>
     </div>
 
     <!-- GLOBAL SCORE -->
@@ -828,7 +828,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 
 <!-- FOOTER -->
 <footer class="diag-footer">
-  <p>Diagnóstico elaborado por <strong>Humanio Marketing</strong> · Para uso exclusivo de {NOMBRE_NEGOCIO}</p>
+  <p>Diagnóstico elaborado por <strong>Humanio</strong> · Para uso exclusivo de {NOMBRE_NEGOCIO}</p>
   <p class="disclaimer">Esta auditoría fue realizada mediante análisis de HTML, sitemap y robots.txt. Para análisis completo se recomienda acceso a Google Search Console y PageSpeed Insights. Los scores son estimaciones basadas en factores observables públicamente.</p>
 </footer>
 

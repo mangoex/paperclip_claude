@@ -5,10 +5,10 @@ slug: "package-outreach"
 metadata:
   paperclip:
     slug: "package-outreach"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-outreach"
-    paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-outreach"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-outreach"
-  key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-outreach"
+    skillKey: "company/HUM/package-outreach"
+    paperclipSkillKey: "company/HUM/package-outreach"
+  skillKey: "company/HUM/package-outreach"
+  key: "company/HUM/package-outreach"
 ---
 
 # Package Outreach — Propuestas Comerciales con Paquetes | Humanio
@@ -90,4 +90,4 @@ Seguimiento amigable + recordar beneficio principal
 - Los links de Hotmart deben ser los correctos para cada paquete
 - El tono es profesional, cercano, sin ser agresivo
 - Máximo 1 emoji por oración
-- No uses "Humanio Marketing" — solo "Humanio"
+- No uses "Humanio" — solo "Humanio"

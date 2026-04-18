@@ -5,10 +5,10 @@ slug: "package-pricing"
 metadata:
   paperclip:
     slug: "package-pricing"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-pricing"
-    paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-pricing"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-pricing"
-  key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-pricing"
+    skillKey: "company/HUM/package-pricing"
+    paperclipSkillKey: "company/HUM/package-pricing"
+  skillKey: "company/HUM/package-pricing"
+  key: "company/HUM/package-pricing"
 ---
 
 # Package Pricing — Asignador de Paquetes | Humanio
@@ -55,13 +55,13 @@ Marcar cuando:
 
 Al presentar precios, siempre incluir equivalencia aproximada:
 
-| Paquete | USD | MXN (~) | COP (~) | PEN (~) | ARS (~) |
-|---------|-----|---------|---------|---------|---------| 
-| Starter | $27 | $460 | $108,000 | S/100 | $24,300 |
-| Pro | $47 | $800 | $188,000 | S/175 | $42,300 |
-| Business | $97 | $1,650 | $388,000 | S/360 | $87,300 |
+| Paquete  | USD | MXN (~) | COP (~)   | PEN (~) | ARS (~)  |
+|----------|-----|---------|-----------|---------|----------|
+| Starter  | $27 | $540    | $108,000  | S/100   | $27,000  |
+| Pro      | $47 | $940    | $188,000  | S/175   | $47,000  |
+| Business | $97 | $1,940  | $388,000  | S/360   | $97,000  |
 
-*Nota: Equivalencias aproximadas. Hotmart cobra en moneda local al tipo de cambio del día.*
+*Tipo de cambio referencial: 1 USD ≈ 20 MXN ≈ 4,000 COP ≈ 3.7 PEN ≈ 1,000 ARS. Hotmart cobra en moneda local al tipo de cambio del día — actualiza esta tabla si el FX se mueve >5%.*
 
 ## Pasarela de pago
 
