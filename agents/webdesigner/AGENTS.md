@@ -147,7 +147,7 @@ Ejecutar el checklist completo de `web-qa`:
 ## PASO 4 — Publicar en Surge.sh
 
 ```bash
-SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-{slug} humanio-{slug}.surge.sh
+SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-{slug} humanio.surge.sh/{slug}
 ```
 
 ---

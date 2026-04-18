@@ -10,7 +10,7 @@
 |---------|-------|
 | Agents | 7 |
 | Projects | 1 |
-| Skills | 45 |
+| Skills | 50 |
 | Tasks | 2 |
 
 ### Agents
@@ -46,7 +46,7 @@ Scout → Qualifier → WebDesigner → Outreach → Closer → [HOTMART PAYMENT
 
 ### Skills
 
-45 skills including: alert-manager, backlink-analyzer, competitor-analysis, content-gap-analysis, content-quality-auditor, content-refresher, domain-authority-auditor, entity-optimizer, geo-content-optimizer, internal-linking-optimizer, keyword-research, memory-management, meta-tags-optimizer, on-page-seo-auditor, performance-reporter, rank-tracker, schema-markup-generator, seo-content-writer, serp-analysis, technical-seo-checker, frontend-design, outreach-proposals, qualifier-prospect-auditor, qualifier-seo, scout-prospector, webdesigner-proposals, frontend-design-review, frontend-ui-dark-ts, closer-sales, sales-copywriting, dataanalyst-pipeline, web-qa, qualifier-diagnostic-html, package-pricing, package-outreach, saas-metrics, retention-playbook, ui-ux-pro-max, paperclip-create-agent, paperclip-create-plugin, paperclip, para-memory-files
+50 skills including: alert-manager, backlink-analyzer, competitor-analysis, content-gap-analysis, content-quality-auditor, content-refresher, domain-authority-auditor, entity-optimizer, geo-content-optimizer, internal-linking-optimizer, keyword-research, memory-management, meta-tags-optimizer, on-page-seo-auditor, performance-reporter, rank-tracker, schema-markup-generator, seo-content-writer, serp-analysis, technical-seo-checker, frontend-design, outreach-proposals, qualifier-prospect-auditor, qualifier-seo, scout-prospector, webdesigner-proposals, frontend-design-review, frontend-ui-dark-ts, closer-sales, sales-copywriting, dataanalyst-pipeline, web-qa, qualifier-diagnostic-html, package-pricing, package-outreach, saas-metrics, retention-playbook, ui-ux-pro-max, paperclip-create-agent, paperclip-create-plugin, paperclip, para-memory-files, **objection-handling** (NEW), **social-selling** (NEW), **cold-outreach** (NEW), **lead-qualification** (NEW), **web-scraping** (NEW)
 
 ## Getting Started
 
@@ -61,3 +61,4 @@ See [Paperclip](https://paperclip.ing) for more information.
 > Humanio — Inteligencia Artificial para negocios
 
 Exported from [Paperclip](https://paperclip.ing) on 2026-04-13
+Updated 2026-04-15: Added 5 GTM skills (objection-handling, social-selling, cold-outreach, lead-qualification, web-scraping) + completed CEO TOOLS.md + assigned retention-playbook to DataAnalyst
