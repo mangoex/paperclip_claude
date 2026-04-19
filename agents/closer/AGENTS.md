@@ -134,7 +134,7 @@ Cuando el prospecto responde vía WhatsApp (inbox `$CHATWOOT_WHATSAPP_INBOX_ID`)
   - seguimiento-3-whatsapp.txt
   - seguimiento-3-email.html
   - closer-log.txt
-- **Sube todos los archivos a Drive antes de enviar cualquier mensaje**
+- **Guarda los archivos en `/tmp` — no subas a Drive (ya no se usa)**
 - El msg 2 se envía el día 3. El msg 3 se genera hoy pero se envía el día 7 solo si no hay respuesta
 - **Sigue el skill `closer-sales` paso a paso** — no improvises ni postergues la generación de archivos
 - **Nunca incluyas precios** en WhatsApp ni en email
