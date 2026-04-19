@@ -24,7 +24,7 @@ El churn promedio en SaaS LATAM para pymes es 8.2% mensual. El objetivo de Human
 ### Riesgo alto (intervenir en 24h)
 - Cliente solicita cancelación
 - No ha visitado su web en 30+ días
-- Rechazó el cobro de Hotmart (tarjeta declinada)
+- Rechazó el cobro recurrente (tarjeta declinada o depósito no realizado)
 - Expresó insatisfacción directa
 - No respondió a los últimos 2 mensajes
 

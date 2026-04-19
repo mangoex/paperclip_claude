@@ -29,23 +29,39 @@ Gestión de contexto persistente entre sesiones.
 - **Extracción de hechos**: En cada heartbeat, revisa conversaciones nuevas y extrae hechos durables
 - **Regla**: Siempre lee el plan del día al inicio. Siempre actualiza antes de salir.
 
-## Google Drive (verificación de entregables)
+## Supabase (verificación de pipeline)
 
-No subes archivos directamente — eso lo hacen Outreach y Closer. Pero puedes verificar que los archivos estén donde deben estar.
+Todos los agentes escriben a Supabase. Úsalo para ver el estado real del pipeline:
 
-- **Carpeta raíz**: `$GOOGLE_DRIVE_FOLDER_ID`
-- **Estructura**: Una subcarpeta por prospecto con todos los materiales (propuesta, reporte, emails, WhatsApp)
+- **URL:** `$SUPABASE_URL` (`https://nloytkdjbhoozjrhrpxq.supabase.co`)
+- **Tablas:** `prospects`, `proposals`, `outreach_log`, `pipeline_events`
+- **Auth:** headers `apikey: $SUPABASE_SERVICE_KEY` + `Authorization: Bearer $SUPABASE_SERVICE_KEY`
 
-## Hotmart (verificación de pagos)
+Ejemplos:
+```bash
+# Ver prospectos en negociación
+curl -s "$SUPABASE_URL/rest/v1/prospects?etapa=eq.en_negociacion&select=*" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" -H "Authorization: Bearer $SUPABASE_SERVICE_KEY"
 
-Cuando Closer escala un cierre exitoso, verifica el pago en Hotmart antes de activar onboarding.
+# Ver inbound de las últimas 24h
+curl -s "$SUPABASE_URL/rest/v1/prospects?origen=eq.inbound_whatsapp&order=created_at.desc" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" -H "Authorization: Bearer $SUPABASE_SERVICE_KEY"
+```
 
-- **Dashboard**: Verificar suscripciones activas, pagos procesados, cancelaciones
-- **Nota**: Integración directa pendiente — hoy se verifica manualmente
+> Google Drive quedó **deprecado**. No revisar Drive ni asumir que agentes suben ahí.
+
+## Pagos (verificación)
+
+Los prospectos pagan en `https://www.humanio.digital/#paquetes` (tarjeta de crédito, débito, depósito bancario).
+
+Cuando Closer escala un cierre exitoso, verifica el pago antes de activar onboarding:
+- Revisar el procesador de pagos configurado en humanio.digital
+- Para depósitos bancarios, confirmar el comprobante recibido
+- Actualizar `prospects.etapa = 'cerrado_ganado'` en Supabase
 
 ## Surge.sh (verificación de deploys)
 
 Cuando WebDesigner notifica una URL publicada:
-- Verificar que `https://humanio-{slug}.surge.sh` carga correctamente
+- Verificar que `https://humanio.surge.sh/{slug}` carga correctamente (NO `humanio-{slug}.surge.sh`)
 - Verificar que `/propuesta` y `/reporte` son accesibles
 - Compartir la URL al Board como comentario en el ticket original

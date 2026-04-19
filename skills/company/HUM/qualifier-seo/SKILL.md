@@ -153,7 +153,7 @@ Umbral mínimo para generar propuesta completa: **score ≥ 6**
 ### Score de oportunidad
 {X}/10 — {Alta/Media} prioridad
 
-### Precios orientativos (suscripción Hotmart — ver skill `package-pricing`)
+### Precios orientativos (suscripción mensual — ver skill `package-pricing`)
 - Starter: USD 27/mes — landing + chatbot básico (lead magnet)
 - Pro: USD 47/mes — web + agente IA + automatizaciones (tier más vendido)
 - Business: USD 97/mes — IA a medida, integraciones (CRM/ERP), soporte prioritario
@@ -274,7 +274,7 @@ Al terminar todos los tickets:
 
 ## Criterios de propuesta de precios (orientativos — suscripción)
 
-Humanio vende paquetes **mensuales recurrentes** vía Hotmart. Siempre orienta hacia el tier que encaje:
+Humanio vende paquetes **mensuales recurrentes** desde `www.humanio.digital/#paquetes` (TC, TD, depósito). Siempre orienta hacia el tier que encaje:
 
 * Starter — USD 27/mes (≈ MXN 540/mes a 20 MXN/USD): landing + chatbot básico
 * Pro — USD 47/mes (≈ MXN 940/mes): web + agente IA + automatizaciones (tier más vendido)

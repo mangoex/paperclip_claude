@@ -15,11 +15,13 @@ metadata:
 
 ## Modelo de negocio
 
-| Paquete | Precio bruto | Comisión Hotmart (9.9% + $0.50) | Ingreso neto |
-|---------|-------------|-------------------------------|-------------|
-| Starter | $27 USD/mes | ~$3.17 | ~$23.83 |
-| Pro | $47 USD/mes | ~$5.15 | ~$41.85 |
-| Business | $97 USD/mes | ~$10.10 | ~$86.90 |
+| Paquete | Precio bruto | Ingreso neto* |
+|---------|-------------|-------------|
+| Starter | $27 USD/mes | ~$26.19 |
+| Pro | $47 USD/mes | ~$45.59 |
+| Business | $97 USD/mes | ~$94.09 |
+
+*Neto aproximado después de ~3% de comisiones promedio del procesador (TC/TD). Depósito bancario: 0% comisión. Pagos desde `www.humanio.digital/#paquetes`.*
 
 ## Métricas clave
 
@@ -77,7 +79,7 @@ El reporte semanal debe incluir:
 ### Meta de madurez
 - 175 clientes (100 Starter + 50 Pro + 25 Business)
 - MRR bruto: $7,425 USD/mes
-- MRR neto: ~$5,572 USD/mes (post-Hotmart)
+- MRR neto: ~$7,200 USD/mes (post-comisiones procesador ~3%)
 
 ## Reglas
 

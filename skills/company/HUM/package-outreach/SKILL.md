@@ -1,6 +1,6 @@
 ---
 name: "package-outreach"
-description: "Generador de propuestas comerciales con los 3 paquetes de suscripción de Humanio. Crea mensajes de email y WhatsApp personalizados con precios en USD y equivalencia en moneda local, incluye links de Hotmart."
+description: "Generador de propuestas comerciales con los 3 paquetes de suscripción de Humanio. Crea mensajes de email y WhatsApp personalizados con precios en USD y equivalencia en moneda local, incluye link de pago a humanio.digital/#paquetes."
 slug: "package-outreach"
 metadata:
   paperclip:
@@ -19,7 +19,7 @@ metadata:
 
 ## Propósito
 
-Generar propuestas comerciales personalizadas que presenten los 3 paquetes de suscripción de Humanio, adaptadas al prospecto específico con su diagnóstico, paquete recomendado y links de pago de Hotmart.
+Generar propuestas comerciales personalizadas que presenten los 3 paquetes de suscripción de Humanio, adaptadas al prospecto específico con su diagnóstico, paquete recomendado y link de pago a `https://www.humanio.digital/#paquetes` (medios: TC, TD, depósito).
 
 ## Estructura de la propuesta
 
@@ -61,7 +61,8 @@ BUSINESS — $97 USD/mes (~{moneda local})
 - Explicar por qué es el ideal para su negocio
 
 ### 5. Llamada a la acción
-- Link directo de Hotmart al paquete recomendado
+- Link directo a `https://www.humanio.digital/#paquetes` (el prospecto elige paquete y medio de pago ahí)
+- Mencionar medios: tarjeta de crédito, tarjeta de débito, depósito bancario
 - Invitación a agendar llamada si tiene preguntas
 
 ### 6. Firma
@@ -71,7 +72,7 @@ Humanio — Inteligencia Artificial para negocios
 
 ### Email (Mensaje 1 — Outreach)
 Asunto: {Nombre del negocio}, tu página web profesional está lista para ver
-Cuerpo: Saludo + propuesta web link + diagnóstico + 3 paquetes + link Hotmart + firma
+Cuerpo: Saludo + propuesta web link + diagnóstico + 3 paquetes + link humanio.digital/#paquetes + firma
 
 ### WhatsApp (Mensaje 1 — Outreach)
 Formato corto (máximo 1000 caracteres): Saludo + Humanio IA + propuesta link + paquete recomendado + precio
@@ -87,7 +88,7 @@ Seguimiento amigable + recordar beneficio principal
 - NUNCA envíes un mensaje sin personalización real del negocio
 - SIEMPRE incluye los 3 paquetes, aunque solo uno sea el recomendado
 - SIEMPRE incluye precios en USD Y en moneda local del país del prospecto
-- Los links de Hotmart deben ser los correctos para cada paquete
+- Todos los links de pago apuntan a `https://www.humanio.digital/#paquetes` (nunca Hotmart)
 - El tono es profesional, cercano, sin ser agresivo
 - Máximo 1 emoji por oración
 - No uses "Humanio" — solo "Humanio"

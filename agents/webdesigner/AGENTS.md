@@ -125,7 +125,8 @@ Cada sitio incluye la propuesta de paquetes como sección o como `/propuesta/`:
 
 - Incluir equivalencia en moneda local según el país del prospecto
 - Destacar el paquete recomendado por el Qualifier
-- Link de Hotmart para cada paquete
+- Link de cada paquete apunta a `https://www.humanio.digital/#paquetes` (NO Hotmart)
+- Menciona medios de pago: tarjeta de crédito, tarjeta de débito, depósito bancario
 
 ---
 
