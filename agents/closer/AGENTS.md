@@ -63,14 +63,58 @@ Si ves que un email "se envió via Chatwoot" con un message ID → **ESE EMAIL N
 
 ---
 
-## WhatsApp — Templates y ventana de 24 horas
+## WhatsApp — ⛔️ REGLA CRÍTICA: SIEMPRE template para msg2 y msg3
 
-- Si el prospecto **respondió** → puedes enviar mensajes libres (dentro de ventana de 24h)
-- Si el prospecto **NO respondió** (msg 2 día 3, msg 3 día 7) → fuera de ventana, debes usar template aprobado
+**NUNCA uses la API de Chatwoot para enviar msg2 ni msg3** — el prospecto no respondió, la ventana de 24h está cerrada. Solo hay un template aprobado por Meta.
 
-**Template de seguimiento:** `humanio_prospecto_inicial` (mismo del msg 1, es el único aprobado)
-- Ajusta las variables para que el copy sea diferente al msg 1 en el espíritu, pero usa el mismo template
-- URL dinámica: slug del prospecto → `humanio-{slug}.surge.sh`
+**SIEMPRE usa WhatsApp Cloud API directo** para msg2 y msg3:
+
+```bash
+curl -X POST "https://graph.facebook.com/v19.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
+  -H "Authorization: Bearer $WHATSAPP_CLOUD_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messaging_product": "whatsapp",
+    "to": "+52XXXXXXXXXX",
+    "type": "template",
+    "template": {
+      "name": "humanio_prospecto_inicial",
+      "language": { "code": "es_MX" },
+      "components": [
+        {
+          "type": "body",
+          "parameters": [
+            {"type": "text", "text": "NOMBRE_CORTO"},
+            {"type": "text", "text": "GIRO_ESPECIALIDAD"},
+            {"type": "text", "text": "CIUDAD"},
+            {"type": "text", "text": "TERMINO_BUSQUEDA"},
+            {"type": "text", "text": "NOMBRE_NEGOCIO"}
+          ]
+        },
+        {
+          "type": "button",
+          "sub_type": "url",
+          "index": 0,
+          "parameters": [{"type": "text", "text": "{slug}"}]
+        }
+      ]
+    }
+  }'
+```
+
+**Variables del template:**
+| Param | Contenido |
+|---|---|
+| `{{1}}` | Nombre corto del contacto (ej. `Dr. Meza`) |
+| `{{2}}` | Especialidad o giro (ej. `implantología y prótesis`) |
+| `{{3}}` | Ciudad (ej. `Culiacán`) |
+| `{{4}}` | Término de búsqueda (ej. `dentista culiacán`) |
+| `{{5}}` | Nombre del negocio (ej. `Meza Dental`) |
+| URL button | Slug → `humanio.surge.sh/` + `{slug}` (NO `humanio-{slug}.surge.sh`) |
+
+**Excepción — mensajes libres permitidos:**
+- Si el prospecto **ya respondió** y estás dentro de la ventana de 24h → puedes responder en texto libre directamente en Chatwoot
+- INBOUND CAMINO B (prospecto nos escribió primero) → el primer reply del Closer puede ir por Chatwoot si el pipeline corrió en menos de 24h desde el mensaje del prospecto
 
 Cuando el prospecto responde vía WhatsApp (inbox `$CHATWOOT_WHATSAPP_INBOX_ID`), responde directamente en esa conversación de Chatwoot.
 
