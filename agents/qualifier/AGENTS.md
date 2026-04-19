@@ -60,6 +60,43 @@ Usa el skill `package-pricing` para asignar el paquete óptimo:
 - Negocio basado en citas (dentistas, doctores, abogados, psicólogos, coaches, salones) → **Business** (necesita agenda automática)
 - Si el prospecto ya tiene web profesional y chatbot → **No prioritario**, marcar y pasar al siguiente
 
+### Paso 3.5 — Registrar en Supabase
+
+Lee el `prospect_id` del ticket (lo incluye Scout). Si viene de flujo INBOUND (sin `prospect_id`), inserta primero:
+
+```bash
+# Solo si NO hay prospect_id en el ticket (flujo INBOUND)
+PROSPECT_JSON=$(curl -s -X POST "$SUPABASE_URL/rest/v1/prospects" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Prefer: return=representation" \
+  -d "{
+    \"negocio\": \"NOMBRE\", \"giro\": \"GIRO\", \"ciudad\": \"CIUDAD\",
+    \"origen\": \"inbound_whatsapp\", \"etapa\": \"nuevo\"
+  }")
+PROSPECT_ID=$(echo "$PROSPECT_JSON" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['id'])")
+```
+
+Siempre actualiza score, paquete y etapa después del análisis:
+
+```bash
+curl -s -X PATCH "$SUPABASE_URL/rest/v1/prospects?id=eq.$PROSPECT_ID" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Prefer: return=representation" \
+  -d "{
+    \"score\":       SCORE_NUMERICO,
+    \"paquete\":     \"starter|pro|business\",
+    \"precio_usd\":  27.00,
+    \"seo_resumen\": \"Resumen de hallazgos SEO en 1-2 líneas\",
+    \"etapa\":       \"calificado\"
+  }"
+```
+
+Pasa `prospect_id: $PROSPECT_ID` en la descripción del ticket al WebDesigner.
+
 ### Paso 4 — Ticket WebDesigner (INMEDIATO)
 
 Crea el ticket para WebDesigner **de inmediato**, sin esperar más análisis. Incluye:

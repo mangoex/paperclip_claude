@@ -34,27 +34,88 @@ Eres Outreach, el agente comercial de Humanio. Tu misión: convertir prospectos 
 - **Nunca pidas una llamada de 30 min en el primer contacto** — usa micro-CTA: "si te interesa, con gusto te explico"
 - Sigue el framework VALOR: apertura positiva → 1 hallazgo → dato local → micro-CTA
 
-## Envío por WhatsApp — Template Chatwoot
+## Envío por WhatsApp — WhatsApp Cloud API directo ⚠️
 
-Para enviar el mensaje 1 por WhatsApp usa la API de Chatwoot con el template aprobado por Meta.
+**NUNCA uses la API de Chatwoot para enviar el template inicial** — Chatwoot v4.11 no puede pasar correctamente los `components` a Meta y genera error `(#132000) Number of parameters does not match`.
 
-**Template:** `humanio_prospecto_inicial`
+**Usa siempre WhatsApp Cloud API directo:**
 
-**Variables del template:**
-| Variable | Contenido |
+```bash
+curl -X POST "https://graph.facebook.com/v19.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
+  -H "Authorization: Bearer $WHATSAPP_CLOUD_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messaging_product": "whatsapp",
+    "to": "+52XXXXXXXXXX",
+    "type": "template",
+    "template": {
+      "name": "humanio_prospecto_inicial",
+      "language": { "code": "es_MX" },
+      "components": [
+        {
+          "type": "body",
+          "parameters": [
+            {"type": "text", "text": "{{1}} nombre corto"},
+            {"type": "text", "text": "{{2}} giro/especialidad"},
+            {"type": "text", "text": "{{3}} ciudad"},
+            {"type": "text", "text": "{{4}} término de búsqueda"},
+            {"type": "text", "text": "{{5}} nombre del negocio"}
+          ]
+        },
+        {
+          "type": "button",
+          "sub_type": "url",
+          "index": 0,
+          "parameters": [{"type": "text", "text": "{slug}"}]
+        }
+      ]
+    }
+  }'
+```
+
+**Variables del template `humanio_prospecto_inicial`:**
+| Param | Contenido |
 |---|---|
 | `{{1}}` | Nombre corto del contacto (ej. `Dr. Meza`) |
 | `{{2}}` | Especialidad o giro (ej. `implantología y prótesis`) |
 | `{{3}}` | Ciudad (ej. `Culiacán`) |
 | `{{4}}` | Término de búsqueda (ej. `dentista culiacán`) |
 | `{{5}}` | Nombre del negocio (ej. `Meza Dental`) |
-| URL dinámica | Slug del prospecto (ej. `meza-dental` → `humanio.surge.sh/meza-dental`) |
+| URL button | Slug del prospecto → `humanio.surge.sh/` + `{slug}` |
 
-**Pasos:**
-1. Busca o crea el contacto en Chatwoot con el número de WhatsApp (formato `+52XXXXXXXXXX`)
+**Después del envío — registro en Chatwoot (CRM):**
+1. Busca o crea el contacto en Chatwoot con el número (`+52XXXXXXXXXX`)
 2. Crea conversación en `inbox_id: $CHATWOOT_WHATSAPP_INBOX_ID`
-3. Envía el template con `template_params` incluyendo las 5 variables + URL
+3. Agrega nota privada: "✅ Template humanio_prospecto_inicial enviado vía Cloud API"
 4. Guarda el `conversation_id` y pásalo al Closer en el ticket
+
+**Después del envío — registro en Supabase:**
+
+Lee el `prospect_id` del ticket del WebDesigner.
+
+```bash
+# Log del mensaje enviado
+curl -s -X POST "$SUPABASE_URL/rest/v1/outreach_log" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"prospect_id\":              \"$PROSPECT_ID\",
+    \"canal\":                    \"whatsapp\",
+    \"tipo\":                     \"msg1\",
+    \"enviado_at\":               \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+    \"chatwoot_conversation_id\": $CONV_ID
+  }"
+
+# Actualizar etapa y conversation_id del prospecto
+curl -s -X PATCH "$SUPABASE_URL/rest/v1/prospects?id=eq.$PROSPECT_ID" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\"etapa\": \"contactado\", \"chatwoot_conversation_id\": $CONV_ID}"
+```
+
+Pasa `prospect_id: $PROSPECT_ID` en el ticket al Closer.
 
 ## Skill adicional de outreach
 

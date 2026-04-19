@@ -150,6 +150,40 @@ SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-{slug} humanio.surge.sh/{slug}
 
 ---
 
+## PASO 4.5 — Registrar en Supabase
+
+Lee el `prospect_id` del ticket del Qualifier. Después del deploy exitoso:
+
+```bash
+# Insertar propuesta
+curl -s -X POST "$SUPABASE_URL/rest/v1/proposals" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Prefer: return=representation" \
+  -d "{
+    \"prospect_id\":   \"$PROSPECT_ID\",
+    \"slug\":          \"{slug}\",
+    \"url_propuesta\": \"https://humanio.surge.sh/{slug}\",
+    \"url_reporte\":   \"https://humanio.surge.sh/{slug}/reporte\",
+    \"paquete\":       \"{paquete}\",
+    \"precio_usd\":    47.00,
+    \"desplegado_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+    \"activo\":        true
+  }"
+
+# Actualizar prospect con slug y etapa
+curl -s -X PATCH "$SUPABASE_URL/rest/v1/prospects?id=eq.$PROSPECT_ID" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\"slug\": \"{slug}\", \"etapa\": \"propuesta_generada\"}"
+```
+
+Pasa `prospect_id: $PROSPECT_ID` en la descripción del ticket al Outreach.
+
+---
+
 ## PASO 5 — Handoff a Outreach
 
 Crea ticket para Outreach con la URL del sitio publicado. Envíale mensaje directo para despertarlo.

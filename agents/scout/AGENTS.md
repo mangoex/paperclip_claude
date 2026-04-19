@@ -123,12 +123,40 @@ Total de prospectos: {N}
 - Candidatos Business (🟢): X
 ```
 
+### 6.5 Registrar en Supabase
+
+Antes de crear el ticket al Qualifier, inserta cada prospecto en Supabase y guarda el `id` retornado para incluirlo en el ticket.
+
+```bash
+PROSPECT_JSON=$(curl -s -X POST "$SUPABASE_URL/rest/v1/prospects" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Prefer: return=representation" \
+  -d "{
+    \"negocio\":    \"NOMBRE_NEGOCIO\",
+    \"giro\":       \"GIRO\",
+    \"ciudad\":     \"CIUDAD\",
+    \"pais\":       \"MX\",
+    \"telefono\":   \"+52XXXXXXXXXX\",
+    \"email\":      \"correo@negocio.com\",
+    \"redes\":      \"@instagram_usuario\",
+    \"web_actual\": \"https://negocio.com\",
+    \"origen\":     \"scout_outbound\",
+    \"etapa\":      \"nuevo\"
+  }")
+PROSPECT_ID=$(echo "$PROSPECT_JSON" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['id'])")
+```
+
+Incluye `prospect_id: {PROSPECT_ID}` en el título o descripción del ticket al Qualifier.
+
 ### 7. Asignación al Qualifier
 
 Al terminar el reporte, crea un nuevo ticket asignado al agente **Qualifier** con:
 - Título: "Calificar prospectos: {Giro} en {Ciudad}, {País}"
 - Adjunta el reporte como documento
 - Prioridad: Medium
+- Incluye en la descripción: `prospect_id: {PROSPECT_ID}` por cada prospecto (o la lista completa)
 
 ### 8. Despertar al Qualifier
 

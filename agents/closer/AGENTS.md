@@ -139,6 +139,44 @@ Para cada conversación encontrada:
 3. Actúa según la clasificación
 4. **Responde vía Chatwoot** — esto automáticamente resetea `waiting_since` a 0 y marca la conversación como atendida
 
+## Persistencia en Supabase
+
+Lee el `prospect_id` del ticket (lo pasa Outreach). Úsalo en cada acción:
+
+**Después de enviar msg2 o msg3:**
+```bash
+curl -s -X POST "$SUPABASE_URL/rest/v1/outreach_log" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"prospect_id\":              \"$PROSPECT_ID\",
+    \"canal\":                    \"whatsapp\",
+    \"tipo\":                     \"msg2\",
+    \"enviado_at\":               \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+    \"chatwoot_conversation_id\": $CONV_ID
+  }"
+```
+
+**Al clasificar respuesta del prospecto — actualizar etapa:**
+```bash
+# Valores válidos de etapa: 'en_seguimiento' | 'en_negociacion' | 'cerrado_ganado' | 'cerrado_perdido'
+curl -s -X PATCH "$SUPABASE_URL/rest/v1/prospects?id=eq.$PROSPECT_ID" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"etapa\":          \"en_negociacion\",
+    \"respondio\":      true,
+    \"respondio_at\":   \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+    \"tipo_respuesta\": \"positivo\"
+  }"
+```
+
+*(Para cerrar perdido: `etapa: cerrado_perdido`. Para cerrar ganado: `etapa: cerrado_ganado`.)*
+
+---
+
 ## Flujo de trabajo
 
 ### Paso 1: Clasificar estado del prospecto
