@@ -7,6 +7,8 @@ skills:
   - paperclipai/paperclip/para-memory-files
   - company/HUM/outreach-proposals
   - company/HUM/sales-copywriting
+  - company/HUM/package-outreach
+  - company/HUM/package-pricing
   - microsoft/skills/frontend-design-review
   - anthropics/skills/frontend-design
   - microsoft/skills/frontend-ui-dark-ts
