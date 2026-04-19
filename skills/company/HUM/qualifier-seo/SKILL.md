@@ -167,8 +167,8 @@ No cotices setups fijos; Humanio vende **suscripción recurrente mensual**. Equi
 Se generará y adjuntará en comentario posterior.
 Inclúyelo en el deploy como página secundaria (`/reporte`). Nómbralo `reporte.html`.
 Al terminar, responde a este ticket con ambas URLs:
-- URL propuesta: https://humanio-{slug}.surge.sh
-- URL reporte: https://humanio-{slug}.surge.sh/reporte
+- URL propuesta: https://humanio.surge.sh/{slug}
+- URL reporte: https://humanio.surge.sh/{slug}/reporte.html
 ```
 
 ### 4.1 Despertar al WebDesigner

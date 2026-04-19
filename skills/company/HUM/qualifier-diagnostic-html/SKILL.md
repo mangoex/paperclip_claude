@@ -913,7 +913,7 @@ en el deploy como página secundaria.
 Instrucción para WebDesigner:
 - Copiar `reporte.html` al directorio del site antes del deploy
 - Asegurarse que el `index.html` tenga un botón "Ver reporte" que apunte a `./reporte`
-- URL final: `humanio-{slug}.surge.sh/reporte`
+- URL final: `humanio.surge.sh/{slug}/reporte.html`
 ```
 
 ### 6. Actualizar el ticket de Outreach
@@ -921,8 +921,8 @@ Instrucción para WebDesigner:
 Cuando WebDesigner entregue la URL del site, el brief de Outreach debe incluir:
 
 ```
-- URL propuesta web: https://humanio-{slug}.surge.sh
-- URL diagnóstico gratuito: https://humanio-{slug}.surge.sh/reporte
+- URL propuesta web: https://humanio.surge.sh/{slug}
+- URL diagnóstico gratuito: https://humanio.surge.sh/{slug}/reporte.html
 ```
 
 ## Reglas críticas

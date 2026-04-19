@@ -55,8 +55,8 @@ SI el campo contiene una URL (https://humanio-*.surge.sh):
 Confirma que tienes ambas URLs del ticket:
 
 ```
-PROPUESTA_URL = https://humanio-{slug}.surge.sh
-REPORTE_URL   = https://humanio-{slug}.surge.sh/reporte
+PROPUESTA_URL = https://humanio.surge.sh/{slug}
+REPORTE_URL   = https://humanio.surge.sh/{slug}/reporte.html
 ```
 
 Usa estas URLs en todos los materiales: correo, WhatsApp y propuesta PDF.
@@ -80,8 +80,8 @@ echo "✅ reporte-seo.html descargado"
 
 Si alguna descarga falla (archivo vacío o error), intenta con la URL alternativa:
 ```bash
-curl -s "https://humanio-{slug}.surge.sh/propuesta" -o /tmp/outreach-{slug}/propuesta.html
-curl -s "https://humanio-{slug}.surge.sh/reporte" -o /tmp/outreach-{slug}/reporte-seo.html
+curl -s "https://humanio.surge.sh/{slug}/propuesta/" -o /tmp/outreach-{slug}/propuesta.html
+curl -s "https://humanio.surge.sh/{slug}/reporte.html" -o /tmp/outreach-{slug}/reporte-seo.html
 ```
 
 ### 5. Enviar correo inicial (SMTP directo) + registrar en Chatwoot (CRM)
