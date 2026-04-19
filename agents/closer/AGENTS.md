@@ -135,9 +135,16 @@ echo "Conversaciones con prospecto esperando respuesta: $CONV_COUNT"
 
 Para cada conversación encontrada:
 1. Lee los mensajes para ver la respuesta del prospecto (mensajes `message_type: incoming`)
-2. Clasifica la respuesta según el Paso 1
-3. Actúa según la clasificación
-4. **Responde vía Chatwoot** — esto automáticamente resetea `waiting_since` a 0 y marca la conversación como atendida
+2. **Busca el `prospect_id` en Supabase por `conversation_id`:**
+   ```bash
+   PROSPECT_DATA=$(curl -s "$SUPABASE_URL/rest/v1/prospects?chatwoot_conversation_id=eq.$CONV_ID&select=id,negocio,slug,paquete,precio_usd,etapa" \
+     -H "apikey: $SUPABASE_SERVICE_KEY" \
+     -H "Authorization: Bearer $SUPABASE_SERVICE_KEY")
+   PROSPECT_ID=$(echo "$PROSPECT_DATA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['id']) if d else print('')")
+   ```
+3. Clasifica la respuesta según el Paso 1
+4. Actúa según la clasificación
+5. **Responde vía Chatwoot** — esto automáticamente resetea `waiting_since` a 0 y marca la conversación como atendida
 
 ## Persistencia en Supabase
 
