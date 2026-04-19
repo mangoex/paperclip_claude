@@ -123,29 +123,44 @@ Total de prospectos: {N}
 - Candidatos Business (🟢): X
 ```
 
-### 6.5 Registrar en Supabase
+### 6.5 Registrar en Supabase (IDEMPOTENTE — verifica duplicados globales)
 
 Antes de crear el ticket al Qualifier, inserta cada prospecto en Supabase y guarda el `id` retornado para incluirlo en el ticket.
 
+**CRÍTICO — idempotencia**: antes de insertar, verifica si el prospecto ya existe en la BD (por teléfono o combinación negocio+ciudad). Si ya existe, reutiliza el `id` existente — nunca dupliques. Esto hace el Scout seguro ante reintentos por tokens agotados o crashes.
+
 ```bash
-PROSPECT_JSON=$(curl -s -X POST "$SUPABASE_URL/rest/v1/prospects" \
+# 1. Check duplicado global (no solo en la lista actual)
+EXISTING=$(curl -s \
+  "$SUPABASE_URL/rest/v1/prospects?or=(telefono.eq.%2B52XXXXXXXXXX,and(negocio.eq.NOMBRE_NEGOCIO,ciudad.eq.CIUDAD))&select=id,etapa" \
   -H "apikey: $SUPABASE_SERVICE_KEY" \
-  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
-  -H "Content-Type: application/json" \
-  -H "Prefer: return=representation" \
-  -d "{
-    \"negocio\":    \"NOMBRE_NEGOCIO\",
-    \"giro\":       \"GIRO\",
-    \"ciudad\":     \"CIUDAD\",
-    \"pais\":       \"MX\",
-    \"telefono\":   \"+52XXXXXXXXXX\",
-    \"email\":      \"correo@negocio.com\",
-    \"redes\":      \"@instagram_usuario\",
-    \"web_actual\": \"https://negocio.com\",
-    \"origen\":     \"scout_outbound\",
-    \"etapa\":      \"nuevo\"
-  }")
-PROSPECT_ID=$(echo "$PROSPECT_JSON" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['id'])")
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY")
+
+EXISTING_ID=$(echo "$EXISTING" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['id'] if d else '')")
+
+if [ -n "$EXISTING_ID" ]; then
+  echo "⏭️  Prospecto ya existe (id=$EXISTING_ID) — reutilizando, no duplicar."
+  PROSPECT_ID="$EXISTING_ID"
+else
+  PROSPECT_JSON=$(curl -s -X POST "$SUPABASE_URL/rest/v1/prospects" \
+    -H "apikey: $SUPABASE_SERVICE_KEY" \
+    -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+    -H "Content-Type: application/json" \
+    -H "Prefer: return=representation" \
+    -d "{
+      \"negocio\":    \"NOMBRE_NEGOCIO\",
+      \"giro\":       \"GIRO\",
+      \"ciudad\":     \"CIUDAD\",
+      \"pais\":       \"MX\",
+      \"telefono\":   \"+52XXXXXXXXXX\",
+      \"email\":      \"correo@negocio.com\",
+      \"redes\":      \"@instagram_usuario\",
+      \"web_actual\": \"https://negocio.com\",
+      \"origen\":     \"scout_outbound\",
+      \"etapa\":      \"nuevo\"
+    }")
+  PROSPECT_ID=$(echo "$PROSPECT_JSON" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['id'])")
+fi
 ```
 
 Incluye `prospect_id: {PROSPECT_ID}` en el título o descripción del ticket al Qualifier.

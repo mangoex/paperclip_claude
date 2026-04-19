@@ -34,6 +34,44 @@ Usa el skill `web-scraping` (Scrapling) como herramienta primaria para analizar 
 
 ---
 
+## Paso 0 — Idempotencia (antes de procesar cualquier prospecto)
+
+> El sistema puede reintentar tickets tras agotamiento de tokens o crashes. Antes de re-ejecutar trabajo, verifica qué ya está hecho en Supabase.
+
+Para cada `prospect_id` del ticket:
+
+```bash
+# ¿Ya hay una propuesta (proposals) para este prospecto?
+EXISTING=$(curl -s \
+  "$SUPABASE_URL/rest/v1/proposals?prospect_id=eq.$PROSPECT_ID&select=id,paquete,precio_usd,diagnostico_url" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY")
+
+if [ "$(echo "$EXISTING" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))')" != "0" ]; then
+  echo "⏭️  Prospecto $PROSPECT_ID ya calificado — saltando auditoría y reusando propuesta existente."
+  # Saltar Pasos 1-4, ir directo a Paso 5 (ticket a WebDesigner) con los datos existentes.
+  # Si el prospecto ya tiene etapa >= 'propuesta_lista' → saltar también Paso 5.
+fi
+
+# También verifica etapa del prospecto — si ya está más adelante en el pipeline, no retrocedas:
+ETAPA=$(curl -s \
+  "$SUPABASE_URL/rest/v1/prospects?id=eq.$PROSPECT_ID&select=etapa" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['etapa'] if d else '')")
+
+case "$ETAPA" in
+  "propuesta_lista"|"contactado"|"en_seguimiento"|"en_negociacion"|"cerrado_ganado"|"cerrado_perdido")
+    echo "⏭️  Prospecto en etapa '$ETAPA' — ya avanzó más allá del Qualifier. Skip."
+    continue
+    ;;
+esac
+```
+
+**Regla**: nunca sobrescribas una fila de `proposals` existente. Si necesitas regenerar un diagnóstico, crea una nueva entrada y marca la anterior como `supersedida`.
+
+---
+
 ## Proceso por prospecto (score ≥ 6)
 
 ### Paso 1 — Auditoría
