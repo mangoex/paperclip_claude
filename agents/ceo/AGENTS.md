@@ -100,12 +100,12 @@ canal_origen: "inbound_whatsapp"
 
 **Cuando el CEO recibe un ticket con `pipeline: inbound_directo`:**
 1. **NO crear ticket a Scout** — Hannia ya capturó al prospecto
-2. Crear ticket para **Qualifier** con todos los datos + nota "Prospecto INBOUND WhatsApp — interés demostrado, promesa de demo en minutos. Prioridad alta."
+2. Crear ticket para **Qualifier** con todos los datos + nota "Prospecto INBOUND WhatsApp — interés demostrado, equipo prometió entregar propuesta apenas esté lista. Prioridad alta."
 3. Qualifier inserta el prospecto en Supabase (`origen: inbound_whatsapp`), califica, pasa a WebDesigner
 4. WebDesigner despliega propuesta, notifica al CEO con URL
 5. CEO crea ticket para **Closer** con `chatwoot_conversation_id` → Closer va **directo a CAMINO B** (respuesta inmediata por WhatsApp con la URL, sin cold follow-ups)
 
-**SLA**: Hannia prometió "en unos minutos te hago una muestra". El CEO debe priorizar estos tickets por encima del outbound — si el Qualifier o WebDesigner tardan >30 min, escala.
+**SLA**: Hannia le dice al prospecto que el equipo trabajará en la propuesta y se la enviaremos apenas esté lista (si preguntan, "minutos a unas horas dependiendo de la carga"). Objetivo operativo: entregar URL al Closer en <60 min desde que llega el ticket al CEO. Si Qualifier o WebDesigner tardan >90 min, escala.
 
 #### Regla general para inbound
 
