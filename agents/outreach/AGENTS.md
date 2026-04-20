@@ -73,6 +73,58 @@ esac
 - **Nunca pidas una llamada de 30 min en el primer contacto** — usa micro-CTA: "si te interesa, con gusto te explico"
 - Sigue el framework VALOR: apertura positiva → 1 hallazgo → dato local → micro-CTA
 
+## ⏰ Horario prudente para envíos OUTBOUND (WhatsApp + Email)
+
+> Nadie quiere recibir un mensaje de ventas a las 11 de la noche o un domingo. Esta regla aplica **solo a envíos en frío (msg1)**; las respuestas a un prospecto que ya escribió (INBOUND) NO tienen horario — se responde de inmediato.
+
+**Ventana permitida (zona horaria `America/Mexico_City`):**
+
+| Día | Ventana |
+|---|---|
+| Lunes–Viernes | 09:00–19:00 |
+| Sábado | 10:00–14:00 |
+| Domingo | ❌ no enviar |
+
+**Guard obligatorio antes de disparar `curl` de Cloud API o SMTP:**
+
+```bash
+HOY=$(TZ=America/Mexico_City date +%u)   # 1=Lun ... 7=Dom
+HORA=$(TZ=America/Mexico_City date +%H)
+VENTANA_OK="false"
+case "$HOY" in
+  1|2|3|4|5) [ "$HORA" -ge 9 ]  && [ "$HORA" -lt 19 ] && VENTANA_OK="true" ;;
+  6)         [ "$HORA" -ge 10 ] && [ "$HORA" -lt 14 ] && VENTANA_OK="true" ;;
+  7)         VENTANA_OK="false" ;;
+esac
+
+if [ "$VENTANA_OK" != "true" ]; then
+  # Calcula próximo slot válido:
+  #  - Si es L-V >=19h o S >=14h → mañana 9/10h
+  #  - Si es S <10h → hoy 10h
+  #  - Si es D cualquier hora → lunes 9h
+  #  - Si es L-V <9h → hoy 9h
+  echo "⏸️  Fuera de ventana (día=$HOY hora=$HORA) — agendando msg1 para próximo horario válido."
+
+  # Marca el prospecto como "programado" y crea un comentario en el ticket indicando
+  # el próximo intento. NO envíes nada ahora. El heartbeat del Outreach en el próximo
+  # horario válido tomará el ticket y disparará el envío.
+  curl -s -X PATCH "$SUPABASE_URL/rest/v1/prospects?id=eq.$PROSPECT_ID" \
+    -H "apikey: $SUPABASE_SERVICE_KEY" \
+    -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+    -H "Content-Type: application/json" \
+    -d "{\"etapa\": \"programado\", \"programado_para\": \"<ISO timestamp próximo slot>\"}"
+
+  # Termina sin enviar; el próximo heartbeat lo retoma.
+  exit 0
+fi
+```
+
+**Regla de oro:** si `VENTANA_OK="false"`, **no envíes NADA** — ni email ni WhatsApp. El ticket queda en Paperclip y se retoma en el próximo heartbeat dentro de ventana. Si el CEO te despierta fuera de horario, respeta la ventana — no envíes templates aunque te lo pidan.
+
+Excepción: mensajes transaccionales automáticos dentro de una conversación activa (24h window de Meta) NO son OUTBOUND — esos los maneja el Closer en INBOUND y sí responden 24/7.
+
+---
+
 ## Envío por WhatsApp — WhatsApp Cloud API directo ⚠️
 
 **NUNCA uses la API de Chatwoot para enviar el template inicial** — Chatwoot v4.11 no puede pasar correctamente los `components` a Meta y genera error `(#132000) Number of parameters does not match`.
