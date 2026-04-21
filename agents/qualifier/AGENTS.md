@@ -83,11 +83,33 @@ esac
 
 ---
 
+## 🚨 Regla de veracidad de datos — NO NEGOCIABLE
+
+> El Qualifier corriendo en Haiku ha fabricado teléfonos secuenciales tipo `+526777890123`, `+526773456789`, `+526774567890` (números inventados, clientes inexistentes). Esto rompe al Outreach aguas abajo: marca prospectos como "contactados" en base a números inválidos. **Nunca más.**
+
+**Reglas duras:**
+1. **NUNCA inventes datos de contacto** — teléfono, email, WhatsApp, dirección, nombre del dueño. Si no lo encontraste en el scraping, el valor es `null`. Punto.
+2. **Si Scrapling / Firecrawl no retornan un teléfono verificable**, en el INSERT de Supabase escribe `"telefono": null` (no `""`, no número inventado).
+3. **Indicadores de número fabricado** (auto-detecta y rechaza):
+   - Dígitos secuenciales (`1234567`, `7890123`)
+   - Dígitos repetidos (`7777777`, `1111111`)
+   - Números idénticos a otros prospectos del mismo batch
+   - Cualquier número "demasiado limpio" (ej. termina en `000`, `111`, `123`)
+4. **Si el número parece inventado** o no pudiste verificarlo cruzando con Google/Facebook/el sitio web del negocio, escribe `null` y agrega en `seo_resumen`: `"⚠️ Contacto sin verificar — requiere investigación manual"`.
+5. **El paquete recomendado debe ser consistente con los datos reales**. Si no encontraste web del negocio, el paquete correcto es Starter (sin web). No asignes Business a un prospecto del que no pudiste verificar ni el teléfono.
+
+**Prospectos sin canales de contacto verificables:**
+- Inserta igual en Supabase con `telefono: null, email: null, etapa: "sin_contacto"` (no `calificado`).
+- NO crees ticket para WebDesigner — un prospecto sin forma de contactarlo no vale la inversión de diseño.
+- Reporta al CEO en el comentario del ticket padre: "N prospectos sin contacto verificable — requieren investigación manual antes de escalar."
+
+---
+
 ## Proceso por prospecto (score ≥ 6)
 
 ### Paso 1 — Auditoría
 
-Invoca el skill `qualifier-prospect-auditor` para analizar el sitio y redes del prospecto.
+Invoca el skill `qualifier-prospect-auditor` para analizar el sitio y redes del prospecto. **Prioriza encontrar canales de contacto reales** — teléfono visible en el sitio, WhatsApp button, email en sección de contacto. Si el sitio no los expone, busca en Google My Business y redes sociales verificadas. Nada de adivinar.
 
 ### Paso 2 — Score
 

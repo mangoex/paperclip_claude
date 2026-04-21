@@ -392,17 +392,86 @@ WA_RESPONSE=$(curl -s -X POST \
     }
   }")
 
-WA_MSG_ID=$(echo "$WA_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['messages'][0]['id'])" 2>/dev/null)
+WA_MSG_ID=$(echo "$WA_RESPONSE" | python3 -c "
+import json, sys
+try:
+    d = json.loads(sys.stdin.read())
+    # Meta devuelve 'error' si el envío falló (número inválido, token expirado, template mal, etc.)
+    if 'error' in d:
+        sys.exit(0)  # imprime vacío — el envío NO ocurrió
+    # Éxito real: debe existir messages[0].id
+    if isinstance(d.get('messages'), list) and d['messages']:
+        print(d['messages'][0].get('id',''))
+except Exception:
+    pass  # imprime vacío
+")
 
 if [ -n "$WA_MSG_ID" ]; then
   echo "✅ WhatsApp enviado — message_id: $WA_MSG_ID"
   WA_STATUS="ENVIADO — ID: $WA_MSG_ID"
 else
-  echo "⚠️ WhatsApp falló — respuesta: $WA_RESPONSE"
-  WA_STATUS="ERROR — revisar manualmente"
+  # Extrae el error real de Meta para diagnóstico
+  WA_ERROR=$(echo "$WA_RESPONSE" | python3 -c "
+import json, sys
+try:
+    d = json.loads(sys.stdin.read())
+    e = d.get('error', {})
+    print(f\"code={e.get('code','?')} message={e.get('message','?')} details={e.get('error_data',{}).get('details','')}\" )
+except:
+    print(sys.stdin.read()[:300])
+")
+  echo "❌ WhatsApp FALLÓ: $WA_ERROR"
+  echo "   Response completo: $WA_RESPONSE"
+  WA_STATUS="ERROR_WA — $WA_ERROR"
   # Guardar texto como fallback para envío manual
   echo "$WA_MESSAGE" > /tmp/outreach-{slug}/mensaje-whatsapp.txt
 fi
+```
+
+### ⛔ GATE crítico — NO continúes si ambos canales fallaron
+
+**Después de intentar WhatsApp y Email, evalúa:**
+
+| WA_STATUS | SMTP_STATUS | Acción |
+|-----------|-------------|--------|
+| `ENVIADO — ID: ...` | cualquiera | ✅ continuar a outreach_log + etapa `contactado` |
+| `ERROR_WA*` | `ENVIADO_VIA_SMTP` | ✅ continuar — al menos email salió |
+| `ERROR_WA*` | `ERROR_SMTP*` | 🛑 **HALT**: ambos canales fallaron. NO registres en outreach_log. NO actualices etapa. Marca el ticket como `blocked` con comentario técnico del error. Reporta al CEO. |
+| `—` (sin teléfono) | `ERROR_SMTP*` | 🛑 HALT idem |
+| `—` (sin teléfono) | `—` (sin email) | 🛑 HALT: prospecto sin canales de contacto. Escalar al CEO — probable fallo del Qualifier. |
+
+**Regla de oro**: `etapa = "contactado"` sólo se escribe cuando **al menos UN envío tiene `provider_message_id` real** (WhatsApp o SMTP). Si lees esta línea y estás tentado a marcar `contactado` "para que avance el pipeline", DETENTE — un prospecto marcado contactado que no recibió mensaje es peor que un prospecto sin tocar, porque el Closer hará seguimiento sobre una conversación que nunca existió.
+
+### Registro obligatorio en `outreach_log` (antes del PATCH etapa)
+
+Una vez que pasaste el GATE, INSERT la fila en `outreach_log` ANTES de actualizar la etapa del prospecto:
+
+```bash
+LOG_ROW=$(curl -s -X POST "$SUPABASE_URL/rest/v1/outreach_log" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Prefer: return=representation" \
+  -d "{
+    \"prospect_id\":              \"$PROSPECT_ID\",
+    \"canal\":                    \"$CANAL\",
+    \"tipo\":                     \"msg1\",
+    \"enviado_at\":               \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+    \"provider_message_id\":      \"$MSG_ID\",
+    \"chatwoot_conversation_id\": ${CONV_ID:-null},
+    \"status\":                   \"sent\"
+  }")
+
+# Verifica que el INSERT creó fila
+LOG_ID=$(echo "$LOG_ROW" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['id'] if isinstance(d,list) and d else '')" 2>/dev/null)
+[ -z "$LOG_ID" ] && { echo "❌ outreach_log INSERT falló: $LOG_ROW"; exit 1; }
+
+# Solo ahora, actualiza etapa
+curl -s -X PATCH "$SUPABASE_URL/rest/v1/prospects?id=eq.$PROSPECT_ID" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\"etapa\": \"contactado\", \"chatwoot_conversation_id\": ${CONV_ID:-null}}"
 ```
 
 > **Formato del teléfono:** `{TELEFONO_PROSPECTO_E164}` debe ser en formato E.164 sin `+`:
