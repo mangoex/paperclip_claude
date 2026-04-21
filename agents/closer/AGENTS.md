@@ -109,9 +109,13 @@ Si ves que un email "se envió via Chatwoot" con un message ID → **ESE EMAIL N
 
 ## WhatsApp — ⛔️ REGLA CRÍTICA: SIEMPRE template para msg2 y msg3
 
-**NUNCA uses la API de Chatwoot para enviar msg2 ni msg3** — el prospecto no respondió, la ventana de 24h está cerrada. Solo hay un template aprobado por Meta.
+**NUNCA uses la API de Chatwoot para enviar msg2 ni msg3** — el prospecto no respondió, la ventana de 24h está cerrada.
 
-**SIEMPRE usa WhatsApp Cloud API directo** para msg2 y msg3:
+**SIEMPRE usa WhatsApp Cloud API directo** para msg2 y msg3.
+
+---
+
+### msg2 — template `humanio_seguimiento_1` (día +1)
 
 ```bash
 curl -X POST "https://graph.facebook.com/v19.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
@@ -122,16 +126,56 @@ curl -X POST "https://graph.facebook.com/v19.0/$WHATSAPP_PHONE_NUMBER_ID/message
     "to": "+52XXXXXXXXXX",
     "type": "template",
     "template": {
-      "name": "humanio_prospecto_inicial",
+      "name": "humanio_seguimiento_1",
       "language": { "code": "es_MX" },
       "components": [
         {
           "type": "body",
           "parameters": [
             {"type": "text", "text": "NOMBRE_CORTO"},
-            {"type": "text", "text": "GIRO_ESPECIALIDAD"},
-            {"type": "text", "text": "CIUDAD"},
-            {"type": "text", "text": "TERMINO_BUSQUEDA"},
+            {"type": "text", "text": "NOMBRE_NEGOCIO"},
+            {"type": "text", "text": "OBJETIVO_GIRO"}
+          ]
+        },
+        {
+          "type": "button",
+          "sub_type": "url",
+          "index": 0,
+          "parameters": [{"type": "text", "text": "{slug}"}]
+        }
+      ]
+    }
+  }'
+```
+
+**Variables `humanio_seguimiento_1`:**
+| Param | Contenido | Ejemplo |
+|---|---|---|
+| `{{1}}` | Nombre corto | `Dr. Meza` |
+| `{{2}}` | Nombre del negocio | `Meza Dental` |
+| `{{3}}` | Objetivo concreto del giro | `convertir visitas en citas` / `atraer más clientes locales` |
+| URL button | Slug → `humanio.surge.sh/` + `{slug}` | `humanio.surge.sh/meza-dental/` |
+
+---
+
+### msg3 — template `humanio_seguimiento_2` (día +3)
+
+```bash
+curl -X POST "https://graph.facebook.com/v19.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
+  -H "Authorization: Bearer $WHATSAPP_CLOUD_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messaging_product": "whatsapp",
+    "to": "+52XXXXXXXXXX",
+    "type": "template",
+    "template": {
+      "name": "humanio_seguimiento_2",
+      "language": { "code": "es_MX" },
+      "components": [
+        {
+          "type": "body",
+          "parameters": [
+            {"type": "text", "text": "NOMBRE_CORTO"},
             {"type": "text", "text": "NOMBRE_NEGOCIO"}
           ]
         },
@@ -146,15 +190,12 @@ curl -X POST "https://graph.facebook.com/v19.0/$WHATSAPP_PHONE_NUMBER_ID/message
   }'
 ```
 
-**Variables del template:**
-| Param | Contenido |
-|---|---|
-| `{{1}}` | Nombre corto del contacto (ej. `Dr. Meza`) |
-| `{{2}}` | Especialidad o giro (ej. `implantología y prótesis`) |
-| `{{3}}` | Ciudad (ej. `Culiacán`) |
-| `{{4}}` | Término de búsqueda (ej. `dentista culiacán`) |
-| `{{5}}` | Nombre del negocio (ej. `Meza Dental`) |
-| URL button | Slug → `humanio.surge.sh/` + `{slug}` (NO `humanio-{slug}.surge.sh`) |
+**Variables `humanio_seguimiento_2`:**
+| Param | Contenido | Ejemplo |
+|---|---|---|
+| `{{1}}` | Nombre corto | `Dr. Meza` |
+| `{{2}}` | Nombre del negocio | `Meza Dental` |
+| URL button | Slug → `humanio.surge.sh/` + `{slug}` | `humanio.surge.sh/meza-dental/` |
 
 **Excepción — mensajes libres permitidos:**
 - Si el prospecto **ya respondió** y estás dentro de la ventana de 24h → puedes responder en texto libre directamente en Chatwoot
