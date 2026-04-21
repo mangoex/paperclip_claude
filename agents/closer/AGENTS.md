@@ -115,6 +115,37 @@ Si ves que un email "se envió via Chatwoot" con un message ID → **ESE EMAIL N
 
 ---
 
+## 🚨 REGLA DE SLUG — NUNCA NEGOCIABLE
+
+> Bug real (2026-04-21): un msg2 se envió con URL `humanio.surge.sh/humanio-barberhouse` (404) porque el Closer extrajo el slug parseando una URL vieja del ticket (formato obsoleto `humanio-{slug}.surge.sh`) en vez de leer el campo `slug` de Supabase. El slug correcto era `barberhouse`. La URL correcta: `humanio.surge.sh/barberhouse/`.
+
+**Reglas duras:**
+1. **SIEMPRE** obtén el slug del campo `prospects.slug` en Supabase (via `PROSPECT_DATA`). **NUNCA** lo parses del texto del ticket ni de URLs que encuentres en comentarios.
+2. **NUNCA** asumas un formato de URL. El repositorio ha migrado de `{slug}.surge.sh` (subdominio viejo) → `humanio-{slug}.surge.sh` (intermedio) → `humanio.surge.sh/{slug}/` (actual). Tickets viejos contienen URLs obsoletas.
+3. **SIEMPRE** construye la URL canónica usando el formato actual + el slug de Supabase:
+   ```
+   CANONICAL_URL="https://humanio.surge.sh/${SLUG}/"
+   ```
+4. **SIEMPRE** valida con `curl -s -o /dev/null -w "%{http_code}" "$CANONICAL_URL"` que devuelve `200` ANTES de enviar el template. Si devuelve 404/5xx, HALT y escala al CEO — probablemente hay que re-desplegar la propuesta.
+5. El parámetro del template WhatsApp para el URL button es **solo el slug** (`barberhouse`), no la URL completa, no con prefijos (`humanio-barberhouse` ❌).
+
+```bash
+# Patrón correcto
+SLUG=$(echo "$PROSPECT_DATA" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['slug'])")
+CANONICAL_URL="https://humanio.surge.sh/${SLUG}/"
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$CANONICAL_URL")
+if [ "$HTTP_CODE" != "200" ]; then
+  echo "❌ URL canónica $CANONICAL_URL → HTTP $HTTP_CODE. HALT — pedir redeploy al WebDesigner."
+  # Marca ticket blocked, comenta al CEO, exit 1
+  exit 1
+fi
+echo "✅ URL válida: $CANONICAL_URL (HTTP 200) — slug=$SLUG"
+```
+
+El button parameter del template es `$SLUG`, no `$CANONICAL_URL`.
+
+---
+
 ### msg2 — template `humanio_seguimiento_1` (día +1)
 
 ```bash
