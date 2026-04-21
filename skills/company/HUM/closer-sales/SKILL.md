@@ -649,55 +649,67 @@ EOF
 echo "✅ closer-log.txt generado"
 ```
 
-### 6. Subir TODOS los archivos a Drive (antes de enviar)
+### 6. Confirmar archivos generados en /tmp
+
+> Drive está deprecado — los archivos viven en `/tmp` durante el run del agente.
 
 ```bash
-# IMPORTANTE: pasar NOMBRE_NEGOCIO como env var evita inyección de shell.
-export NOMBRE_NEGOCIO="{NOMBRE_NEGOCIO}"
-
-node /paperclip/upload-to-drive.js "$NOMBRE_NEGOCIO" \
-  "/tmp/closer-{slug}/seguimiento-2-whatsapp.txt" \
-  "/tmp/closer-{slug}/seguimiento-2-email.html" \
-  "/tmp/closer-{slug}/seguimiento-3-whatsapp.txt" \
-  "/tmp/closer-{slug}/seguimiento-3-email.html" \
-  "/tmp/closer-{slug}/closer-log.txt"
-
-if [ $? -ne 0 ]; then
-  node /app/upload-to-drive.js "$NOMBRE_NEGOCIO" \
-    "/tmp/closer-{slug}/seguimiento-2-whatsapp.txt" \
-    "/tmp/closer-{slug}/seguimiento-2-email.html" \
-    "/tmp/closer-{slug}/seguimiento-3-whatsapp.txt" \
-    "/tmp/closer-{slug}/seguimiento-3-email.html" \
-    "/tmp/closer-{slug}/closer-log.txt"
-fi
-echo "✅ Todos los archivos subidos a Drive"
+ls -lh /tmp/closer-{slug}/
+# Esperado: seguimiento-2-whatsapp.txt, seguimiento-2-email.html,
+#           seguimiento-3-whatsapp.txt, seguimiento-3-email.html,
+#           seguimiento-2-meta.json, seguimiento-3-meta.json, closer-log.txt
+echo "✅ Archivos listos en /tmp/closer-{slug}/"
 ```
 
-### 7. Enviar mensaje 2 por WhatsApp
+### 7. Enviar mensaje 2 por WhatsApp — template `humanio_seguimiento_1`
+
+> ⚠️ La ventana de 24h de Meta está cerrada — NUNCA uses `type: text`. SIEMPRE usa el template aprobado.
+
+Variables del template:
+- `{{1}}` = nombre corto del contacto (ej. `Dr. Meza`)
+- `{{2}}` = nombre del negocio (ej. `Meza Dental`)
+- `{{3}}` = objetivo concreto del giro (ej. `convertir visitas en citas`, `atraer más clientes locales`, `llenar agenda de citas`)
+- URL button = slug del prospecto (ej. `meza-dental`)
 
 ```bash
 WA_RESPONSE=$(curl -s -X POST \
-  "https://graph.facebook.com/v18.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
+  "https://graph.facebook.com/v19.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
   -H "Authorization: Bearer $WHATSAPP_CLOUD_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d "{
     \"messaging_product\": \"whatsapp\",
     \"to\": \"{TELEFONO_PROSPECTO_E164}\",
-    \"type\": \"text\",
-    \"text\": {
-      \"preview_url\": true,
-      \"body\": $(cat /tmp/closer-{slug}/seguimiento-2-whatsapp.txt | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+    \"type\": \"template\",
+    \"template\": {
+      \"name\": \"humanio_seguimiento_1\",
+      \"language\": { \"code\": \"es_MX\" },
+      \"components\": [
+        {
+          \"type\": \"body\",
+          \"parameters\": [
+            {\"type\": \"text\", \"text\": \"{NOMBRE_CORTO}\"},
+            {\"type\": \"text\", \"text\": \"{NOMBRE_NEGOCIO}\"},
+            {\"type\": \"text\", \"text\": \"{OBJETIVO_GIRO}\"}
+          ]
+        },
+        {
+          \"type\": \"button\",
+          \"sub_type\": \"url\",
+          \"index\": 0,
+          \"parameters\": [{\"type\": \"text\", \"text\": \"{SLUG}\"}]
+        }
+      ]
     }
   }")
 
 WA_MSG_ID=$(echo "$WA_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['messages'][0]['id'])" 2>/dev/null)
 
 if [ -n "$WA_MSG_ID" ]; then
-  echo "✅ WhatsApp msg 2 enviado — ID: $WA_MSG_ID"
+  echo "✅ WhatsApp msg 2 enviado (template humanio_seguimiento_1) — ID: $WA_MSG_ID"
   WA2_STATUS="ENVIADO — ID: $WA_MSG_ID"
 else
-  echo "⚠️ WhatsApp msg 2 no enviado — PENDIENTE ENVÍO MANUAL"
-  WA2_STATUS="PENDIENTE ENVÍO MANUAL"
+  echo "⚠️ WhatsApp msg 2 falló: $WA_RESPONSE"
+  WA2_STATUS="ERROR: $WA_RESPONSE"
 fi
 ```
 
@@ -712,28 +724,44 @@ fi
 HOY=$(date +%Y-%m-%d)
 if [ "$HOY" >= "$FECHA_MSG3" ] && [ "$STATUS_RESPUESTA" = "sin_respuesta" ]; then
 
-  # ── Mensaje 3 WhatsApp (mismo curl del paso 7) ──────────────────────────
+  # ── Mensaje 3 WhatsApp — template humanio_seguimiento_2 ─────────────────
+  # Variables: {{1}} nombre corto, {{2}} nombre negocio, button = slug
   WA_RESPONSE=$(curl -s -X POST \
-    "https://graph.facebook.com/v18.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
+    "https://graph.facebook.com/v19.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
     -H "Authorization: Bearer $WHATSAPP_CLOUD_API_TOKEN" \
     -H "Content-Type: application/json" \
     -d "{
       \"messaging_product\": \"whatsapp\",
       \"to\": \"{TELEFONO_PROSPECTO_E164}\",
-      \"type\": \"text\",
-      \"text\": {
-        \"preview_url\": true,
-        \"body\": $(cat /tmp/closer-{slug}/seguimiento-3-whatsapp.txt | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+      \"type\": \"template\",
+      \"template\": {
+        \"name\": \"humanio_seguimiento_2\",
+        \"language\": { \"code\": \"es_MX\" },
+        \"components\": [
+          {
+            \"type\": \"body\",
+            \"parameters\": [
+              {\"type\": \"text\", \"text\": \"{NOMBRE_CORTO}\"},
+              {\"type\": \"text\", \"text\": \"{NOMBRE_NEGOCIO}\"}
+            ]
+          },
+          {
+            \"type\": \"button\",
+            \"sub_type\": \"url\",
+            \"index\": 0,
+            \"parameters\": [{\"type\": \"text\", \"text\": \"{SLUG}\"}]
+          }
+        ]
       }
     }")
 
   WA3_MSG_ID=$(echo "$WA_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['messages'][0]['id'])" 2>/dev/null)
   if [ -n "$WA3_MSG_ID" ]; then
-    echo "✅ WhatsApp msg 3 enviado — ID: $WA3_MSG_ID"
+    echo "✅ WhatsApp msg 3 enviado (template humanio_seguimiento_2) — ID: $WA3_MSG_ID"
     WA3_STATUS="ENVIADO — ID: $WA3_MSG_ID"
   else
-    echo "⚠️ WhatsApp msg 3 no enviado — PENDIENTE ENVÍO MANUAL"
-    WA3_STATUS="PENDIENTE ENVÍO MANUAL"
+    echo "⚠️ WhatsApp msg 3 falló: $WA_RESPONSE"
+    WA3_STATUS="ERROR: $WA_RESPONSE"
   fi
 
   # ── Mensaje 3 Email (vía SMTP directo — NO Chatwoot API) ───────────────
