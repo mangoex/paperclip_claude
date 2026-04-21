@@ -111,21 +111,37 @@ Usa el skill `package-pricing` para asignar el paquete óptimo:
 
 ### Paso 3.5 — Registrar en Supabase
 
-Lee el `prospect_id` del ticket (lo incluye Scout). Si viene de flujo INBOUND (sin `prospect_id`), inserta primero:
+**OBLIGATORIO para todos los prospectos** — sin importar si es INBOUND u OUTBOUND.
+
+**Si el ticket incluye `prospect_id`** (flujo INBOUND o re-proceso), usa ese ID directamente.
+
+**Si el ticket NO incluye `prospect_id`** (flujo OUTBOUND / nuevo descubrimiento), inserta primero:
 
 ```bash
-# Solo si NO hay prospect_id en el ticket (flujo INBOUND)
+# Insertar prospecto nuevo (OUTBOUND o INBOUND sin ID previo)
+ORIGEN="outbound_scout"  # o "inbound_whatsapp" según corresponda
 PROSPECT_JSON=$(curl -s -X POST "$SUPABASE_URL/rest/v1/prospects" \
   -H "apikey: $SUPABASE_SERVICE_KEY" \
   -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
   -H "Content-Type: application/json" \
   -H "Prefer: return=representation" \
   -d "{
-    \"negocio\": \"NOMBRE\", \"giro\": \"GIRO\", \"ciudad\": \"CIUDAD\",
-    \"origen\": \"inbound_whatsapp\", \"etapa\": \"nuevo\"
+    \"negocio\":    \"NOMBRE_NEGOCIO\",
+    \"giro\":       \"GIRO\",
+    \"ciudad\":     \"CIUDAD, ESTADO\",
+    \"pais\":       \"MX\",
+    \"telefono\":   \"TELEFONO_O_VACIO\",
+    \"email\":      \"EMAIL_O_VACIO\",
+    \"web_actual\": \"URL_O_VACIO\",
+    \"origen\":     \"$ORIGEN\",
+    \"etapa\":      \"nuevo\",
+    \"respondio\":  false
   }")
 PROSPECT_ID=$(echo "$PROSPECT_JSON" | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['id'])")
+echo "✅ Prospecto insertado: $PROSPECT_ID"
 ```
+
+> ⚠️ **Si este paso falla o retorna vacío, DETENTE** — sin `prospect_id` no puedes continuar. Reporta el error antes de crear tickets.
 
 Siempre actualiza score, paquete y etapa después del análisis:
 
@@ -146,14 +162,43 @@ curl -s -X PATCH "$SUPABASE_URL/rest/v1/prospects?id=eq.$PROSPECT_ID" \
 
 Pasa `prospect_id: $PROSPECT_ID` en la descripción del ticket al WebDesigner.
 
-### Paso 4 — Ticket WebDesigner (INMEDIATO)
+### Paso 4 — Ticket WebDesigner (INMEDIATO + ASIGNADO)
 
-Crea el ticket para WebDesigner **de inmediato**, sin esperar más análisis. Incluye:
-- Datos del negocio
-- Score y paquete recomendado
-- Brief de diseño
+Crea el ticket para WebDesigner **de inmediato** y **asignado explícitamente** — sin esto, el WebDesigner nunca lo verá.
 
-Después envía un mensaje directo al agente WebDesigner para despertarlo.
+```bash
+# 1. Obtener el ID del agente WebDesigner
+WEBDESIGNER_ID=$(curl -s "$PAPERCLIP_API_URL/api/companies/$COMPANY_ID/agents" \
+  -H "Authorization: Bearer $PAPERCLIP_API_KEY" \
+  | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+agents = data if isinstance(data, list) else data.get('agents', [])
+for a in agents:
+    name = (a.get('nameKey') or a.get('name') or '').lower()
+    if 'webdesigner' in name:
+        print(a['id'])
+        break
+")
+
+echo "WebDesigner ID: $WEBDESIGNER_ID"
+
+# 2. Crear ticket ASIGNADO al WebDesigner (assigneeAgentId es OBLIGATORIO)
+curl -s -X POST "$PAPERCLIP_API_URL/api/companies/$COMPANY_ID/issues" \
+  -H "Authorization: Bearer $PAPERCLIP_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"title\": \"🎨 Propuesta: $NEGOCIO — $PAQUETE\",
+    \"description\": \"prospect_id: $PROSPECT_ID\nnegocio: $NEGOCIO\ngiro: $GIRO\nciudad: $CIUDAD\npaquete: $PAQUETE\nprecio_usd: $PRECIO_USD\nslug_sugerido: $SLUG\n\nBrief de diseño: [incluir hallazgos clave del análisis SEO y estilo recomendado]\n\nScore SEO: $SCORE_SEO/10\",
+    \"assigneeAgentId\": \"$WEBDESIGNER_ID\",
+    \"status\": \"todo\",
+    \"priority\": \"high\"
+  }"
+```
+
+> ⚠️ **`assigneeAgentId` es OBLIGATORIO** — sin él, el WebDesigner no recibe notificación y el ticket queda huérfano para siempre. El heartbeat del WebDesigner (≤5 min) lo recogerá automáticamente una vez asignado.
+
+> ⚠️ **No uses la palabra "URL"** en el ticket — el WebDesigner generará las URLs reales tras el deploy.
 
 **El WebDesigner es quien crea el ticket de Outreach** — tú NO creas ticket de Outreach.
 
