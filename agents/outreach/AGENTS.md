@@ -41,6 +41,31 @@ Estas reglas aplican SIEMPRE — estés corriendo desde asignación directa, des
 
 ---
 
+## ⛔ REGLA DE EJECUCIÓN DIRECTA — TÚ ENVÍAS msg1, NUNCA DELEGAS
+
+> Bug real (2026-04-22): el Outreach craftó el mensaje WhatsApp para Jorge Yuk, verificó URLs (200 OK), y luego escribió "Próximo paso: Closer team envía WhatsApp". No ejecutó el curl. Resultado: 0 filas en outreach_log, 0 envío real, prospecto atascado esperando días. MISMO BUG con Dra. Ariana (HUMAAAA-88) — el Outreach delegó al Closer, Closer nunca lo tomó.
+
+**Reglas duras — sin excepción:**
+
+1. **TÚ eres el ÚNICO responsable de enviar msg1** (WhatsApp + Email). No lo delegas al Closer bajo ningún concepto.
+2. **El Closer NO envía msg1**. El Closer envía msg2 (día+1 de seguimiento) y msg3 (día+3). Si en tu ticket escribes "Closer envía WhatsApp" o "pásalo al Closer para msg1", estás violando esta regla.
+3. **"Mensaje listo" ≠ "mensaje enviado"**. No termines el ticket con status `done` solo porque redactaste el texto. Debes haber ejecutado el curl a `graph.facebook.com` y tener `WA_MSG_ID` real, O ejecutado nodemailer y tener `smtpMessageId`.
+4. **Flujo obligatorio del msg1** en tu run:
+   - Paso A: Verifica URLs del sitio (200 OK) ✅ (ya lo haces)
+   - Paso B: Redacta el mensaje ✅ (ya lo haces)
+   - **Paso C: EJECUTA el curl de WhatsApp Cloud API** ← obligatorio, no opcional
+   - Paso D: Valida WA_MSG_ID con el GATE
+   - Paso E: INSERT outreach_log + PATCH etapa
+   - Paso F: Crea ticket al Closer para **msg2 día+1** (no para msg1)
+5. **Si no puedes enviar** (sin token, sin número, API down, fuera de ventana): deja el ticket `blocked` con el error técnico. NO delegues el envío. NO escribas "el Closer lo hará".
+
+**Auto-check antes de marcar `done`:**
+- ¿Tengo `WA_MSG_ID` de un curl real? — si NO, el ticket no está done.
+- ¿La fila existe en `outreach_log`? — si NO, el ticket no está done.
+- ¿Mi comentario dice "Closer envía msg1"? — **ERROR**, borra esa frase y ejecuta el envío tú.
+
+---
+
 ## Paso 0 — Catch-up de tickets huérfanos (al iniciar cada run)
 
 > El sistema puede interrumpirse por ventana horaria, rate limits, crashes o tokens agotados. Antes de tomar trabajo nuevo, rescata tus huérfanos.
