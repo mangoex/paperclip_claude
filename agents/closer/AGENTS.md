@@ -363,8 +363,38 @@ Para cada conversación encontrada:
 
 Lee el `prospect_id` del ticket (lo pasa Outreach). Úsalo en cada acción:
 
-**Después de enviar msg2 o msg3:**
+**Después de enviar msg2 o msg3 — registro obligatorio con evidencia real:**
+
+> ⚠️ **Gate antes del INSERT**: valida que tengas `WA_MSG_ID` real de Meta (`$WA_RESPONSE.messages[0].id`). Si no tienes wamid, el envío FALLÓ — NO escribas en outreach_log como si hubiera salido. Aplica las reglas de honestidad.
+
 ```bash
+# Solo después de que WA_MSG_ID esté confirmado (no vacío, no error)
+LOG_RESPONSE=$(curl -s -X POST "$SUPABASE_URL/rest/v1/outreach_log" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Prefer: return=representation" \
+  -d "{
+    \"prospect_id\":              \"$PROSPECT_ID\",
+    \"canal\":                    \"whatsapp\",
+    \"tipo\":                     \"msg2\",
+    \"enviado_at\":               \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+    \"chatwoot_conversation_id\": ${CONV_ID:-null},
+    \"provider_message_id\":      \"$WA_MSG_ID\",
+    \"status\":                   \"sent\"
+  }")
+
+# Verifica que el INSERT creó fila (si el schema rechaza algo, no continúes)
+LOG_ID=$(echo "$LOG_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['id'] if isinstance(d,list) and d else '')" 2>/dev/null)
+[ -z "$LOG_ID" ] && { echo "❌ outreach_log INSERT falló: $LOG_RESPONSE"; exit 1; }
+```
+
+**Si el envío WhatsApp FALLÓ** (Meta devolvió `error`, token expirado, número inválido, etc.) — registra la falla para auditoría sin avanzar la etapa:
+
+```bash
+# Solo registrar cuando hay error claro del provider. NO actualices etapa del prospecto.
+WA_ERROR=$(echo "$WA_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); e=d.get('error',{}); print(f\"code={e.get('code','?')} message={e.get('message','?')}\")" 2>/dev/null || echo "$WA_RESPONSE")
+
 curl -s -X POST "$SUPABASE_URL/rest/v1/outreach_log" \
   -H "apikey: $SUPABASE_SERVICE_KEY" \
   -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
@@ -374,7 +404,9 @@ curl -s -X POST "$SUPABASE_URL/rest/v1/outreach_log" \
     \"canal\":                    \"whatsapp\",
     \"tipo\":                     \"msg2\",
     \"enviado_at\":               \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
-    \"chatwoot_conversation_id\": $CONV_ID
+    \"chatwoot_conversation_id\": ${CONV_ID:-null},
+    \"status\":                   \"failed\",
+    \"error_detail\":             $(echo "$WA_ERROR" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read().strip()))')
   }"
 ```
 
