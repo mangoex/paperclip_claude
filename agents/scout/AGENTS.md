@@ -39,7 +39,7 @@ Extrae del ticket:
 
 ### 2. Búsqueda en Google Maps
 
-Usa el skill `web-scraping` (Scrapling) para buscar:
+Usa el skill `scrapling-official` para buscar:
 - "{giro} en {ciudad}"
 - "{giro} {ciudad} {país}"
 - "{giro} cerca de {ciudad}"
@@ -206,8 +206,8 @@ Cuando un prospecto tiene presencia activa en LinkedIn, Facebook o comunidades l
 - Incluir estas señales en el reporte para que Outreach pueda personalizar mejor el primer contacto
 - Priorizar prospectos con alta actividad social (mayor probabilidad de respuesta)
 
-### Web Scraping Avanzado (`web-scraping`) — HERRAMIENTA PRINCIPAL
-Usa el skill `web-scraping` (Scrapling) como herramienta primaria para toda extracción de datos. Solo recurre a Firecrawl si Scrapling falla:
+### Web Scraping Avanzado (`scrapling-official`) — HERRAMIENTA PRINCIPAL
+Usa el skill `scrapling-official` como herramienta primaria para toda extracción de datos. Solo recurre a Firecrawl si Scrapling falla:
 - Sigue el Pre-Scrape Analysis Gate antes de cualquier extracción
 - Clasifica el target (HTML estático, SPA, protegido) y selecciona la herramienta correcta
 - Respeta robots.txt y rate limits (mínimo 1s entre requests)
