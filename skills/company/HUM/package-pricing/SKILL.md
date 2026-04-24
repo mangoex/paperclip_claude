@@ -5,10 +5,10 @@ slug: "package-pricing"
 metadata:
   paperclip:
     slug: "package-pricing"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-pricing"
-    paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-pricing"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-pricing"
-  key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/package-pricing"
+    skillKey: "company/HUM/package-pricing"
+    paperclipSkillKey: "company/HUM/package-pricing"
+  skillKey: "company/HUM/package-pricing"
+  key: "company/HUM/package-pricing"
 ---
 
 # Package Pricing — Asignador de Paquetes | Humanio

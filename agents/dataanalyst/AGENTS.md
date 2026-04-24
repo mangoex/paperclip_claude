@@ -6,8 +6,8 @@ skills:
   - "paperclipai/paperclip/paperclip"
   - "paperclipai/paperclip/para-memory-files"
   - "company/hum/dataanalyst-pipeline"
-  - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/saas-metrics"
-  - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/retention-playbook"
+  - "company/HUM/saas-metrics"
+  - "company/HUM/retention-playbook"
   - "company/hum/dataanalyst-dashboard-html"
 ---
 

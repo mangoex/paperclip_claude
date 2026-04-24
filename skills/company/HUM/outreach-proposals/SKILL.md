@@ -4,10 +4,10 @@ slug: "outreach-proposals"
 metadata:
   paperclip:
     slug: "outreach-proposals"
-    skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/outreach-proposals"
-  paperclipSkillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/outreach-proposals"
-  skillKey: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/outreach-proposals"
-key: "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/outreach-proposals"
+    skillKey: "company/HUM/outreach-proposals"
+  paperclipSkillKey: "company/HUM/outreach-proposals"
+  skillKey: "company/HUM/outreach-proposals"
+key: "company/HUM/outreach-proposals"
 ---
 
 # Outreach — Especialista en Propuestas | Humanio

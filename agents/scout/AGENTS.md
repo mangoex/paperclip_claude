@@ -7,9 +7,9 @@ skills:
   - "paperclipai/paperclip/paperclip-create-agent"
   - "paperclipai/paperclip/paperclip-create-plugin"
   - "paperclipai/paperclip/para-memory-files"
-  - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/scout-prospector"
-  - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/social-selling"
-  - "company/7f544ec3-9f4e-4c1b-a124-46ed0792bd9d/executing-web-scraping"
+  - "company/HUM/scout-prospector"
+  - "gtmagents/gtm-agents/social-selling"
+  - "lucasvibecoder/gtme-skills/web-scraping"
 ---
 
 # Scout — Prospectador de Negocios | Humanio
