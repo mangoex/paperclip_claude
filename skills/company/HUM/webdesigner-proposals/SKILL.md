@@ -952,24 +952,71 @@ Verifica también:
 
 **Si alguno falta, NO continues al paso 8.**
 
-### 8. Publicar en Surge.sh
+### 8. Publicar en Surge.sh — patrón subcarpeta `humanio.surge.sh/{slug}`
+
+⚠️ **REGLA CRÍTICA — NO usar sub-subdominios** (`masnivel.humanio.surge.sh`) porque rompen el wildcard SSL de Surge (`*.surge.sh` solo cubre 1 nivel) y el navegador marca "no seguro". Tampoco `humanio-{slug}.surge.sh` porque NO coincide con el botón del template Meta aprobado.
+
+Todas las propuestas viven en un único proyecto `humanio.surge.sh` con una subcarpeta por prospecto. El template WhatsApp de Meta apunta a `https://humanio.surge.sh/{slug}`.
 
 ```bash
 SLUG=$(echo "{NOMBRE_NEGOCIO}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
-DOMAIN="humanio-${SLUG}.surge.sh"
 
-# Deploy con token de autenticación (sin login interactivo)
-SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-$SLUG $DOMAIN
+# 8.1 — Descargar el árbol actual de humanio.surge.sh a /tmp/humanio-root
+ROOT=/tmp/humanio-root
+rm -rf "$ROOT" && mkdir -p "$ROOT"
 
-echo "Sitio publicado: https://${DOMAIN}"
-echo "Propuesta: https://${DOMAIN}/propuesta"
-echo "Reporte: https://${DOMAIN}/reporte"
-```
+# Intenta descargar el listado actual (los slugs ya desplegados). Si falla, arrancas vacío.
+# Para respetar lo ya publicado necesitas mantener los slugs previos en disco.
+# Mantén el árbol fuente en $AGENT_HOME/humanio-root/ y sincronízalo antes del deploy si corresponde.
+if [ -d "$AGENT_HOME/humanio-root" ]; then
+  cp -r "$AGENT_HOME/humanio-root/." "$ROOT/"
+fi
 
-Si el dominio ya existe (error 409), añade sufijo numérico:
-```bash
-DOMAIN="humanio-${SLUG}-2.surge.sh"
-SURGE_TOKEN=$SURGE_TOKEN surge /tmp/proposal-$SLUG $DOMAIN
+# 8.2 — Agregar el nuevo slug como subcarpeta
+mkdir -p "$ROOT/$SLUG"
+cp -r /tmp/proposal-$SLUG/. "$ROOT/$SLUG/"
+
+# 8.3 — Reescribir rutas absolutas `href="/..."` en el HTML a relativas,
+# para que el site funcione bajo el subpath /{slug}/
+python3 - "$ROOT/$SLUG" <<'PY'
+import sys
+from pathlib import Path
+root = Path(sys.argv[1])
+for p in root.rglob('*.html'):
+    depth = len(p.relative_to(root).parts) - 1
+    prefix = '../' * depth if depth > 0 else './'
+    txt = p.read_text(encoding='utf-8', errors='ignore')
+    for old, rep in [
+        ('href="/reporte.html"', f'href="{prefix}reporte.html"'),
+        ('href="/propuesta/"',   f'href="{prefix}propuesta/"'),
+        ('href="/propuesta"',    f'href="{prefix}propuesta/"'),
+        ('href="/"',             'href="./"' if depth == 0 else f'href="{prefix}"'),
+    ]:
+        txt = txt.replace(old, rep)
+    p.write_text(txt, encoding='utf-8')
+PY
+
+# 8.4 — Asegurar que exista un index.html en el root (redirect a humanio.digital)
+if [ ! -f "$ROOT/index.html" ]; then
+  cat > "$ROOT/index.html" <<'HTML'
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">
+<title>Humanio — Inteligencia Artificial para negocios</title>
+<meta http-equiv="refresh" content="0; url=https://www.humanio.digital/">
+<link rel="canonical" href="https://www.humanio.digital/"></head>
+<body><p>Redirigiendo…</p></body></html>
+HTML
+fi
+
+# 8.5 — Deploy al dominio único
+SURGE_TOKEN=$SURGE_TOKEN surge "$ROOT" humanio.surge.sh
+
+# 8.6 — Persistir el árbol en AGENT_HOME para el próximo deploy
+mkdir -p "$AGENT_HOME/humanio-root"
+cp -r "$ROOT/." "$AGENT_HOME/humanio-root/"
+
+echo "Sitio publicado: https://humanio.surge.sh/${SLUG}/"
+echo "Propuesta: https://humanio.surge.sh/${SLUG}/propuesta/"
+echo "Reporte:   https://humanio.surge.sh/${SLUG}/reporte.html"
 ```
 
 ### 9. Crear ticket para Outreach y despertarlo
@@ -991,8 +1038,8 @@ Inmediatamente después del deploy exitoso, crea este ticket:
 **WhatsApp:** {WHATSAPP}
 **Email:** {EMAIL si existe}
 **Score:** {SCORE}/10
-**URL propuesta web:** https://humanio-{slug}.surge.sh
-**URL reporte SEO:** https://humanio-{slug}.surge.sh/reporte
+**URL propuesta web:** https://humanio.surge.sh/{slug}
+**URL reporte SEO:** https://humanio.surge.sh/{slug}/reporte.html
 **Argumento principal:** {del brief del Qualifier}
 **Servicios propuestos:** {servicios y precios del Qualifier}
 ```
@@ -1002,8 +1049,8 @@ Después de crear el ticket, envía un mensaje directo al agente **Outreach**:
 ```
 Hola Outreach — tienes un brief nuevo listo para {NOMBRE_NEGOCIO} ({GIRO} en {CIUDAD}).
 Ticket: {TICKET_ID}
-Propuesta: https://humanio-{slug}.surge.sh
-Reporte: https://humanio-{slug}.surge.sh/reporte
+Propuesta: https://humanio.surge.sh/{slug}
+Reporte: https://humanio.surge.sh/{slug}/reporte.html
 Procesa este y todos los tickets pendientes en un solo run.
 ```
 
@@ -1013,9 +1060,9 @@ Procesa este y todos los tickets pendientes en un solo run.
 ## Propuesta web publicada ✅
 
 **Cliente:** {NOMBRE_NEGOCIO}
-**URL principal:** https://humanio-{slug}.surge.sh
-**URL propuesta:** https://humanio-{slug}.surge.sh/propuesta
-**URL reporte:** https://humanio-{slug}.surge.sh/reporte
+**URL principal:** https://humanio.surge.sh/{slug}
+**URL propuesta:** https://humanio.surge.sh/{slug}/propuesta/
+**URL reporte:** https://humanio.surge.sh/{slug}/reporte.html
 **Ticket Outreach:** creado ✅
 ```
 

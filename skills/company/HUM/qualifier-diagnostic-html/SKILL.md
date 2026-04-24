@@ -283,7 +283,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
       <div class="hero-meta-item"><strong>{FECHA_HOY}</strong>Fecha de análisis</div>
       <div class="hero-meta-item"><strong>{GIRO}</strong>Industria</div>
       <div class="hero-meta-item"><strong>{CIUDAD}</strong>Mercado objetivo</div>
-      <div class="hero-meta-item"><strong>Humanio — IA para negocios</strong>Elaborado por</div>
+      <div class="hero-meta-item"><strong>Humanio</strong>Elaborado por</div>
     </div>
 
     <!-- GLOBAL SCORE -->
@@ -913,7 +913,7 @@ en el deploy como página secundaria.
 Instrucción para WebDesigner:
 - Copiar `reporte.html` al directorio del site antes del deploy
 - Asegurarse que el `index.html` tenga un botón "Ver reporte" que apunte a `./reporte`
-- URL final: `humanio-{slug}.surge.sh/reporte`
+- URL final: `humanio.surge.sh/{slug}/reporte.html`
 ```
 
 ### 6. Actualizar el ticket de Outreach
@@ -921,8 +921,8 @@ Instrucción para WebDesigner:
 Cuando WebDesigner entregue la URL del site, el brief de Outreach debe incluir:
 
 ```
-- URL propuesta web: https://humanio-{slug}.surge.sh
-- URL diagnóstico gratuito: https://humanio-{slug}.surge.sh/reporte
+- URL propuesta web: https://humanio.surge.sh/{slug}
+- URL diagnóstico gratuito: https://humanio.surge.sh/{slug}/reporte.html
 ```
 
 ## Reglas críticas

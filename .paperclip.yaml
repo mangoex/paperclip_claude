@@ -6,7 +6,6 @@ agents:
     capabilities: "CEO de Humanio. Coordina Scout, Qualifier, WebDesigner, Outreach, Closer y DataAnalyst. Asigna tareas de prospección, aprueba propuestas, monitorea pipeline. Cuando recibe 'prospectar {giro} en {ciudad}', crea ticket para Scout."
     adapter:
       config:
-        dangerouslySkipPermissions: true
         model: "claude-sonnet-4-5-20250929"
       type: "claude_local"
     runtime:
@@ -29,16 +28,21 @@ agents:
       maxConcurrentRuns: 1
     inputs:
       env:
+        SCRAPLING_DEFAULT_FETCHER:
+          description: "Fetcher por defecto de Scrapling (Fetcher | StealthyFetcher | DynamicFetcher)"
+          kind: "text"
+          default: "StealthyFetcher"
+          requirement: "optional"
         FIRECRAWL_API_KEY:
-          description: "Firecrawl API key — requerida para buscar y analizar negocios locales"
+          description: "Firecrawl API key — usada como fallback cuando Scrapling no basta"
           kind: "secret"
           default: ""
-          requirement: "required"
+          requirement: "optional"
         FIRECRAWL_MCP_URL:
-          description: "URL del MCP server de Firecrawl — formato: https://mcp.firecrawl.dev/{TOKEN}/v2/mcp"
+          description: "URL del MCP server de Firecrawl — fallback: https://mcp.firecrawl.dev/{TOKEN}/v2/mcp"
           kind: "secret"
           default: ""
-          requirement: "required"
+          requirement: "optional"
 
   qualifier:
     role: "general"
@@ -53,23 +57,27 @@ agents:
       maxConcurrentRuns: 1
     inputs:
       env:
+        SCRAPLING_DEFAULT_FETCHER:
+          description: "Fetcher por defecto de Scrapling para auditorías SEO (StealthyFetcher recomendado)"
+          kind: "text"
+          default: "StealthyFetcher"
+          requirement: "optional"
         FIRECRAWL_API_KEY:
-          description: "Firecrawl API key — requerida para analizar sitios web de prospectos"
+          description: "Firecrawl API key — fallback opcional si Scrapling no puede con un sitio"
           kind: "secret"
           default: ""
-          requirement: "required"
+          requirement: "optional"
         FIRECRAWL_MCP_URL:
-          description: "URL del MCP server de Firecrawl — formato: https://mcp.firecrawl.dev/{TOKEN}/v2/mcp"
+          description: "URL del MCP server de Firecrawl — fallback opcional"
           kind: "secret"
           default: ""
-          requirement: "required"
+          requirement: "optional"
 
   webdesigner:
     role: "general"
     capabilities: "Diseñador web premium de Humanio. Recibe briefs del Qualifier y genera sitios de 3 páginas (presentación, propuesta comercial, reporte SEO) en HTML/CSS/JS con estilos visuales únicos por prospecto y efectos JS premium obligatorios. Publica en Surge.sh, crea ticket para Outreach y le envía mensaje directo."
     adapter:
       config:
-        dangerouslySkipPermissions: true
         model: "claude-sonnet-4-5-20250929"
       type: "claude_local"
     runtime:
@@ -99,7 +107,6 @@ agents:
     capabilities: "Especialista en comunicación comercial de Humanio. Recibe prospectos calificados con site publicado en Surge.sh, genera materiales de contacto personalizados (email, WhatsApp, script de llamada), los sube a Google Drive y crea ticket para Closer con mensaje directo."
     adapter:
       config:
-        dangerouslySkipPermissions: true
         model: "claude-sonnet-4-5-20250929"
       type: "claude_local"
     runtime:
@@ -179,7 +186,7 @@ agents:
           default: ""
           requirement: "optional"
         CHATWOOT_API_URL:
-          description: "URL base de Chatwoot (sin slash final) — ej. https://n8n-humanio-chatwoot.yroec7.easypanel.host"
+          description: "URL base de Chatwoot (sin slash final)"
           kind: "secret"
           default: ""
           requirement: "required"
@@ -204,7 +211,6 @@ agents:
     capabilities: "Cerrador de ventas de Humanio. Recibe prospectos contactados por Outreach y ejecuta secuencia de seguimiento: genera todos los archivos (msg2 + msg3 + log) el día 3, los sube a Drive, envía msg2 y programa msg3 para día 7 si no hay respuesta. Maneja objeciones con IA y escala a CEO para cierre."
     adapter:
       config:
-        dangerouslySkipPermissions: true
         model: "claude-sonnet-4-5-20250929"
       type: "claude_local"
     runtime:
@@ -310,7 +316,6 @@ agents:
     capabilities: "Experto en evaluación y análisis de datos, creación de reportes y tableros de control, indicadores, OKRs. Identifica oportunidades de mercado a través de análisis de datos del pipeline de Humanio."
     adapter:
       config:
-        dangerouslySkipPermissions: true
         model: "claude-sonnet-4-5-20250929"
       type: "claude_local"
     runtime:

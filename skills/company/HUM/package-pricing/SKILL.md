@@ -55,20 +55,20 @@ Marcar cuando:
 
 Al presentar precios, siempre incluir equivalencia aproximada:
 
-| Paquete | USD | MXN (~) | COP (~) | PEN (~) | ARS (~) |
-|---------|-----|---------|---------|---------|---------| 
-| Starter | $27 | $460 | $108,000 | S/100 | $24,300 |
-| Pro | $47 | $800 | $188,000 | S/175 | $42,300 |
-| Business | $97 | $1,650 | $388,000 | S/360 | $87,300 |
+| Paquete  | USD | MXN (~) | COP (~)   | PEN (~) | ARS (~)  |
+|----------|-----|---------|-----------|---------|----------|
+| Starter  | $27 | $540    | $108,000  | S/100   | $27,000  |
+| Pro      | $47 | $940    | $188,000  | S/175   | $47,000  |
+| Business | $97 | $1,940  | $388,000  | S/360   | $97,000  |
 
-*Nota: Equivalencias aproximadas. Hotmart cobra en moneda local al tipo de cambio del día.*
+*Tipo de cambio referencial: 1 USD ≈ 20 MXN ≈ 4,000 COP ≈ 3.7 PEN ≈ 1,000 ARS. Actualizar esta tabla si el FX se mueve >5%.*
 
 ## Pasarela de pago
 
-- **Hotmart** — suscripción recurrente mensual
-- Multi-país, multi-moneda nativo
-- Comisión: 9.9% + $0.50 USD por transacción
-- El prospecto recibe link de pago personalizado
+- **Página de pago:** `https://www.humanio.digital/#paquetes`
+- **Medios:** tarjeta de crédito, tarjeta de débito, depósito bancario
+- Multi-país, multi-moneda
+- El prospecto selecciona paquete y medio de pago en la página
 
 ## Formato de recomendación
 
@@ -80,7 +80,7 @@ Al incluir la recomendación en un ticket, usar este formato:
 **Paquete:** {Starter/Pro/Business}
 **Precio:** ${precio} USD/mes (~{equivalencia} {moneda local})
 **Razón:** {justificación en 1-2 líneas basada en hallazgos reales}
-**Link Hotmart:** {link correspondiente al paquete}
+**Link de pago:** https://www.humanio.digital/#paquetes
 ```
 
 ## Upselling path

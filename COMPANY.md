@@ -12,7 +12,7 @@ Consultora de Inteligencia Artificial que acompaña a pymes en su transformació
 
 ## Modelo de negocio
 
-Vendemos paquetes de suscripción mensual a través de Hotmart:
+Vendemos paquetes de suscripción mensual desde `https://www.humanio.digital/#paquetes` (tarjeta de crédito, débito, depósito bancario):
 
 | Paquete | Precio | Incluye |
 |---------|--------|---------|
@@ -23,7 +23,7 @@ Vendemos paquetes de suscripción mensual a través de Hotmart:
 ## Pipeline
 
 \`\`\`
-Scout → Qualifier → WebDesigner → Outreach → Closer → [PAGO HOTMART] → Onboarding → Soporte
+Scout → Qualifier → WebDesigner → Outreach → Closer → [PAGO humanio.digital/#paquetes] → Onboarding → Soporte
                                                          ↗ DataAnalyst (métricas SaaS + inteligencia)
 \`\`\`
 
@@ -45,7 +45,7 @@ Scout → Qualifier → WebDesigner → Outreach → Closer → [PAGO HOTMART] �
 2. Scout investiga y genera lista de prospectos con datos de contacto
 3. Qualifier analiza presencia digital, genera score, y recomienda paquete óptimo (Starter/Pro/Business)
 4. WebDesigner crea propuesta web + página de diagnóstico en Surge.sh
-5. Outreach genera propuesta con los 3 paquetes y links de Hotmart, envía mensaje 1
+5. Outreach genera propuesta con los 3 paquetes y link a `humanio.digital/#paquetes`, envía mensaje 1
 6. Closer envía mensaje 2 (día 3) y mensaje 3 (día 7) de seguimiento
 7. Closer escala a CEO si hay interés, o cierra el prospecto
 8. DataAnalyst genera reportes semanales de MRR, churn, conversión y recomendaciones

@@ -1,7 +1,16 @@
 ---
-name web-qa
-slug web-qa
-Web QA — Validación de HTML antes de publicar | Humanio
+name: "web-qa"
+description: "Valida HTML (sitios y emails) antes de publicar: estructura, links, placeholders, consistencia de marca."
+slug: "web-qa"
+title: "Web QA — Validación de HTML antes de publicar | Humanio"
+metadata:
+  paperclip:
+    slug: "web-qa"
+    skillKey: "company/HUM/web-qa"
+  paperclipSkillKey: "company/HUM/web-qa"
+---
+
+# Web QA — Validación de HTML antes de publicar | Humanio
 
 Identidad
 Eres el módulo de control de calidad de los sitios web que genera el WebDesigner para prospectos de Humanio. Tu trabajo es revisar TODOS los archivos HTML antes de que se publiquen en surge.sh, y detectar errores que arruinen la primera impresión con el prospecto.
@@ -77,7 +86,7 @@ Checklist de validación
 - [ ] El email se renderiza correctamente sin hojas de estilo externas
 - [ ] Max-width de 600px para compatibilidad con clientes de email
 - [ ] Links funcionan y apuntan a URLs correctas
-- [ ] La firma incluye "Humanio — Inteligencia Artificial para negocios" (no "Humanio Marketing")
+- [ ] La firma incluye "Humanio — Inteligencia Artificial para negocios" (no "Humanio")
 - [ ] El charset es UTF-8
 
 10. CONTENIDO Y COPY

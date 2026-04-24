@@ -1,6 +1,12 @@
 ---
-name: closer-sales
-slug: closer-sales
+name: "closer-sales"
+description: "Closer Sales — Ejecución de Seguimiento Comercial | Humanio"
+slug: "closer-sales"
+metadata:
+  paperclip:
+    slug: "closer-sales"
+    skillKey: "company/HUM/closer-sales"
+  paperclipSkillKey: "company/HUM/closer-sales"
 ---
 
 # Closer Sales — Ejecución de Seguimiento Comercial | Humanio
@@ -27,8 +33,8 @@ ciudad: "{CIUDAD}"
 score: {SCORE}
 telefono: "{TELEFONO_PROSPECTO}"        # formato E.164: 5216671234567
 email: "{EMAIL_PROSPECTO}"
-propuesta_url: "https://humanio-{slug}.surge.sh"
-reporte_url: "https://humanio-{slug}.surge.sh/reporte"
+propuesta_url: "https://humanio.surge.sh/{slug}"
+reporte_url: "https://humanio.surge.sh/{slug}/reporte.html"
 fecha_mensaje_1: "{FECHA_MSG1}"          # YYYY-MM-DD
 canal_mensaje_1: "email|whatsapp|ambos"
 status_respuesta: "sin_respuesta|leido|respondio_positivo|respondio_negativo|respondio_pregunta|respondio_objecion"
@@ -81,38 +87,73 @@ console.log(`Prospecto respondió: ${prospectReplied} (${prospectMessages.length
 > Ejecuta este camino cuando el prospecto haya enviado al menos un mensaje en la conversación.
 > **No envíes follow-ups 2 ni 3.** En su lugar, responde con enfoque de cierre de ventas.
 
+### B0. Handoff — silenciar Hannia (solo INBOUND)
+
+Si la conversación viene del flujo INBOUND (prospecto nos escribió primero y Hannia capturó datos), **lo PRIMERO que haces antes de responder** es marcar la conversación para silenciar al bot:
+
+```bash
+curl -s -X POST \
+  "$CHATWOOT_API_URL/api/v1/accounts/${CHATWOOT_ACCOUNT_ID:-1}/conversations/$CONV_ID/custom_attributes" \
+  -H "api_access_token: $CHATWOOT_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"custom_attributes":{"bot_silenciado":true,"closer_activo":true}}'
+```
+
+El workflow n8n "Humanio — WhatsApp Prospecto Bot" lee `conversation.custom_attributes.bot_silenciado` en cada webhook y se corta si es `true`. Sin este paso, Hannia seguirá respondiendo en paralelo al Closer.
+
+Verifica que se aplicó:
+```bash
+curl -s "$CHATWOOT_API_URL/api/v1/accounts/1/conversations/$CONV_ID" \
+  -H "api_access_token: $CHATWOOT_API_TOKEN" \
+  | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('custom_attributes'))"
+# Esperado: {'bot_silenciado': True, 'closer_activo': True, ...}
+```
+
 ### B1. Leer y clasificar la respuesta
 
 Lee el último mensaje del prospecto y clasifícalo:
 
 | Clasificación | Señales | Acción |
 |--------------|---------|--------|
-| `INTERES_POSITIVO` | "me interesa", "cuánto cuesta", "cuándo podemos hablar", "me llamó la atención" | Proponer llamada de 15 min |
-| `PREGUNTA_TECNICA` | Pregunta sobre cómo funciona SEO, IA, el servicio | Responder con dato del Qualifier + proponer llamada |
-| `OBJECION_PRECIO` | "es caro", "no tengo presupuesto", "cuánto cuesta exactamente" | Manejar objeción + proponer llamada |
-| `OBJECION_TIEMPO` | "estoy muy ocupado", "ahorita no", "en unos meses" | Manejar objeción + proponer llamada |
-| `OBJECION_PROVEEDOR` | "ya tenemos alguien", "ya trabajamos con una agencia" | Posicionar como complementario + proponer llamada |
+| `INTERES_POSITIVO` | "me interesa", "cuánto cuesta", "cuándo podemos hablar", "me llamó la atención" | Compartir `humanio.digital/#paquetes` + recomendar paquete + preguntar mañana/tarde |
+| `PREGUNTA_TECNICA` | Pregunta sobre cómo funciona SEO, IA, el servicio | Responder con dato del Qualifier + `humanio.digital` |
+| `OBJECION_PRECIO` | "es caro", "no tengo presupuesto", "cuánto cuesta exactamente" | Manejar objeción + recomendar paquete más accesible |
+| `OBJECION_TIEMPO` | "estoy muy ocupado", "ahorita no", "en unos meses" | Manejar objeción + ofrecer contacto de nuestro lado mañana/tarde |
+| `OBJECION_PROVEEDOR` | "ya tenemos alguien", "ya trabajamos con una agencia" | Posicionar como complementario + compartir `humanio.digital` |
 | `RECHAZO` | "no gracias", "no me interesa", "no en este momento" | Cerrar con dignidad, no insistir |
 
 ### B2. Generar respuesta de cierre
 
-Redacta la respuesta según la clasificación. **Siempre en primera persona como Miguel González.** **Siempre con objetivo de agendar llamada de 15 minutos.**
+Redacta la respuesta según la clasificación. **Siempre en primera persona como Miguel González.**
+
+**CTA estándar (reemplaza cualquier "llamada de 15 minutos"):**
+1. Comparte `https://humanio.digital/#paquetes` para que revise los paquetes
+2. Recomienda UN paquete específico según el perfil (giro / tamaño del negocio / hallazgos del Qualifier)
+3. Cierra con: *"Si prefieres que te contactemos nosotros, ¿te queda mejor por la mañana o por la tarde?"*
+
+**Nunca** propongas agendar una videollamada ni pidas que el prospecto "aparte 15 minutos". El prospecto no quiere reservar tiempo; queremos que (a) revise los paquetes solo o (b) nos deje un hueco suave para llamarle.
+
+**Paquete recomendado — guía rápida:**
+| Perfil | Paquete | Rationale |
+|---|---|---|
+| Negocio local, sin web o con web muy vieja | **Presencia Esencial** | Primero resolver base: sitio nuevo + SEO local + WhatsApp |
+| Negocio local con web decente pero sin ventas | **Crecimiento con IA** | Añadir chatbot + captura de leads + automatización de respuestas |
+| Consultorio / servicios profesionales | **Crecimiento con IA** | Agente conversacional que agenda y filtra |
+| Negocio con volumen alto o múltiples canales | **Transformación IA** | Integración completa: CRM + agentes + dashboard |
+| Objeción de precio explícita | **Presencia Esencial** | Punto de entrada más bajo; escalar después |
 
 **Template INTERES_POSITIVO:**
 ```
 Hola {NOMBRE_CONTACTO},
 
-Me da gusto que te haya llamado la atención — precisamente por eso quería platicarte los puntos clave del diagnóstico de forma directa.
+Me da mucho gusto que te haya llamado la atención. Preparé el análisis pensando exactamente en {NOMBRE_NEGOCIO} — {HALLAZGO_CLAVE_NO_USADO}.
 
-Tengo listo el análisis completo con oportunidades concretas para {NOMBRE_NEGOCIO}. Son cosas muy específicas que podemos revisar en una llamada corta de 15 minutos.
+Para que veas cómo podemos ayudarte, aquí están los paquetes que manejamos:
+https://humanio.digital/#paquetes
 
-¿Te funciona alguno de estos horarios esta semana?
-• Martes o miércoles por la mañana
-• Jueves por la tarde
+Por tu perfil, el que mejor te puede funcionar es **{PAQUETE_RECOMENDADO}** — {RAZON_PAQUETE_EN_UNA_LINEA}.
 
-Me ajusto a tu agenda. También podemos hacerlo por videollamada si te resulta más cómodo.
-
-Quedo atento.
+Revísalo con calma. Si prefieres que te contactemos nosotros para resolver dudas, ¿te queda mejor por la mañana o por la tarde?
 
 Miguel González | Humanio
 ```
@@ -123,9 +164,11 @@ Hola {NOMBRE_CONTACTO},
 
 Buena pregunta — {RESPUESTA_ESPECIFICA_CON_DATO_DEL_QUALIFIER}.
 
-Para que tenga más contexto y pueda mostrarte exactamente cómo aplicaría esto a {NOMBRE_NEGOCIO}, lo más práctico sería una llamada de 15 minutos donde puedo compartir pantalla y mostrarte el diagnóstico completo.
+Aquí puedes ver cómo se ve aplicado en los paquetes que tenemos: https://humanio.digital/#paquetes
 
-¿Tienes disponibilidad esta semana?
+Para {NOMBRE_NEGOCIO}, el que más sentido hace es **{PAQUETE_RECOMENDADO}** — {RAZON_PAQUETE_EN_UNA_LINEA}.
+
+Si quieres que te llame para aclarar algo, dime si prefieres que te marque por la mañana o por la tarde.
 
 Miguel González | Humanio
 ```
@@ -134,11 +177,14 @@ Miguel González | Humanio
 ```
 Hola {NOMBRE_CONTACTO},
 
-Entiendo la pregunta sobre la inversión — es lo más razonable antes de tomar una decisión.
+Entiendo perfectamente la pregunta sobre la inversión.
 
-Lo que quiero mostrarte en el diagnóstico es precisamente eso: qué impacto concreto tendría en {NOMBRE_NEGOCIO} y si los números tienen sentido para tu negocio. Hay opciones para empezar pequeño y escalar.
+Por eso manejamos paquetes escalonados — puedes empezar con el más accesible y crecer cuando veas resultados:
+https://humanio.digital/#paquetes
 
-¿Tienes 15 minutos esta semana para que te explique los puntos clave? Así puedes decidir con información real.
+Para {NOMBRE_NEGOCIO} te recomiendo arrancar con **Presencia Esencial** — es el punto de entrada y nos permite resolver la base sin comprometer presupuesto grande.
+
+Si quieres que te platique los números con más detalle, ¿prefieres que te contacte por la mañana o por la tarde?
 
 Miguel González | Humanio
 ```
@@ -147,11 +193,14 @@ Miguel González | Humanio
 ```
 Hola {NOMBRE_CONTACTO},
 
-Lo entiendo perfectamente — el día a día de {NOMBRE_NEGOCIO} siempre es lo primero.
+Lo entiendo — el día a día de {NOMBRE_NEGOCIO} siempre es lo primero.
 
-Precisamente por eso trabajamos con un modelo donde nosotros hacemos todo — tú no necesitas aprender ni gestionar nada técnico. La llamada de diagnóstico son solo 15 minutos y la hago yo en el horario que mejor te funcione.
+Precisamente por eso nuestros paquetes están diseñados para que nosotros hagamos todo el trabajo pesado. Tú revisas y apruebas:
+https://humanio.digital/#paquetes
 
-¿Hay algún momento esta semana, aunque sea breve?
+Por tu perfil, **{PAQUETE_RECOMENDADO}** sería el que menos tiempo te consume de tu lado.
+
+Si quieres que te lo explique yo mismo, ¿te queda mejor una llamada rápida por la mañana o por la tarde?
 
 Miguel González | Humanio
 ```
@@ -160,11 +209,15 @@ Miguel González | Humanio
 ```
 Hola {NOMBRE_CONTACTO},
 
-Con gusto. Lo que hacemos en Humanio es diferente a una agencia tradicional — integramos IA para automatizar procesos del negocio que generan ventas directas.
+Con gusto — y tiene todo el sentido que ya tengan a alguien.
 
-El diagnóstico que preparé para {NOMBRE_NEGOCIO} va más allá del SEO — incluye oportunidades de automatización que complementan lo que ya tienen.
+Humanio no reemplaza a una agencia de marketing tradicional: integramos IA para automatizar procesos que tu proveedor actual probablemente no cubre (chatbots, agentes conversacionales, captura automática de leads).
 
-¿Le damos 15 minutos para que lo veas? No cuesta nada evaluar.
+Revisa los paquetes para ver qué podría sumar: https://humanio.digital/#paquetes
+
+Para {NOMBRE_NEGOCIO}, **{PAQUETE_RECOMENDADO}** es el que mejor complementa lo que ya tienen.
+
+Si quieres que te explique cómo encaja, ¿prefieres que te contactemos por la mañana o por la tarde?
 
 Miguel González | Humanio
 ```
@@ -255,12 +308,56 @@ await fetch(`${CW_URL}/api/v1/accounts/${ACCOUNT_ID}/conversations/${CONV_ID}/me
 
 > Ejecuta este camino SOLO cuando `prospectReplied === false`.
 
-### 3. Calcular timing
+### A0. Condiciones de PARO — verificar antes de cualquier envío
+
+Antes de calcular fechas o generar archivos, valida estas condiciones en Supabase. Si **cualquiera** es verdadera, NO envíes nada:
+
+```bash
+PROSPECT_CHECK=$(curl -s \
+  "$SUPABASE_URL/rest/v1/prospects?id=eq.$PROSPECT_ID&select=etapa,respondio" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY")
+
+ETAPA=$(echo "$PROSPECT_CHECK" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['etapa'] if d else '')")
+RESPONDIO=$(echo "$PROSPECT_CHECK" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['respondio'] if d else 'false')")
+
+if [ "$ETAPA" = "cerrado_ganado" ] || [ "$ETAPA" = "cerrado_perdido" ] || [ "$ETAPA" = "en_negociacion" ]; then
+  echo "⛔️ STOP — etapa=$ETAPA. No enviar follow-ups."
+  exit 0
+fi
+if [ "$RESPONDIO" = "True" ]; then
+  echo "⛔️ STOP — prospecto ya respondió. Ir a CAMINO B."
+  exit 0
+fi
+```
+
+### A1. Verificar cadencia — nunca 2 mensajes el mismo día
+
+Antes de enviar, consulta `outreach_log` para asegurar que no mandaste otro mensaje hoy ni ayer (la ventana mínima entre follow-ups es 24 h):
+
+```bash
+DESDE=$(date -u -v-1d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d "-1 day" +%Y-%m-%dT%H:%M:%SZ)
+
+RECENT=$(curl -s \
+  "$SUPABASE_URL/rest/v1/outreach_log?prospect_id=eq.$PROSPECT_ID&enviado_at=gte.$DESDE&select=tipo,enviado_at" \
+  -H "apikey: $SUPABASE_SERVICE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_KEY")
+
+COUNT=$(echo "$RECENT" | python3 -c "import json,sys; print(len(json.load(sys.stdin)))")
+if [ "$COUNT" -gt 0 ]; then
+  echo "⛔️ STOP — ya se envió un mensaje en las últimas 24 h. No duplicar."
+  exit 0
+fi
+```
+
+### A2. Calcular timing (día+1 para msg2, día+3 para msg3)
+
+> **Cadencia:** msg2 se envía **1 día** después de msg1. msg3 se envía **3 días** después de msg1. Nunca más de 3 contactos totales. Nunca dos el mismo día.
 
 ```bash
 FECHA_MSG1="{FECHA_MSG1}"
-FECHA_MSG2=$(date -d "$FECHA_MSG1 + 3 days" +%Y-%m-%d)
-FECHA_MSG3=$(date -d "$FECHA_MSG1 + 7 days" +%Y-%m-%d)
+FECHA_MSG2=$(date -j -v+1d -f "%Y-%m-%d" "$FECHA_MSG1" "+%Y-%m-%d" 2>/dev/null || date -d "$FECHA_MSG1 + 1 day" +%Y-%m-%d)
+FECHA_MSG3=$(date -j -v+3d -f "%Y-%m-%d" "$FECHA_MSG1" "+%Y-%m-%d" 2>/dev/null || date -d "$FECHA_MSG1 + 3 days" +%Y-%m-%d)
 HOY=$(date +%Y-%m-%d)
 
 if [ "$HOY" \< "$FECHA_MSG2" ]; then
@@ -552,52 +649,67 @@ EOF
 echo "✅ closer-log.txt generado"
 ```
 
-### 6. Subir TODOS los archivos a Drive (antes de enviar)
+### 6. Confirmar archivos generados en /tmp
+
+> Drive está deprecado — los archivos viven en `/tmp` durante el run del agente.
 
 ```bash
-node /paperclip/upload-to-drive.js "{NOMBRE_NEGOCIO}" \
-  /tmp/closer-{slug}/seguimiento-2-whatsapp.txt \
-  /tmp/closer-{slug}/seguimiento-2-email.html \
-  /tmp/closer-{slug}/seguimiento-3-whatsapp.txt \
-  /tmp/closer-{slug}/seguimiento-3-email.html \
-  /tmp/closer-{slug}/closer-log.txt
-
-if [ $? -ne 0 ]; then
-  node /app/upload-to-drive.js "{NOMBRE_NEGOCIO}" \
-    /tmp/closer-{slug}/seguimiento-2-whatsapp.txt \
-    /tmp/closer-{slug}/seguimiento-2-email.html \
-    /tmp/closer-{slug}/seguimiento-3-whatsapp.txt \
-    /tmp/closer-{slug}/seguimiento-3-email.html \
-    /tmp/closer-{slug}/closer-log.txt
-fi
-echo "✅ Todos los archivos subidos a Drive"
+ls -lh /tmp/closer-{slug}/
+# Esperado: seguimiento-2-whatsapp.txt, seguimiento-2-email.html,
+#           seguimiento-3-whatsapp.txt, seguimiento-3-email.html,
+#           seguimiento-2-meta.json, seguimiento-3-meta.json, closer-log.txt
+echo "✅ Archivos listos en /tmp/closer-{slug}/"
 ```
 
-### 7. Enviar mensaje 2 por WhatsApp
+### 7. Enviar mensaje 2 por WhatsApp — template `humanio_seguimiento_1`
+
+> ⚠️ La ventana de 24h de Meta está cerrada — NUNCA uses `type: text`. SIEMPRE usa el template aprobado.
+
+Variables del template:
+- `{{1}}` = nombre corto del contacto (ej. `Dr. Meza`)
+- `{{2}}` = nombre del negocio (ej. `Meza Dental`)
+- `{{3}}` = objetivo concreto del giro (ej. `convertir visitas en citas`, `atraer más clientes locales`, `llenar agenda de citas`)
+- URL button = slug del prospecto (ej. `meza-dental`)
 
 ```bash
 WA_RESPONSE=$(curl -s -X POST \
-  "https://graph.facebook.com/v18.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
+  "https://graph.facebook.com/v19.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
   -H "Authorization: Bearer $WHATSAPP_CLOUD_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d "{
     \"messaging_product\": \"whatsapp\",
     \"to\": \"{TELEFONO_PROSPECTO_E164}\",
-    \"type\": \"text\",
-    \"text\": {
-      \"preview_url\": true,
-      \"body\": $(cat /tmp/closer-{slug}/seguimiento-2-whatsapp.txt | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+    \"type\": \"template\",
+    \"template\": {
+      \"name\": \"humanio_seguimiento_1\",
+      \"language\": { \"code\": \"es_MX\" },
+      \"components\": [
+        {
+          \"type\": \"body\",
+          \"parameters\": [
+            {\"type\": \"text\", \"text\": \"{NOMBRE_CORTO}\"},
+            {\"type\": \"text\", \"text\": \"{NOMBRE_NEGOCIO}\"},
+            {\"type\": \"text\", \"text\": \"{OBJETIVO_GIRO}\"}
+          ]
+        },
+        {
+          \"type\": \"button\",
+          \"sub_type\": \"url\",
+          \"index\": 0,
+          \"parameters\": [{\"type\": \"text\", \"text\": \"{SLUG}\"}]
+        }
+      ]
     }
   }")
 
 WA_MSG_ID=$(echo "$WA_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['messages'][0]['id'])" 2>/dev/null)
 
 if [ -n "$WA_MSG_ID" ]; then
-  echo "✅ WhatsApp msg 2 enviado — ID: $WA_MSG_ID"
+  echo "✅ WhatsApp msg 2 enviado (template humanio_seguimiento_1) — ID: $WA_MSG_ID"
   WA2_STATUS="ENVIADO — ID: $WA_MSG_ID"
 else
-  echo "⚠️ WhatsApp msg 2 no enviado — PENDIENTE ENVÍO MANUAL"
-  WA2_STATUS="PENDIENTE ENVÍO MANUAL"
+  echo "⚠️ WhatsApp msg 2 falló: $WA_RESPONSE"
+  WA2_STATUS="ERROR: $WA_RESPONSE"
 fi
 ```
 
@@ -612,28 +724,44 @@ fi
 HOY=$(date +%Y-%m-%d)
 if [ "$HOY" >= "$FECHA_MSG3" ] && [ "$STATUS_RESPUESTA" = "sin_respuesta" ]; then
 
-  # ── Mensaje 3 WhatsApp (mismo curl del paso 7) ──────────────────────────
+  # ── Mensaje 3 WhatsApp — template humanio_seguimiento_2 ─────────────────
+  # Variables: {{1}} nombre corto, {{2}} nombre negocio, button = slug
   WA_RESPONSE=$(curl -s -X POST \
-    "https://graph.facebook.com/v18.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
+    "https://graph.facebook.com/v19.0/$WHATSAPP_PHONE_NUMBER_ID/messages" \
     -H "Authorization: Bearer $WHATSAPP_CLOUD_API_TOKEN" \
     -H "Content-Type: application/json" \
     -d "{
       \"messaging_product\": \"whatsapp\",
       \"to\": \"{TELEFONO_PROSPECTO_E164}\",
-      \"type\": \"text\",
-      \"text\": {
-        \"preview_url\": true,
-        \"body\": $(cat /tmp/closer-{slug}/seguimiento-3-whatsapp.txt | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+      \"type\": \"template\",
+      \"template\": {
+        \"name\": \"humanio_seguimiento_2\",
+        \"language\": { \"code\": \"es_MX\" },
+        \"components\": [
+          {
+            \"type\": \"body\",
+            \"parameters\": [
+              {\"type\": \"text\", \"text\": \"{NOMBRE_CORTO}\"},
+              {\"type\": \"text\", \"text\": \"{NOMBRE_NEGOCIO}\"}
+            ]
+          },
+          {
+            \"type\": \"button\",
+            \"sub_type\": \"url\",
+            \"index\": 0,
+            \"parameters\": [{\"type\": \"text\", \"text\": \"{SLUG}\"}]
+          }
+        ]
       }
     }")
 
   WA3_MSG_ID=$(echo "$WA_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['messages'][0]['id'])" 2>/dev/null)
   if [ -n "$WA3_MSG_ID" ]; then
-    echo "✅ WhatsApp msg 3 enviado — ID: $WA3_MSG_ID"
+    echo "✅ WhatsApp msg 3 enviado (template humanio_seguimiento_2) — ID: $WA3_MSG_ID"
     WA3_STATUS="ENVIADO — ID: $WA3_MSG_ID"
   else
-    echo "⚠️ WhatsApp msg 3 no enviado — PENDIENTE ENVÍO MANUAL"
-    WA3_STATUS="PENDIENTE ENVÍO MANUAL"
+    echo "⚠️ WhatsApp msg 3 falló: $WA_RESPONSE"
+    WA3_STATUS="ERROR: $WA_RESPONSE"
   fi
 
   # ── Mensaje 3 Email (vía SMTP directo — NO Chatwoot API) ───────────────

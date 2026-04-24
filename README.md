@@ -1,5 +1,3 @@
----
-
 # Humanio ![Org Chart](images/org-chart.png)
 
 ## What's Inside
@@ -46,7 +44,7 @@ Scout → Qualifier → WebDesigner → Outreach → Closer → [HOTMART PAYMENT
 
 ### Skills
 
-57 skills including: alert-manager, backlink-analyzer, competitor-analysis, content-gap-analysis, content-quality-auditor, content-refresher, domain-authority-auditor, entity-optimizer, geo-content-optimizer, internal-linking-optimizer, keyword-research, memory-management, meta-tags-optimizer, on-page-seo-auditor, performance-reporter, rank-tracker, schema-markup-generator, seo-content-writer, serp-analysis, technical-seo-checker, frontend-design, outreach-proposals, qualifier-prospect-auditor, qualifier-seo, scout-prospector, webdesigner-proposals, frontend-design-review, frontend-ui-dark-ts, closer-sales, sales-copywriting, dataanalyst-pipeline, dataanalyst-dashboard-html, web-qa, qualifier-diagnostic-html, package-pricing, package-outreach, saas-metrics, retention-playbook, design-styles, layout-blueprints, ui-ux-pro-max, ckm-banner-design, ckm-brand, ckm-design-system, ckm-design, ckm-slides, ckm-ui-styling, paperclip-create-agent, paperclip-create-plugin, paperclip, para-memory-files, objection-handling, social-selling, cold-outreach, lead-qualification, web-scraping, frontend-design-review (microsoft), frontend-ui-dark-ts (microsoft)
+57 skills including: alert-manager, backlink-analyzer, competitor-analysis, content-gap-analysis, content-quality-auditor, content-refresher, domain-authority-auditor, entity-optimizer, geo-content-optimizer, internal-linking-optimizer, keyword-research, memory-management, meta-tags-optimizer, on-page-seo-auditor, performance-reporter, rank-tracker, schema-markup-generator, seo-content-writer, serp-analysis, technical-seo-checker, frontend-design, outreach-proposals, qualifier-prospect-auditor, qualifier-seo, scout-prospector, webdesigner-proposals, frontend-design-review, frontend-ui-dark-ts, closer-sales, sales-copywriting, dataanalyst-pipeline, web-qa, qualifier-diagnostic-html, package-pricing, package-outreach, saas-metrics, retention-playbook, ui-ux-pro-max, paperclip-create-agent, paperclip-create-plugin, paperclip, para-memory-files, **objection-handling** (NEW), **social-selling** (NEW), **cold-outreach** (NEW), **lead-qualification** (NEW), **web-scraping** (NEW)
 
 ## Getting Started
 
